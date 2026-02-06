@@ -5,7 +5,7 @@ The system now includes a complete admin user role management system with the fo
 - **ADMIN**: System administrator with full access to manage users and roles
 - **FOCAL**: Focal point user role
 - **LGU**: Local Government Unit user role
-- **PROVINCIAL**: Provincial user role
+- **PROVINCE**: Province user role
 
 ## Setup Instructions
 
@@ -63,7 +63,7 @@ The admin dashboard displays all users with their:
 3. Select a role from the dropdown:
    - FOCAL
    - LGU
-   - PROVINCIAL
+   - PROVINCE
 4. Click "Assign Role" to save
 
 ### Grant/Revoke Admin Privileges
@@ -95,7 +95,7 @@ The users table now includes:
 1. **First Admin Creation**: System allows creation of first admin at `/admin/create-first-admin`
 2. **Admin Login**: Admin logs in with admin credentials
 3. **User Management**: Admin can view all users at `/admin/users`
-4. **Assign Role**: Admin can assign FOCAL, LGU, or PROVINCIAL roles to users
+4. **Assign Role**: Admin can assign FOCAL, LGU, or PROVINCE roles to users
 5. **Grant Admin**: Admin can grant admin privileges to other users
 6. **Revoke Admin**: Admin can revoke admin privileges (except their own)
 
@@ -130,7 +130,7 @@ When a user logs in, the following session variables are set:
 2. **Password Protection**: Passwords are hashed using `PASSWORD_DEFAULT` (bcrypt)
 3. **Self-Protection**: Cannot revoke own admin privileges
 4. **First Admin Safeguard**: First admin creation is only allowed when no admin exists
-5. **Role Database**: Roles are managed from the database (ADMIN, FOCAL, LGU, PROVINCIAL)
+5. **Role Database**: Roles are managed from the database (ADMIN, FOCAL, LGU, PROVINCE)
 
 ## File Changes
 

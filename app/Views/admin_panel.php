@@ -678,7 +678,7 @@
                             <span class="badge badge-admin">ADMIN</span>
                             <span class="badge badge-focal">FOCAL</span>
                             <span class="badge badge-lgu">LGU</span>
-                            <span class="badge badge-provincial">PROVINCIAL</span>
+                            <span class="badge badge-provincial">PROVINCE</span>
                         </div>
                     </div>
 
@@ -758,7 +758,7 @@
                         <option value="1">ADMIN</option>
                         <option value="2">FOCAL</option>
                         <option value="3">LGU</option>
-                        <option value="4">PROVINCIAL</option>
+                        <option value="4">PROVINCE</option>
                     </select>
                 </div>
             </div>
@@ -978,7 +978,7 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    const roleNames = {1: 'ADMIN', 2: 'FOCAL', 3: 'LGU', 4: 'PROVINCIAL'};
+                    const roleNames = {1: 'ADMIN', 2: 'FOCAL', 3: 'LGU', 4: 'PROVINCE'};
                     showSuccessModal('Role assigned successfully!', `User has been assigned the ${roleNames[roleId]} role.`);
                 } else {
                     alert('Error: ' + data.message);

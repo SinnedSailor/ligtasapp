@@ -55,8 +55,8 @@ class CreateRolesTable extends Migration
                 'created_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'name' => 'PROVINCIAL',
-                'description' => 'Provincial user',
+                'name' => 'PROVINCE',
+                'description' => 'Province user',
                 'created_at' => date('Y-m-d H:i:s'),
             ],
         ]);
