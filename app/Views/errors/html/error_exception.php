@@ -12,11 +12,11 @@ $errorId = uniqid('error', true);
 
     <title><?= esc($title) ?></title>
     <style>
-        <?= preg_replace('#[\r\n\t ]+#', ' ', file_get_contents(FCPATH . 'assets' . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . 'debug.css')) ?>
+        <?= preg_replace('#[\r\n\t ]+#', ' ', file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'debug.css')) ?>
     </style>
 
     <script>
-        <?= file_get_contents(FCPATH . 'assets' . DIRECTORY_SEPARATOR . 'js' . DIRECTORY_SEPARATOR . 'debug.js') ?>
+        <?= file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'debug.js') ?>
     </script>
 </head>
 <body onload="init()">
@@ -32,8 +32,8 @@ $errorId = uniqid('error', true);
         <div class="container">
             <h1><?= esc($title), esc($exception->getCode() ? ' #' . $exception->getCode() : '') ?></h1>
             <p>
-                <?= nl2br(esc((string)$exception->getMessage())) ?>
-                <a href="https://www.duckduckgo.com/?q=<?= urlencode($title . ' ' . preg_replace('#\'.*\'|".*"#Us', '', (string)$exception->getMessage())) ?>"
+                <?= nl2br(esc($exception->getMessage())) ?>
+                <a href="https://www.duckduckgo.com/?q=<?= urlencode($title . ' ' . preg_replace('#\'.*\'|".*"#Us', '', $exception->getMessage())) ?>"
                    rel="noreferrer" target="_blank">search &rarr;</a>
             </p>
         </div>
@@ -62,8 +62,8 @@ $errorId = uniqid('error', true);
     Caused by:
     <?= esc($prevException::class), esc($prevException->getCode() ? ' #' . $prevException->getCode() : '') ?>
 
-    <?= nl2br(esc((string)$prevException->getMessage())) ?>
-    <a href="https://www.duckduckgo.com/?q=<?= urlencode($prevException::class . ' ' . preg_replace('#\'.*\'|".*"#Us', '', (string)$prevException->getMessage())) ?>"
+    <?= nl2br(esc($prevException->getMessage())) ?>
+    <a href="https://www.duckduckgo.com/?q=<?= urlencode($prevException::class . ' ' . preg_replace('#\'.*\'|".*"#Us', '', $prevException->getMessage())) ?>"
        rel="noreferrer" target="_blank">search &rarr;</a>
     <?= esc(clean_path($prevException->getFile()) . ':' . $prevException->getLine()) ?>
     </pre>

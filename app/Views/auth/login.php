@@ -1,167 +1,181 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - IWAS</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<?php
+$hideNavbar = true;
+$hideSidebar = true;
+$hideFooter = true;
+?>
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1C4D8D 0%, #2563A8 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+<?= $this->extend('layouts/staradmin') ?>
 
-        .login-container {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 400px;
-            padding: 40px;
-        }
+<?= $this->section('pageStyles') ?>
+<style>
+    .auth-page {
+        min-height: calc(100vh - 40px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 30px 15px;
+    }
 
-        .login-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
+    .auth-card {
+        width: 100%;
+        max-width: 420px;
+    }
 
-        .login-header h1 {
-            color: #333;
-            font-size: 28px;
-            margin-bottom: 10px;
-        }
+    .auth-form-card {
+        padding: 2.5rem;
+    }
 
-        .login-header p {
-            color: #666;
-            font-size: 14px;
-        }
+    .iwas-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 2px solid #09637E;
+    }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
+    .iwas-logo-circle {
+        width: 70px;
+        height: 70px;
+        margin: 0 auto 1rem;
+        background: linear-gradient(135deg, #09637E 0%, #0B4F63 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 15px rgba(9, 99, 126, 0.3);
+    }
 
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 600;
-            font-size: 14px;
-        }
+    .iwas-logo-circle i {
+        color: #fff;
+        font-size: 32px;
+    }
 
-        input[type="email"],
-        input[type="password"],
-        input[type="text"] {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 5px;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
+    .iwas-header h3 {
+        color: #09637E;
+        font-weight: 700;
+        margin: 0.5rem 0;
+        font-size: 28px;
+    }
 
-        input[type="email"]:focus,
-        input[type="password"]:focus,
-        input[type="text"]:focus {
-            outline: none;
-            border-color: #1C4D8D;
-        }
+    .iwas-header p {
+        color: #666;
+        font-size: 13px;
+        letter-spacing: 0.5px;
+        margin: 0;
+    }
 
-        .login-btn {
-            width: 100%;
-            padding: 12px;
-            background: #1C4D8D;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            margin-top: 10px;
-        }
+    .form-group input {
+        border: 1.5px solid #e8e8e8;
+        font-size: 14px;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
 
-        .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(28, 77, 141, 0.4);
-        }
+    .form-group input:focus {
+        border-color: #09637E;
+        box-shadow: 0 0 0 3px rgba(9, 99, 126, 0.1);
+        background-color: #f8fafb;
+    }
 
-        .register-link {
-            text-align: center;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #e0e0e0;
-        }
+    .form-group input::placeholder {
+        color: #999;
+    }
 
-        .register-link p {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
+    .auth-form-btn {
+        background: linear-gradient(135deg, #09637E 0%, #0B4F63 100%);
+        border: none;
+        color: #fff;
+        font-weight: 600;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(9, 99, 126, 0.2);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 13px;
+    }
 
-        .register-link a {
-            color: #1C4D8D;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s;
-        }
+    .auth-form-btn:hover {
+        background: linear-gradient(135deg, #0B4F63 0%, #09637E 100%);
+        box-shadow: 0 6px 20px rgba(9, 99, 126, 0.3);
+        color: #fff;
+        transform: translateY(-2px);
+    }
 
-        .register-link a:hover {
-            color: #154470;
-        }
+    .text-center.mt-4 {
+        color: #666;
+        font-size: 13px;
+    }
 
-        .error-message {
-            background-color: #fee;
-            border-left: 4px solid #f44336;
-            color: #c62828;
-            padding: 12px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-    </style>
-</head>
-<body>
-    <div class="login-container">
-        <div class="login-header">
-            <h1>IWAS</h1>
+    .text-center.mt-4 a {
+        color: #09637E;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border-bottom: 2px solid transparent;
+    }
+
+    .text-center.mt-4 a:hover {
+        color: #0B4F63;
+        border-bottom-color: #0B4F63;
+    }
+
+    .alert-danger {
+        background-color: rgba(201, 74, 74, 0.1);
+        border: 1px solid #C94A4A;
+        color: #8B2D2D;
+        border-radius: 6px;
+    }
+
+    .welcome-text {
+        color: #09637E;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+
+    .subtitle-text {
+        color: #999;
+        font-size: 13px;
+        font-weight: 400;
+    }
+</style>
+<?= $this->endSection() ?>
+
+<?= $this->section('content') ?>
+<div class="auth-page">
+    <div class="auth-form-card auth-form-light text-left auth-card">
+        <div class="iwas-header">
+            <div class="iwas-logo-circle">
+                <i class="ti-water"></i>
+            </div>
+            <h3>IWAS</h3>
             <p>Integrated Water Safety Program</p>
         </div>
 
+        <div class="mb-4">
+            <h4 class="welcome-text">Welcome back</h4>
+            <p class="subtitle-text m-0">Sign in to continue</p>
+        </div>
+
         <?php if (session()->has('error')): ?>
-            <div class="error-message">
-                <?= session()->getFlashdata('error') ?>
+            <div class="alert alert-danger mt-3">
+                <i class="ti-alert mr-2"></i><?= session()->getFlashdata('error') ?>
             </div>
         <?php endif; ?>
 
-        <form action="<?= base_url('/authenticate') ?>" method="POST">
+        <form class="pt-2" action="<?= base_url('/authenticate') ?>" method="POST">
             <?= csrf_field() ?>
-            
             <div class="form-group">
-                <label for="email">Email or Username</label>
-                <input type="text" id="email" name="email" required placeholder="Enter your email or username">
+                <input type="text" class="form-control form-control-lg" name="email" id="email" placeholder="Email or Username" required>
             </div>
-
             <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required placeholder="Enter your password">
+                <input type="password" class="form-control form-control-lg" name="password" id="password" placeholder="Password" required>
             </div>
-
-            <button type="submit" class="login-btn">Login</button>
+            <div class="mt-4">
+                <button type="submit" class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn">Sign In</button>
+            </div>
+            <div class="text-center mt-4">
+                Don't have an account? <a href="<?= base_url('/register') ?>">Create one</a>
+            </div>
         </form>
-
-        <div class="register-link">
-            <p>Don't have an account?</p>
-            <a href="<?= base_url('/register') ?>">Create one here</a>
-        </div>
     </div>
-</body>
-</html>
+</div>
+<?= $this->endSection() ?>

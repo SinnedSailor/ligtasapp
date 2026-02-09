@@ -1,691 +1,502 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ordinance</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<?= $this->extend('layouts/staradmin') ?>
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f5f5;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+<?= $this->section('pageStyles') ?>
+<style>
+    .docs-header {
+        margin-bottom: 1.5rem;
+    }
 
-        .navbar {
-            background: #FFDE15;
-            color: #002C76;
-            padding: 15px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            height: 60px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-        }
+    .documents-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+    }
 
-        .navbar-title {
-            font-size: 24px;
-            font-weight: 600;
-        }
+    .document-card {
+        background: #fff;
+        border-radius: 10px;
+        border: 1px solid #e9ecef;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
 
-        .navbar-right {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
+    .document-card h5 {
+        color: #09637E;
+        margin-bottom: 10px;
+    }
 
-        .user-email {
-            font-size: 14px;
-            opacity: 0.9;
-        }
+    .document-card p.text-muted {
+        min-height: 44px;
+        margin-bottom: 0;
+    }
 
-        .logout-btn {
-            background: rgba(0, 44, 118, 0.2);
-            color: #002C76;
-            border: 1px solid rgba(0, 44, 118, 0.3);
-            padding: 8px 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: background 0.3s;
-            text-decoration: none;
-            display: inline-block;
-        }
+    .document-card .form-control {
+        margin-top: 10px;
+    }
 
-        .logout-btn:hover {
-            background: rgba(0, 44, 118, 0.3);
-        }
+    .document-card .form-control[type="file"] {
+        text-align: center;
+    }
 
-        /* Main Layout */
-        .main-layout {
-            display: flex;
-            flex: 1;
-            height: calc(100vh - 60px);
-            overflow: hidden;
-            margin-top: 60px;
-        }
+    .submit-section {
+        margin-top: 20px;
+        text-align: right;
+    }
 
-        /* Sidebar Navigation */
-        .sidebar {
-            width: 250px;
-            background: #002C76;
-            padding: 0;
-            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
-            overflow-y: auto;
-            position: fixed;
-            height: calc(100vh - 60px);
-            left: 0;
-            display: flex;
-            flex-direction: column;
-        }
+    .submit-btn {
+        background: #09637E;
+        color: #fff;
+        border: none;
+        padding: 10px 24px;
+        border-radius: 6px;
+        font-weight: 600;
+    }
 
-        /* Profile Section */
-        .profile-section {
-            padding: 30px 20px;
-            text-align: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
+    .submit-btn[disabled] {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
 
-        .profile-avatar {
-            width: 80px;
-            height: 80px;
-            background: rgba(255, 222, 21, 0.3);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 15px;
-            font-size: 40px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            text-decoration: none;
-            color: white;
-        }
+    .status-badge {
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
 
-        .profile-avatar:hover {
-            background: rgba(255, 222, 21, 0.5);
-            transform: scale(1.05);
-        }
+    .status-pending {
+        background: rgba(245, 158, 11, 0.15);
+        color: #B45309;
+    }
 
-        .profile-avatar:hover::after {
-            content: 'Edit Profile';
-            position: absolute;
-            bottom: -35px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 12px;
-            white-space: nowrap;
-            z-index: 1000;
-        }
+    .status-approved {
+        background: rgba(16, 185, 129, 0.15);
+        color: #047857;
+    }
 
-        .profile-edit-icon {
-            position: absolute;
-            bottom: 5px;
-            right: 5px;
-            background: #FFDE15;
-            color: #002C76;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            border: 2px solid white;
-        }
+    .status-rejected {
+        background: rgba(220, 38, 38, 0.12);
+        color: #B91C1C;
+    }
 
-        .profile-name {
-            color: white;
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
+    .section-title {
+        font-weight: 600;
+        color: #0f172a;
+        margin-bottom: 12px;
+    }
 
-        .profile-email {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 12px;
-        }
+    .table-docs th {
+        color: #0B5FB3;
+        font-weight: 600;
+    }
 
-        .nav-menu {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 0;
-            flex: 1;
-        }
+    .table-docs td {
+        vertical-align: middle;
+    }
 
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 15px 20px;
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            font-weight: 500;
-            border-left: 4px solid transparent;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-            font-size: 14px;
-        }
+    .doc-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
 
-        .nav-item:hover {
-            color: white;
-            background: rgba(255, 222, 21, 0.1);
-            border-left-color: #FFDE15;
-        }
+    .preview-modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.6);
+        z-index: 3000;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
 
-        .nav-item.active {
-            color: white;
-            background: rgba(255, 222, 21, 0.15);
-            border-left-color: #FFDE15;
-        }
+    .preview-modal.show {
+        display: flex;
+    }
 
-        .nav-icon {
-            font-size: 20px;
-            width: 24px;
-            text-align: center;
-        }
+    .preview-card {
+        background: #fff;
+        border-radius: 12px;
+        width: min(1000px, 100%);
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.25);
+    }
 
-        /* Content Area */
-        .content-wrapper {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-            margin-left: 250px;
-            height: calc(100vh - 60px);
-        }
+    .preview-header {
+        padding: 16px 20px;
+        border-bottom: 1px solid #e9ecef;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
 
-        @media (max-width: 768px) {
-            .main-layout {
-                flex-direction: column;
-            }
+    .preview-title {
+        font-weight: 600;
+        color: #0f172a;
+    }
 
-            .sidebar {
-                width: 100%;
-                padding: 15px 0;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            }
+    .preview-body {
+        padding: 0;
+        background: #f8fafc;
+        flex: 1;
+    }
 
-            .nav-menu {
-                flex-direction: row;
-                flex-wrap: wrap;
-            }
+    .preview-body iframe {
+        width: 100%;
+        height: 65vh;
+        border: none;
+    }
 
-            .nav-item {
-                padding: 12px 15px;
-                font-size: 12px;
-                gap: 8px;
-            }
+    .preview-footer {
+        padding: 16px 20px;
+        border-top: 1px solid #e9ecef;
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
 
-            .nav-item span:last-child {
-                display: none;
-            }
-        }
+    .close-preview {
+        background: #e2e8f0;
+        border: none;
+        border-radius: 8px;
+        padding: 6px 12px;
+        font-weight: 600;
+        color: #0f172a;
+    }
 
-        .container {
-            max-width: 1400px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
+    html.modal-open,
+    body.modal-open {
+        height: 100%;
+        overflow: hidden;
+    }
 
-        .content-card {
-            background: white;
-            border-radius: 10px;
-            padding: 40px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
+    .preview-modal {
+        overscroll-behavior: contain;
+    }
+</style>
+<?= $this->endSection() ?>
 
-        .content-card h1 {
-            color: #002C76;
-            font-size: 32px;
-            margin-bottom: 20px;
-        }
+<?= $this->section('content') ?>
+<?php
+    $roleName = $roleName ?? (session()->get('role_name') ?? 'No Role');
+    $isAdmin = $isAdmin ?? (bool) session()->get('is_admin');
+    $isLgu = $roleName === 'LGU';
+    $isProvince = $roleName === 'PROVINCE';
+    $isFocal = $roleName === 'FOCAL';
+    $canReview = $isProvince || $isAdmin;
+    $canViewApproved = $isFocal || $isAdmin;
+    $docLabels = [
+        'ordinance' => 'Ordinance',
+        'pops' => 'POPS Plan',
+        'budget' => 'Annual Budget Report',
+    ];
+    $statusClasses = [
+        'pending' => 'status-pending',
+        'approved' => 'status-approved',
+        'rejected' => 'status-rejected',
+    ];
+?>
 
-        .content-card p {
-            color: #666;
-            font-size: 16px;
-            line-height: 1.6;
-        }
+<div class="page-header docs-header">
+    <h3 class="page-title">
+        <?= $isFocal ? 'View Documents' : ($isProvince ? 'Review Documents' : 'Upload Documents') ?>
+    </h3>
+    <p class="text-muted">Ordinance, POPS Plan, and Annual Budget Report workflow.</p>
+</div>
 
-        .coming-soon {
-            font-size: 48px;
-            margin: 30px 0;
-            color: #002C76;
-        }
+<?php if (session()->getFlashdata('success')): ?>
+    <div class="alert alert-success">
+        <?= esc(session()->getFlashdata('success')) ?>
+    </div>
+<?php endif; ?>
 
-        .footer {
-            text-align: center;
-            padding: 20px;
-            color: #999;
-            font-size: 14px;
-            margin-top: 40px;
-        }
+<?php if (session()->getFlashdata('error')): ?>
+    <div class="alert alert-danger">
+        <?= esc(session()->getFlashdata('error')) ?>
+    </div>
+<?php endif; ?>
 
-        /* Confirmation Modal Styles */
-        .confirmation-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .confirmation-modal.show {
-            display: flex;
-        }
-
-        .confirmation-dialog {
-            background: white;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-            text-align: center;
-            min-width: 350px;
-        }
-
-        .confirmation-dialog h2 {
-            color: #FFDE15;
-            margin-bottom: 15px;
-            font-size: 20px;
-        }
-
-        .confirmation-dialog p {
-            color: #666;
-            margin-bottom: 25px;
-            font-size: 16px;
-        }
-
-        .confirmation-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-        }
-
-        .btn-yes, .btn-no {
-            padding: 10px 30px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 16px;
-            transition: all 0.3s;
-            min-width: 120px;
-        }
-
-        .btn-yes {
-            background: #002C76;
-            color: white;
-        }
-
-        .btn-yes:hover {
-            background: #1a1f4d;
-        }
-
-        .btn-no {
-            background: #C9282D;
-            color: white;
-        }
-
-        .btn-no:hover {
-            background: #9d1f22;
-        }
-    </style>
-</head>
-<body>
-    <div class="navbar">
-        <div class="navbar-title">Integrated Water Safety Program</div>
-        <div class="navbar-right">
-            <a href="#" class="logout-btn" onclick="showLogoutConfirmation(event)">Logout</a>
-        </div>
+<?php if ($isLgu): ?>
+    <div class="alert alert-info">
+        Upload PDF, DOC, or DOCX files (Max 10MB each). Submitted documents are reviewed by the Province role.
     </div>
 
-    <!-- Logout Confirmation Modal -->
-    <div class="confirmation-modal" id="logoutModal">
-        <div class="confirmation-dialog">
-            <h2>Confirm Logout</h2>
-            <p>Are you sure you want to logout?</p>
-            <div class="confirmation-buttons">
-                <button class="btn-yes" onclick="confirmLogout()">Yes</button>
-                <button class="btn-no" onclick="cancelLogout()">No</button>
+    <form action="<?= base_url('/documents/upload') ?>" method="post" enctype="multipart/form-data" id="documentUploadForm">
+        <div class="documents-grid">
+            <div class="document-card">
+                <h5><i class="ti-files"></i> Ordinance</h5>
+                <p class="text-muted">Local ordinance documents related to water safety regulations.</p>
+                <input type="file" name="ordinance_files[]" class="form-control" multiple accept=".pdf,.doc,.docx">
+            </div>
+
+            <div class="document-card">
+                <h5><i class="ti-shield"></i> POPS Plan</h5>
+                <p class="text-muted">Peace and Order and Public Safety Plan documents.</p>
+                <input type="file" name="pops_files[]" class="form-control" multiple accept=".pdf,.doc,.docx">
+            </div>
+
+            <div class="document-card">
+                <h5><i class="ti-wallet"></i> Annual Budget Report</h5>
+                <p class="text-muted">Annual budget reports for water safety programs.</p>
+                <input type="file" name="budget_files[]" class="form-control" multiple accept=".pdf,.doc,.docx">
             </div>
         </div>
+
+        <div class="submit-section">
+            <button class="submit-btn" type="submit" id="submitDocumentsButton">
+                <i class="ti-check"></i>
+                Submit Documents
+            </button>
+        </div>
+    </form>
+<?php elseif ($canReview || $canViewApproved): ?>
+    <div class="alert alert-info">
+        Documents are managed by role-based review. Only approved documents are visible to FOCAL users.
     </div>
+<?php else: ?>
+    <div class="alert alert-warning">
+        Your account does not have access to the document workflow. Please contact an administrator.
+    </div>
+<?php endif; ?>
 
-    <div class="main-layout">
-        <!-- Sidebar Navigation -->
-        <div class="sidebar">
-            <!-- Profile Section -->
-            <div class="profile-section">
-                <a href="<?= base_url('/user-profile') ?>" class="profile-avatar">
-                    <i class="bi bi-person-fill"></i>
-                    <span class="profile-edit-icon"><i class="bi bi-pencil-fill"></i></span>
-                </a>
-                <div class="profile-name"><?= strtoupper(session()->get('username') ?? 'User') ?></div>
-                <div class="profile-email"><?= session()->get('role_name') ?? 'No Role' ?></div>
-            </div>
-
-            <!-- Navigation Menu -->
-            <nav class="nav-menu">
-                <a href="<?= base_url('/dashboard') ?>" class="nav-item">
-                    <i class="bi bi-speedometer2 nav-icon"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="<?= base_url('/ordinance') ?>" class="nav-item active">
-                    <i class="bi bi-file-earmark-arrow-up nav-icon"></i>
-                    <span>Ordinance</span>
-                </a>
-                <a href="<?= base_url('/pops') ?>" class="nav-item">
-                    <i class="bi bi-shield-check nav-icon"></i>
-                    <span>POPS Plan</span>
-                </a>
-                <a href="<?= base_url('/incident-report') ?>" class="nav-item">
-                    <i class="bi bi-exclamation-triangle nav-icon"></i>
-                    <span>Incident Report</span>
-                </a>
-                <?php if (session()->get('is_admin')): ?>
-                <a href="<?= base_url('/admin-panel') ?>" class="nav-item">
-                    <i class="bi bi-shield-lock nav-icon"></i>
-                    <span>Admin Panel</span>
-                </a>
-                <?php endif; ?>
-            </nav>
-        </div>
-
-        <!-- Content Area -->
-        <div class="content-wrapper">
-
-    <div class="container">
-        <style>
-            .container {
-                max-width: 100%;
-                margin: 0;
-                padding: 30px;
-            }
-
-            .page-header {
-                margin-bottom: 30px;
-            }
-
-            .page-header h1 {
-                color: #002C76;
-                font-size: 28px;
-                margin-bottom: 10px;
-                display: flex;
-                align-items: center;
-                gap: 15px;
-            }
-
-            .page-header p {
-                color: #666;
-                font-size: 14px;
-            }
-
-            .ordinances-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-                gap: 20px;
-                margin-bottom: 30px;
-            }
-
-            .ordinance-card {
-                background: white;
-                border-radius: 10px;
-                padding: 25px;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-                transition: all 0.3s;
-                border-left: 4px solid #002C76;
-            }
-
-            .ordinance-card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-            }
-
-            .ordinance-header {
-                display: flex;
-                align-items: flex-start;
-                gap: 15px;
-                margin-bottom: 15px;
-            }
-
-            .ordinance-icon {
-                font-size: 32px;
-                color: #002C76;
-                flex-shrink: 0;
-            }
-
-            .ordinance-title {
-                flex: 1;
-            }
-
-            .ordinance-title h3 {
-                color: #002C76;
-                font-size: 18px;
-                margin-bottom: 5px;
-            }
-
-            .ordinance-number {
-                color: #999;
-                font-size: 12px;
-                font-weight: 600;
-                text-transform: uppercase;
-            }
-
-            .ordinance-content {
-                color: #666;
-                font-size: 14px;
-                line-height: 1.6;
-                margin-bottom: 15px;
-            }
-
-            .ordinance-details {
-                display: flex;
-                flex-direction: column;
-                gap: 8px;
-            }
-
-            .detail-item {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                color: #666;
-                font-size: 13px;
-            }
-
-            .detail-icon {
-                color: #002C76;
-                font-size: 16px;
-            }
-
-            .ordinance-footer {
-                margin-top: 15px;
-                padding-top: 15px;
-                border-top: 1px solid #e0e0e0;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-
-            .status-badge {
-                padding: 5px 12px;
-                border-radius: 20px;
-                font-size: 12px;
-                font-weight: 600;
-            }
-
-            .status-active {
-                background: #d4edda;
-                color: #155724;
-            }
-
-            .status-pending {
-                background: #fff3cd;
-                color: #856404;
-            }
-
-            .view-btn {
-                background: #002C76;
-                color: white;
-                border: none;
-                padding: 8px 16px;
-                border-radius: 5px;
-                cursor: pointer;
-                font-size: 13px;
-                font-weight: 600;
-                transition: all 0.3s;
-            }
-
-            .view-btn:hover {
-                background: #1a1f4d;
-            }
-
-            .upload-section {
-                background: white;
-                border-radius: 10px;
-                padding: 30px;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-                margin-bottom: 30px;
-            }
-
-            .upload-section h2 {
-                color: #002C76;
-                font-size: 20px;
-                margin-bottom: 20px;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            }
-
-            .upload-area {
-                border: 2px dashed #002C76;
-                border-radius: 10px;
-                padding: 40px;
-                text-align: center;
-                background: #f8f9fa;
-                transition: all 0.3s;
-                cursor: pointer;
-            }
-
-            .upload-area:hover {
-                background: #fffaf0;
-                border-color: #FFD700;
-            }
-
-            .upload-icon {
-                font-size: 48px;
-                color: #002C76;
-                margin-bottom: 20px;
-            }
-
-            .upload-text {
-                color: #333;
-                font-size: 18px;
-                margin-bottom: 10px;
-                font-weight: 600;
-            }
-
-            .upload-hint {
-                color: #666;
-                font-size: 14px;
-            }
-
-            .file-input {
-                display: none;
-            }
-
-            .upload-btn {
-                background: #002C76;
-                color: white;
-                border: none;
-                padding: 12px 30px;
-                border-radius: 5px;
-                cursor: pointer;
-                font-size: 16px;
-                font-weight: 600;
-                margin-top: 20px;
-                transition: all 0.3s;
-            }
-
-            .upload-btn:hover {
-                background: #1a1f4d;
-            }
-        </style>
-
-        <div class="upload-section">
-            <h2>
-                <i class="bi bi-cloud-arrow-up"></i>
-                Upload Additional Ordinance Documents
-            </h2>
-            <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
-                <div class="upload-icon">
-                    <i class="bi bi-file-earmark-arrow-up"></i>
+<?php if ($isLgu): ?>
+    <div class="card mt-4">
+        <div class="card-body">
+            <div class="section-title">My Submissions</div>
+            <?php if (!empty($myDocuments)): ?>
+                <div class="table-responsive">
+                    <table class="table table-hover table-docs">
+                        <thead>
+                            <tr>
+                                <th>Document Type</th>
+                                <th>File</th>
+                                <th>Status</th>
+                                <th>Uploaded</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($myDocuments as $doc): ?>
+                                <tr>
+                                    <td><?= esc($docLabels[$doc['doc_type']] ?? strtoupper($doc['doc_type'])) ?></td>
+                                    <td><?= esc($doc['original_name']) ?></td>
+                                    <td>
+                                        <span class="status-badge <?= esc($statusClasses[$doc['status']] ?? 'status-pending') ?>">
+                                            <?= esc(strtoupper($doc['status'])) ?>
+                                        </span>
+                                    </td>
+                                    <td><?= esc(date('M d, Y', strtotime($doc['created_at']))) ?></td>
+                                    <td>
+                                        <div class="doc-actions">
+                                            <button class="btn btn-sm btn-outline-secondary doc-preview" type="button" data-doc-id="<?= $doc['id'] ?>" data-doc-name="<?= esc($doc['original_name']) ?>">
+                                                View
+                                            </button>
+                                            <a class="btn btn-sm btn-outline-primary" href="<?= base_url('/documents/download/' . $doc['id']) ?>">
+                                                Download
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
                 </div>
-                <div class="upload-text">Click to upload ordinance documents</div>
-                <div class="upload-hint">Supported formats: PDF, DOC, DOCX (Max 10MB each)</div>
-                <input type="file" id="fileInput" class="file-input" multiple accept=".pdf,.doc,.docx" onchange="handleFiles(this.files)">
-                <button class="upload-btn">Browse Files</button>
+            <?php else: ?>
+                <p class="text-muted mb-0">No submissions yet.</p>
+            <?php endif; ?>
+        </div>
+    </div>
+<?php endif; ?>
+
+<?php if ($canReview): ?>
+    <div class="card mt-4">
+        <div class="card-body">
+            <div class="section-title">Pending Documents for Review</div>
+            <?php if (!empty($pendingDocuments)): ?>
+                <div class="table-responsive">
+                    <table class="table table-hover table-docs">
+                        <thead>
+                            <tr>
+                                <th>Document Type</th>
+                                <th>File</th>
+                                <th>Submitted By</th>
+                                <th>Location</th>
+                                <th>Uploaded</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($pendingDocuments as $doc): ?>
+                                <tr>
+                                    <td><?= esc($docLabels[$doc['doc_type']] ?? strtoupper($doc['doc_type'])) ?></td>
+                                    <td><?= esc($doc['original_name']) ?></td>
+                                    <td><?= esc(trim($doc['first_name'] . ' ' . $doc['last_name'])) ?></td>
+                                    <td><?= esc(trim(($doc['municipality'] ?? '') . ', ' . ($doc['province'] ?? ''), ' ,')) ?></td>
+                                    <td><?= esc(date('M d, Y', strtotime($doc['created_at']))) ?></td>
+                                    <td>
+                                        <div class="doc-actions">
+                                            <button class="btn btn-sm btn-outline-secondary doc-preview" type="button" data-doc-id="<?= $doc['id'] ?>" data-doc-name="<?= esc($doc['original_name']) ?>">
+                                                View
+                                            </button>
+                                            <a class="btn btn-sm btn-outline-primary" href="<?= base_url('/documents/download/' . $doc['id']) ?>">Download</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php else: ?>
+                <p class="text-muted mb-0">No pending documents right now.</p>
+            <?php endif; ?>
+        </div>
+    </div>
+<?php endif; ?>
+
+<?php if ($canViewApproved): ?>
+    <div class="card mt-4">
+        <div class="card-body">
+            <div class="section-title">Approved Documents</div>
+            <?php if (!empty($approvedDocuments)): ?>
+                <div class="table-responsive">
+                    <table class="table table-hover table-docs">
+                        <thead>
+                            <tr>
+                                <th>Document Type</th>
+                                <th>File</th>
+                                <th>Submitted By</th>
+                                <th>Location</th>
+                                <th>Approved</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($approvedDocuments as $doc): ?>
+                                <tr>
+                                    <td><?= esc($docLabels[$doc['doc_type']] ?? strtoupper($doc['doc_type'])) ?></td>
+                                    <td><?= esc($doc['original_name']) ?></td>
+                                    <td><?= esc(trim($doc['first_name'] . ' ' . $doc['last_name'])) ?></td>
+                                    <td><?= esc(trim(($doc['municipality'] ?? '') . ', ' . ($doc['province'] ?? ''), ' ,')) ?></td>
+                                    <td><?= esc($doc['reviewed_at'] ? date('M d, Y', strtotime($doc['reviewed_at'])) : '-') ?></td>
+                                    <td>
+                                        <div class="doc-actions">
+                                            <button class="btn btn-sm btn-outline-secondary doc-preview" type="button" data-doc-id="<?= $doc['id'] ?>" data-doc-name="<?= esc($doc['original_name']) ?>">
+                                                View
+                                            </button>
+                                            <a class="btn btn-sm btn-outline-primary" href="<?= base_url('/documents/download/' . $doc['id']) ?>">
+                                                Download
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php else: ?>
+                <p class="text-muted mb-0">No approved documents yet.</p>
+            <?php endif; ?>
+        </div>
+    </div>
+<?php endif; ?>
+
+<div class="preview-modal" id="documentPreviewModal" aria-hidden="true">
+    <div class="preview-card">
+        <div class="preview-header">
+            <div class="preview-title" id="previewTitle">Document Preview</div>
+            <button class="close-preview" type="button" id="closePreview">Close</button>
+        </div>
+        <div class="preview-body">
+            <iframe id="previewFrame" src="" title="Document Preview"></iframe>
+        </div>
+        <div class="preview-footer">
+            <div class="doc-actions">
+                <a class="btn btn-sm btn-outline-primary" id="previewDownload" href="#">Download</a>
             </div>
+            <?php if ($canReview): ?>
+                <div class="doc-actions">
+                    <form method="post" id="previewApproveForm" action="#">
+                        <button class="btn btn-sm btn-success" type="submit">Approve</button>
+                    </form>
+                    <form method="post" id="previewRejectForm" action="#">
+                        <button class="btn btn-sm btn-danger" type="submit">Reject</button>
+                    </form>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
+</div>
 
-    <script>
-        function viewOrdinance(type) {
-            alert(`Viewing detailed ordinance information for: ${type}\n\nThis would open a detailed view with full ordinance text, implementation guidelines, and compliance checklist.`);
-        }
+<?= $this->endSection() ?>
 
-        function handleFiles(files) {
-            alert(`${files.length} file(s) selected for upload.\n\nIn production, these documents would be uploaded to the server for review and implementation.`);
-        }
-    </script>
+<?= $this->section('pageScripts') ?>
+<script>
+    const previewModal = document.getElementById('documentPreviewModal');
+    const previewFrame = document.getElementById('previewFrame');
+    const previewTitle = document.getElementById('previewTitle');
+    const previewDownload = document.getElementById('previewDownload');
+    const closePreview = document.getElementById('closePreview');
+    const approveForm = document.getElementById('previewApproveForm');
+    const rejectForm = document.getElementById('previewRejectForm');
 
-    <script>
-        function showLogoutConfirmation(event) {
-            event.preventDefault();
-            document.getElementById('logoutModal').classList.add('show');
-        }
+    document.querySelectorAll('.doc-preview').forEach((button) => {
+        button.addEventListener('click', () => {
+            const docId = button.getAttribute('data-doc-id');
+            const docName = button.getAttribute('data-doc-name');
+            previewTitle.textContent = docName || 'Document Preview';
+            previewFrame.src = `<?= base_url('/documents/view') ?>/${docId}`;
+            previewDownload.href = `<?= base_url('/documents/download') ?>/${docId}`;
 
-        function confirmLogout() {
-            window.location.href = '<?= base_url('/logout') ?>';
-        }
-
-        function cancelLogout() {
-            document.getElementById('logoutModal').classList.remove('show');
-        }
-
-        // Close modal when clicking outside of it
-        document.getElementById('logoutModal').addEventListener('click', function(event) {
-            if (event.target === this) {
-                cancelLogout();
+            if (approveForm) {
+                approveForm.action = `<?= base_url('/documents/approve') ?>/${docId}`;
             }
-        });
-    </script>
+            if (rejectForm) {
+                rejectForm.action = `<?= base_url('/documents/reject') ?>/${docId}`;
+            }
 
-        </div>
-    </div>
-</body>
-</html>
+            previewModal.classList.add('show');
+            previewModal.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('modal-open');
+            document.documentElement.classList.add('modal-open');
+        });
+    });
+
+    function closeModal() {
+        previewModal.classList.remove('show');
+        previewModal.setAttribute('aria-hidden', 'true');
+        previewFrame.src = '';
+        document.body.classList.remove('modal-open');
+        document.documentElement.classList.remove('modal-open');
+    }
+
+    closePreview.addEventListener('click', closeModal);
+    previewModal.addEventListener('click', (event) => {
+        if (event.target === previewModal) {
+            closeModal();
+        }
+    });
+
+    const uploadForm = document.getElementById('documentUploadForm');
+    const submitButton = document.getElementById('submitDocumentsButton');
+
+    if (uploadForm && submitButton) {
+        uploadForm.addEventListener('submit', () => {
+            if (submitButton.disabled) {
+                return;
+            }
+
+            submitButton.disabled = true;
+            submitButton.textContent = 'Submitting...';
+            uploadForm.setAttribute('aria-busy', 'true');
+        });
+    }
+</script>
+<?= $this->endSection() ?>

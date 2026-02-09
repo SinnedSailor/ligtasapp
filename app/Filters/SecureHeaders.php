@@ -15,7 +15,7 @@ class SecureHeaders implements FilterInterface
 
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null): ResponseInterface
     {
-        $response->setHeader('X-Frame-Options', 'DENY');
+        $response->setHeader('X-Frame-Options', 'SAMEORIGIN');
         $response->setHeader('X-XSS-Protection', '1; mode=block');
         $response->setHeader('X-Content-Type-Options', 'nosniff');
         $response->setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');

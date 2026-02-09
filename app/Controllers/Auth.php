@@ -2,13 +2,22 @@
 
 namespace App\Controllers;
 
+use App\Models\IncidentReportModel;
 use App\Models\UserModel;
 
 class Auth extends BaseController
 {
     public function login()
     {
-        return view('auth/login');
+        if (session()->get('logged_in')) {
+            return redirect()->to('/dashboard');
+        }
+
+        return view('auth/login', [
+            'hideNavbar' => true,
+            'hideSidebar' => true,
+            'hideFooter' => true,
+        ]);
     }
 
     public function authenticate()
@@ -60,7 +69,15 @@ class Auth extends BaseController
 
     public function register()
     {
-        return view('auth/register');
+        if (session()->get('logged_in')) {
+            return redirect()->to('/dashboard');
+        }
+
+        return view('auth/register', [
+            'hideNavbar' => true,
+            'hideSidebar' => true,
+            'hideFooter' => true,
+        ]);
     }
 
     public function store_register()
@@ -148,7 +165,14 @@ class Auth extends BaseController
             return redirect()->to('/login');
         }
 
-        return view('incident_report');
+        $incidentReportModel = new IncidentReportModel();
+        $rows = $incidentReportModel
+            ->orderBy('n', 'asc')
+            ->findAll();
+
+        return view('incident_report', [
+            'initialRows' => $rows,
+        ]);
     }
 
     public function pops()

@@ -16,10 +16,19 @@ $routes->get('/dashboard', 'Auth::dashboard');
 $routes->get('/logout', 'Auth::logout');
 
 // Navigation routes
-$routes->get('/ordinance', 'Auth::ordinance');
+$routes->get('/ordinance', 'Documents::index');
 $routes->get('/incident-report', 'Auth::incident_report');
-$routes->get('/pops', 'Auth::pops');
+$routes->post('/incident-report/import', 'IncidentReport::import');
+$routes->get('/pops', 'Documents::index');
 $routes->get('/user-profile', 'Auth::user_profile');
+
+// Document workflow routes
+$routes->post('/documents/upload', 'Documents::upload');
+$routes->post('/documents/approve/(:num)', 'Documents::approve/$1');
+$routes->post('/documents/reject/(:num)', 'Documents::reject/$1');
+$routes->get('/documents/download/(:num)', 'Documents::download/$1');
+$routes->get('/documents/view/(:num)', 'Documents::view/$1');
+$routes->get('/documents/health', 'Documents::healthCheck');
 
 // Admin routes
 $routes->get('/admin-panel', 'Admin::panel');
