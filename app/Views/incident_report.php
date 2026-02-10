@@ -95,10 +95,55 @@
         color: #6c757d;
         font-size: 0.9rem;
     }
+
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .status-pending {
+        background: rgba(245, 158, 11, 0.15);
+        color: #b45309;
+    }
+
+    .status-approved {
+        background: rgba(16, 185, 129, 0.15);
+        color: #047857;
+    }
+
+    .status-rejected {
+        background: rgba(220, 38, 38, 0.12);
+        color: #b91c1c;
+    }
+
+    html.modal-open,
+    body.modal-open {
+        height: 100%;
+        overflow: hidden;
+    }
+
+    body.modal-open .page-body-wrapper,
+    body.modal-open .main-panel {
+        height: 100%;
+        overflow: hidden;
+    }
 </style>
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
+<?php
+    $roleName = $roleName ?? (session()->get('role_name') ?? '');
+    $isLgu = strtoupper(trim((string) $roleName)) === 'LGU';
+    $isProvince = strtoupper(trim((string) $roleName)) === 'PROVINCE';
+    $isAdmin = $isAdmin ?? (bool) session()->get('is_admin');
+    $canReview = $isProvince || $isAdmin;
+    $provinceList = $provinces ?? [];
+?>
 <div class="page-header">
     <h3 class="page-title">Incident Report</h3>
     <nav aria-label="breadcrumb">
@@ -124,9 +169,15 @@
                     <span class="file-name" id="fileName" style="<?= $hasInitialRows ? 'display:none;' : '' ?>">No file selected</span>
                 </div>
 
+                <?php if ($isLgu): ?>
+                    <div class="alert alert-info">
+                        Upload at least one photo or document per incident. Attachments are reviewed by Province users.
+                    </div>
+                <?php endif; ?>
+
                 <div class="d-flex flex-wrap gap-2 mb-3">
-                    <button class="btn btn-primary btn-sm" onclick="addNewRow()">
-                        <i class="ti-plus"></i> Add New Row
+                    <button class="btn btn-primary btn-sm" onclick="openIncidentModal()">
+                        <i class="ti-plus"></i> Add Incident
                     </button>
                     <button id="saveButton" class="btn btn-success btn-sm" onclick="openSaveModal()" style="<?= $hasInitialRows ? 'display:none;' : '' ?>">
                         <i class="ti-save"></i> Save to Database
@@ -145,18 +196,20 @@
                                 <th class="col-primary">Name of Victim</th>
                                 <th class="col-secondary">Location Category</th>
                                 <th class="col-secondary">Age of the Person</th>
-                                <th class="col-secondary">Gender of the Person</th>
+                                <th class="col-secondary">Sex</th>
                                 <th class="col-secondary">Occasion</th>
                                 <th class="col-tertiary">Other Factors</th>
                                 <th class="col-tertiary">Person's Residence</th>
                                 <th class="col-tertiary">Occupation of the Victim</th>
                                 <th class="col-tertiary">Remarks</th>
+                                <th>Attachments</th>
+                                <th>Review</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="tableBody">
                             <tr>
-                                <td colspan="16" class="empty-message">No data yet. Upload an Excel file or click "Add New Row" to add data.</td>
+                                <td colspan="16" class="empty-message">No data yet. Upload an Excel file or click "Add Incident" to add data.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -232,6 +285,169 @@
     </div>
 </div>
 
+<div class="modal fade" id="attachmentModal" tabindex="-1" aria-labelledby="attachmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="attachmentModalLabel">Upload Notice</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="attachmentModalMessage">Please upload at least one file.</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="reviewConfirmModal" tabindex="-1" aria-labelledby="reviewConfirmLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reviewConfirmLabel">Confirm Review</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="reviewConfirmMessage">Are you sure you want to update this incident?</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="reviewConfirmAction">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="incidentModal" tabindex="-1" aria-labelledby="incidentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="incidentModalLabel">Add Incident</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="incidentForm">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label" for="incidentMonth">Month of Incident</label>
+                            <select class="form-select form-select-sm" id="incidentMonth" style="background-color: #fff; color: #222; font-weight: 500;">
+                                <option value="" disabled selected style="color: #888; font-weight: 400;">Select month</option>
+                                <?php for ($month = 1; $month <= 12; $month++): ?>
+                                    <option value="<?= $month ?>" style="color: #222; font-weight: 500;">
+                                        <?= $month ?>
+                                    </option>
+                                <?php endfor; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="incidentYear">Year of Incident</label>
+                            <input type="text" class="form-control form-control-sm" id="incidentYear" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="incidentProvince">Province</label>
+                            <select class="form-select form-select-sm" id="incidentProvince" style="background-color: #fff; color: #222; font-weight: 500;">
+                                <option value="" disabled selected style="color: #888; font-weight: 400;">Select province</option>
+                                <?php foreach ($provinceList as $province): ?>
+                                    <option value="<?= esc($province) ?>" style="color: #222; font-weight: 500;">
+                                        <?= esc($province) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="incidentMunicipality">Municipality/City where Incidence Occurred</label>
+                            <select class="form-select form-select-sm" id="incidentMunicipality" style="background-color: #fff; color: #222; font-weight: 500;">
+                                <option value="" disabled selected style="color: #888; font-weight: 400;">Select municipality</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="incidentVictim">Name of Victim</label>
+                            <input type="text" class="form-control form-control-sm" id="incidentVictim" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="incidentLocation">Location Category</label>
+                            <input type="text" class="form-control form-control-sm" id="incidentLocation" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="incidentAge">Age of the Person</label>
+                            <input type="text" class="form-control form-control-sm" id="incidentAge" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="incidentGender">Sex</label>
+                            <select class="form-select form-select-sm" id="incidentGender" style="background-color: #fff; color: #222; font-weight: 500;">
+                                <option value="" disabled selected style="color: #888; font-weight: 400;">Select gender</option>
+                                <option value="m" style="color: #222; font-weight: 500;">Male</option>
+                                <option value="f" style="color: #222; font-weight: 500;">Female</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="incidentOccasion">Occasion</label>
+                            <input type="text" class="form-control form-control-sm" id="incidentOccasion" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="incidentFactors">Other Factors</label>
+                            <input type="text" class="form-control form-control-sm" id="incidentFactors" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="incidentResidence">Person's Residence</label>
+                            <input type="text" class="form-control form-control-sm" id="incidentResidence" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="incidentOccupation">Occupation of the Victim</label>
+                            <input type="text" class="form-control form-control-sm" id="incidentOccupation" />
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" for="incidentRemarks">Remarks</label>
+                            <input type="text" class="form-control form-control-sm" id="incidentRemarks" />
+                        </div>
+                    </div>
+
+                    <?php if ($isLgu): ?>
+                        <div class="border-top pt-3 mt-3" id="incidentAttachmentSection">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <h6 class="mb-0">Attachments</h6>
+                                <span class="text-muted" id="incidentAttachmentStatus" style="font-size: 0.85rem;"></span>
+                            </div>
+                            <div class="text-muted" id="incidentAttachmentHint" style="font-size: 0.85rem;"></div>
+                            <div class="d-flex flex-wrap gap-2 mt-2">
+                                <input type="file" id="incidentAttachments" class="form-control form-control-sm" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx" multiple />
+                                <button type="button" class="btn btn-outline-primary btn-sm" id="incidentUploadButton" onclick="uploadIncidentAttachments()">Upload Attachments</button>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="incidentSaveButton" onclick="saveIncidentFromModal()">Save Incident</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="attachmentViewerModal" tabindex="-1" aria-labelledby="attachmentViewerLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="attachmentViewerLabel">Incident Attachments</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="attachmentList" class="list-group mb-3"></div>
+                <div id="attachmentPreview" class="border rounded" style="min-height: 320px; background: #f8fafc; display: flex; align-items: center; justify-content: center;">
+                    <span class="text-muted">Select a file to preview.</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-outline-primary" id="attachmentDownload" href="#" target="_blank" rel="noopener">Download</a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <?= $this->endSection() ?>
 
 <?= $this->section('pageScripts') ?>
@@ -239,6 +455,15 @@
 <script>
     let tableData = [];
     const importUrl = "<?= base_url('/incident-report/import') ?>";
+    const attachmentUploadUrl = "<?= base_url('/incident-report/attachments/upload') ?>";
+    const attachmentListUrl = "<?= base_url('/incident-report/attachments') ?>";
+    const attachmentViewUrl = "<?= base_url('/incident-report/attachments/view') ?>";
+    const attachmentDownloadUrl = "<?= base_url('/incident-report/attachments/download') ?>";
+    const approveUrl = "<?= base_url('/incident-report/approve') ?>";
+    const rejectUrl = "<?= base_url('/incident-report/reject') ?>";
+    const canUploadAttachments = <?= $isLgu ? 'true' : 'false' ?>;
+    const canReviewIncidents = <?= $canReview ? 'true' : 'false' ?>;
+    const municipalities = <?= json_encode($municipalities ?? []) ?>;
     const columns = [
         'N',
         'Month of Incident',
@@ -276,8 +501,92 @@
     const nextPageButton = document.getElementById('nextPage');
     const pageInfoLabel = document.getElementById('pageInfo');
     const pageSizeSelect = document.getElementById('pageSize');
+    const incidentModalLabel = document.getElementById('incidentModalLabel');
+    const incidentSaveButton = document.getElementById('incidentSaveButton');
+    const incidentAttachmentHint = document.getElementById('incidentAttachmentHint');
+    const incidentAttachmentStatus = document.getElementById('incidentAttachmentStatus');
+    const incidentAttachmentsInput = document.getElementById('incidentAttachments');
+    const incidentUploadButton = document.getElementById('incidentUploadButton');
     let currentPage = 1;
     let pageSize = 10;
+    let currentIncidentIndex = null;
+
+    const incidentFieldMap = [
+        { id: 'incidentMonth', column: 'Month of Incident' },
+        { id: 'incidentYear', column: 'Year of Incident' },
+        { id: 'incidentProvince', column: 'Province' },
+        { id: 'incidentMunicipality', column: 'Municipality/City where Incidence Occurred' },
+        { id: 'incidentVictim', column: 'Name of Victim' },
+        { id: 'incidentLocation', column: 'Location Category' },
+        { id: 'incidentAge', column: 'Age of the Person' },
+        { id: 'incidentGender', column: 'Gender of the Person' },
+        { id: 'incidentOccasion', column: 'Occasion' },
+        { id: 'incidentFactors', column: 'Other Factors' },
+        { id: 'incidentResidence', column: "Person's Residence" },
+        { id: 'incidentOccupation', column: 'Occupation of the Victim' },
+        { id: 'incidentRemarks', column: 'Remarks' },
+    ];
+
+    if (typeof bootstrap !== 'undefined') {
+        document.addEventListener('show.bs.modal', function(event) {
+            const modal = event.target;
+            const openModals = document.querySelectorAll('.modal.show').length;
+            const zIndex = 1050 + (openModals * 20);
+            modal.style.zIndex = zIndex;
+            setTimeout(() => {
+                const backdrops = document.querySelectorAll('.modal-backdrop.show');
+                const backdrop = backdrops[backdrops.length - 1];
+                if (backdrop) {
+                    backdrop.style.zIndex = zIndex - 10;
+                }
+            }, 0);
+        });
+    }
+
+    const scrollLockKeys = ['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '];
+    let scrollLocked = false;
+
+    function isInOpenModal(target) {
+        return !!(target && target.closest && target.closest('.modal.show'));
+    }
+
+    function preventScroll(event) {
+        if (isInOpenModal(event.target)) {
+            return;
+        }
+        event.preventDefault();
+    }
+
+    function preventScrollKeys(event) {
+        if (scrollLockKeys.includes(event.key)) {
+            event.preventDefault();
+        }
+    }
+
+    function setScrollLock(locked) {
+        if (locked && !scrollLocked) {
+            scrollLocked = true;
+            document.addEventListener('wheel', preventScroll, { passive: false });
+            document.addEventListener('touchmove', preventScroll, { passive: false });
+            document.addEventListener('keydown', preventScrollKeys, false);
+        } else if (!locked && scrollLocked) {
+            scrollLocked = false;
+            document.removeEventListener('wheel', preventScroll, { passive: false });
+            document.removeEventListener('touchmove', preventScroll, { passive: false });
+            document.removeEventListener('keydown', preventScrollKeys, false);
+        }
+    }
+
+    if (typeof bootstrap !== 'undefined') {
+        document.addEventListener('shown.bs.modal', function() {
+            setScrollLock(true);
+        });
+        document.addEventListener('hidden.bs.modal', function() {
+            if (document.querySelectorAll('.modal.show').length === 0) {
+                setScrollLock(false);
+            }
+        });
+    }
 
     function setImportSaveState(hasData) {
         const showButtons = !hasData;
@@ -346,10 +655,9 @@
         if (serverRows.length > 0) {
             tableData = serverRows.map(mapServerRow);
             renderTable();
-            setImportSaveState(true);
-        } else {
-            setImportSaveState(false);
         }
+        setImportSaveState(false);
+        updateIncidentMunicipalities();
 
         const fileInput = document.getElementById('excelFile');
         if (fileInput) {
@@ -379,6 +687,10 @@
                         tableData = tableData.concat(normalizedRows);
                         renderTable();
                         showImportSuccess(jsonData.length);
+                            // Automatically save to database after import
+                            saveToDatabase();
+                            // Auto-refresh after import and save
+                            setTimeout(() => { window.location.reload(); }, 1500);
                     } catch (error) {
                         alert('Error reading file: ' + error.message);
                         document.getElementById('fileName').textContent = 'No file selected';
@@ -401,7 +713,7 @@
         const tbody = document.getElementById('tableBody');
 
         if (tableData.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="16" class="empty-message">No data yet. Upload an Excel file or click "Add New Row" to add data.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="17" class="empty-message">No data yet. Upload an Excel file or click "Add Incident" to add data.</td></tr>';
             updatePaginationControls();
             return;
         }
@@ -419,35 +731,45 @@
             const index = startIndex + pageIndex;
             row['N'] = row['N'] || (index + 1);
 
-            html += `<tr id="row-${index}">`;
+            html += `<tr id="row-${index}" data-review-status="${row.review_status || ''}" data-attachments="${row.attachments_count || 0}">`;
             columns.forEach(col => {
                 const value = row[col] || '';
                 const colClass = getColumnClass(col);
 
                 if (col === 'N') {
                     html += `<td class="${colClass}"><span>${row['N']}</span></td>`;
-                } else if (col === 'Gender of the Person') {
-                    const safeKey = col.replace(/[ '\/]/g, '_');
-                    html += `<td class="${colClass}">
-                        <span class="display-${index}-${safeKey}">${String(value).toUpperCase()}</span>
-                        <select class="input-${index}-${safeKey} table-input" style="display:none;">
-                            <option value="">Select</option>
-                            <option value="m" ${String(value).toLowerCase() === 'm' ? 'selected' : ''}>M</option>
-                            <option value="f" ${String(value).toLowerCase() === 'f' ? 'selected' : ''}>F</option>
-                        </select>
-                    </td>`;
+                } else if (col === '') {
+                    html += `<td class="${colClass}"><span>${String(value).toUpperCase()}</span></td>`;
                 } else {
-                    const safeKey = col.replace(/[ '\/]/g, '_');
-                    html += `<td class="${colClass}">
-                        <span class="display-${index}-${safeKey}">${value}</span>
-                        <input type="text" class="input-${index}-${safeKey} table-input" value="${value}" style="display:none;" />
-                    </td>`;
+                    html += `<td class="${colClass}"><span>${value}</span></td>`;
                 }
             });
+            const attachmentsCount = row.attachments_count || 0;
+            const reviewStatus = row.review_status || 'pending';
+            const statusClass = reviewStatus === 'approved' ? 'status-approved' : (reviewStatus === 'rejected' ? 'status-rejected' : 'status-pending');
+
+            const viewButton = `<button class="btn btn-sm btn-outline-secondary mt-1" onclick="openAttachmentViewer(${row['N']})">View</button>`;
+
+            let reviewControls = '';
+            if (canReviewIncidents) {
+                reviewControls = `
+                    <div class="d-flex gap-1 flex-wrap">
+                        <button class="btn btn-sm btn-success" onclick="reviewIncident(${row['N']}, 'approve')">Approve</button>
+                        <button class="btn btn-sm btn-danger" onclick="reviewIncident(${row['N']}, 'reject')">Reject</button>
+                    </div>
+                `;
+            }
+
             html += `<td>
-                <button class="btn btn-inverse-primary btn-sm" onclick="editRow(${index})" id="edit-${index}">Edit</button>
-                <button class="btn btn-inverse-success btn-sm" onclick="saveRow(${index})" style="display:none;" id="save-${index}">Save</button>
-                <button class="btn btn-inverse-secondary btn-sm" onclick="cancelEdit(${index})" style="display:none;" id="cancel-${index}">Cancel</button>
+                <div><span class="status-pill ${statusClass}">${reviewStatus || 'pending'}</span></div>
+                <div class="text-muted" style="font-size:12px;">${attachmentsCount} file(s)</div>
+                ${viewButton}
+            </td>
+            <td>
+                ${reviewControls || '<span class="text-muted">-</span>'}
+            </td>
+            <td>
+                <button class="btn btn-inverse-primary btn-sm" onclick="openIncidentModal(${index})">Edit</button>
                 <button class="btn btn-inverse-danger btn-sm" onclick="deleteRow(${index})">Delete</button>
             </td></tr>`;
         });
@@ -505,64 +827,182 @@
         }
     }
 
-    function addNewRow() {
-        const newRow = { 'N': tableData.length + 1 };
-        editableColumns.forEach(col => {
-            newRow[col] = '';
-        });
-        tableData.push(newRow);
-        currentPage = getTotalPages();
-        renderTable();
+    function openIncidentModal(index) {
+        currentIncidentIndex = (index === 0 || index) ? index : null;
+        const isEdit = currentIncidentIndex !== null;
+        const row = isEdit ? tableData[currentIncidentIndex] : null;
 
-        const newIndex = tableData.length - 1;
-        setTimeout(() => editRow(newIndex), 100);
-    }
-
-    function editRow(index) {
-        editableColumns.forEach(col => {
-            const colKey = col.replace(/[ '\/]/g, '_');
-            const display = document.querySelector(`.display-${index}-${colKey}`);
-            const input = document.querySelector(`.input-${index}-${colKey}`);
-            if (display) display.style.display = 'none';
-            if (input) input.style.display = 'block';
-        });
-
-        document.getElementById(`edit-${index}`).style.display = 'none';
-        document.getElementById(`save-${index}`).style.display = 'inline-block';
-        document.getElementById(`cancel-${index}`).style.display = 'inline-block';
-    }
-
-    function saveRow(index) {
-        const genderKey = 'Gender of the Person'.replace(/[ '\/]/g, '_');
-        const genderInput = document.querySelector(`.input-${index}-${genderKey}`);
-        if (genderInput && genderInput.value) {
-            const gender = genderInput.value.toLowerCase();
-            if (gender !== 'm' && gender !== 'f' && gender !== '') {
-                alert('Gender must be "m" or "f" only!');
+        incidentFieldMap.forEach(field => {
+            const input = document.getElementById(field.id);
+            if (!input) {
                 return;
+            }
+            input.value = row ? (row[field.column] || '') : '';
+        });
+
+        const provinceInput = document.getElementById('incidentProvince');
+        const municipalityInput = document.getElementById('incidentMunicipality');
+        const provinceValue = row ? (row['Province'] || '') : '';
+        const municipalityValue = row ? (row['Municipality/City where Incidence Occurred'] || '') : '';
+        if (provinceInput) {
+            ensureProvinceOption(provinceValue);
+            provinceInput.value = provinceValue;
+        }
+        if (municipalityInput) {
+            updateIncidentMunicipalities(municipalityValue);
+        }
+
+        if (incidentModalLabel) {
+            incidentModalLabel.textContent = isEdit ? `Edit Incident ${row && row['N'] ? '#' + row['N'] : ''}` : 'Add Incident';
+        }
+
+        if (incidentSaveButton) {
+            incidentSaveButton.textContent = isEdit ? 'Update Incident' : 'Add Incident';
+        }
+
+        if (incidentAttachmentsInput) {
+            incidentAttachmentsInput.value = '';
+        }
+
+        updateIncidentAttachmentSection(row);
+
+        if (typeof bootstrap === 'undefined') {
+            return;
+        }
+
+        const modalElement = document.getElementById('incidentModal');
+        const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+        modal.show();
+    }
+
+    function updateIncidentAttachmentSection(row) {
+        if (!incidentAttachmentHint) {
+            return;
+        }
+
+        if (!canUploadAttachments) {
+            incidentAttachmentHint.textContent = '';
+            return;
+        }
+
+        const hasIncident = !!(row && row['N']);
+        const isLocal = !!(row && row._local);
+        const canUpload = hasIncident && !isLocal;
+
+        incidentAttachmentHint.textContent = canUpload
+            ? 'Upload photos or documents for this incident.'
+            : 'Save the incident to the database before uploading attachments.';
+
+        if (incidentAttachmentStatus) {
+            const count = row && row.attachments_count ? row.attachments_count : 0;
+            const status = row && row.review_status ? row.review_status : 'pending';
+            incidentAttachmentStatus.textContent = hasIncident ? `${count} file(s), status: ${status}` : '';
+        }
+
+        if (incidentAttachmentsInput) {
+            incidentAttachmentsInput.disabled = false;
+        }
+
+        if (incidentUploadButton) {
+            incidentUploadButton.disabled = false;
+        }
+    }
+
+    function saveIncidentFromModal() {
+        const genderField = incidentFieldMap.find(field => field.column === 'Gender of the Person');
+        if (genderField) {
+            const genderInput = document.getElementById(genderField.id);
+            if (genderInput && genderInput.value) {
+                const gender = genderInput.value.toLowerCase();
+                if (gender !== 'm' && gender !== 'f' && gender !== '') {
+                    alert('Gender must be "m" or "f" only!');
+                    return;
+                }
             }
         }
 
-        editableColumns.forEach(col => {
-            const colKey = col.replace(/[ '\/]/g, '_');
-            const input = document.querySelector(`.input-${index}-${colKey}`);
-            if (input) {
-                tableData[index][col] = input.value;
+        const isEdit = currentIncidentIndex !== null;
+        const row = isEdit ? tableData[currentIncidentIndex] : { 'N': tableData.length + 1, _local: true };
+
+        incidentFieldMap.forEach(field => {
+            const input = document.getElementById(field.id);
+            if (!input) {
+                return;
             }
+            row[field.column] = input.value;
         });
 
-        tableData[index]['N'] = tableData[index]['N'] || (index + 1);
+        if (!isEdit) {
+            tableData.push(row);
+            currentPage = getTotalPages();
+        } else {
+            tableData[currentIncidentIndex] = row;
+        }
 
         renderTable();
-        alert('Row saved successfully!');
+
+        if (typeof bootstrap !== 'undefined') {
+            const modalElement = document.getElementById('incidentModal');
+            const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+            modal.hide();
+        }
     }
 
-    function cancelEdit(index) {
-        renderTable();
+    function ensureProvinceOption(value) {
+        const provinceInput = document.getElementById('incidentProvince');
+        if (!provinceInput || !value) {
+            return;
+        }
+
+        const options = Array.from(provinceInput.options).map(option => option.value);
+        if (!options.includes(value)) {
+            const option = document.createElement('option');
+            option.value = value;
+            option.textContent = value;
+            provinceInput.appendChild(option);
+        }
+    }
+
+    function updateIncidentMunicipalities(preferredValue) {
+        const provinceInput = document.getElementById('incidentProvince');
+        const municipalityInput = document.getElementById('incidentMunicipality');
+        if (!provinceInput || !municipalityInput) {
+            return;
+        }
+
+        const province = provinceInput.value;
+        const selectedValue = preferredValue !== undefined ? preferredValue : municipalityInput.value;
+        municipalityInput.innerHTML = '<option value="">Select municipality</option>';
+
+        if (province && municipalities[province]) {
+            municipalities[province].forEach((municipality) => {
+                const option = document.createElement('option');
+                option.value = municipality;
+                option.textContent = municipality;
+                if (municipality === selectedValue) {
+                    option.selected = true;
+                }
+                municipalityInput.appendChild(option);
+            });
+        }
+
+        if (selectedValue && (!municipalities[province] || !municipalities[province].includes(selectedValue))) {
+            const option = document.createElement('option');
+            option.value = selectedValue;
+            option.textContent = selectedValue;
+            option.selected = true;
+            municipalityInput.appendChild(option);
+        }
+    }
+
+    const incidentProvinceSelect = document.getElementById('incidentProvince');
+    if (incidentProvinceSelect) {
+        incidentProvinceSelect.addEventListener('change', () => updateIncidentMunicipalities());
+        incidentProvinceSelect.addEventListener('input', () => updateIncidentMunicipalities());
     }
 
     function normalizeRow(row) {
-        const normalized = { N: row['N'] ?? '' };
+        const normalized = { N: row['N'] ?? '', _local: true };
         editableColumns.forEach(col => {
             normalized[col] = '';
         });
@@ -605,7 +1045,10 @@
             'Other Factors': row.factors || '',
             "Person's Residence": row.residence || '',
             'Occupation of the Victim': row.occupation || '',
-            'Remarks': row.remarks || ''
+            'Remarks': row.remarks || '',
+            'review_status': row.review_status || '',
+            'attachments_count': row.attachments_count || 0,
+            '_local': false
         };
     }
 
@@ -751,7 +1194,14 @@
 
             let message = `Saved. Inserted: ${result.inserted}, Updated: ${result.updated}, Skipped: ${result.skipped}.`;
             if (result.errors && result.errors.length) {
-                message += `\n${result.errors.length} rows were missing required fields.`;
+                const missingRows = result.errors.filter(e => e.missing).length;
+                const invalidMonthRows = result.errors.filter(e => e.invalid && e.invalid.includes('month_of_incident')).length;
+                if (missingRows) {
+                    message += `\n${missingRows} rows were missing required fields.`;
+                }
+                if (invalidMonthRows) {
+                    message += `\n${invalidMonthRows} rows had invalid month values (must be 1-12).`;
+                }
             }
             showSaveResult(message);
         } catch (error) {
@@ -821,12 +1271,230 @@
         modal.show();
     }
 
+    function showAttachmentModal(message) {
+        const messageEl = document.getElementById('attachmentModalMessage');
+        if (messageEl) {
+            messageEl.textContent = message;
+        }
+
+        if (typeof bootstrap === 'undefined') {
+            alert(message);
+            return;
+        }
+
+        const modalElement = document.getElementById('attachmentModal');
+        const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+        modal.show();
+    }
+
+    async function openAttachmentViewer(incidentN) {
+        if (!incidentN) {
+            showAttachmentModal('Incident number is missing.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${attachmentListUrl}/${incidentN}`);
+            const result = await response.json();
+            if (!response.ok) {
+                showAttachmentModal(result.message || 'Failed to load attachments.');
+                return;
+            }
+
+            const attachments = result.attachments || [];
+            const listEl = document.getElementById('attachmentList');
+            const previewEl = document.getElementById('attachmentPreview');
+            const downloadEl = document.getElementById('attachmentDownload');
+
+            listEl.innerHTML = '';
+            previewEl.innerHTML = '<span class="text-muted">Select a file to preview.</span>';
+            downloadEl.href = '#';
+
+            if (attachments.length === 0) {
+                listEl.innerHTML = '<div class="text-muted">No attachments uploaded yet.</div>';
+            } else {
+                attachments.forEach((item, index) => {
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'list-group-item list-group-item-action';
+                    button.textContent = `${item.original_name} (${item.file_kind})`;
+                    button.addEventListener('click', () => {
+                        const viewUrl = `${attachmentViewUrl}/${item.id}`;
+                        const downloadUrl = `${attachmentDownloadUrl}/${item.id}`;
+                        downloadEl.href = downloadUrl;
+
+                        const mimeType = item.mime_type || '';
+                        const isImage = mimeType.startsWith('image/');
+                        const isPdf = mimeType === 'application/pdf';
+                        const isOffice = mimeType === 'application/msword'
+                            || mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+
+                        if (isImage) {
+                            previewEl.innerHTML = `<img src="${viewUrl}" alt="${item.original_name}" style="max-width:100%; max-height:520px;" />`;
+                        } else if (isPdf || isOffice) {
+                            previewEl.innerHTML = `<iframe src="${viewUrl}" style="width:100%; height:520px; border:0;" title="${item.original_name}"></iframe>`;
+                        } else {
+                            previewEl.innerHTML = `
+                                <div class="text-center p-4">
+                                    <div class="text-muted mb-2">Preview not available for this file type.</div>
+                                    <a class="btn btn-outline-primary" href="${downloadUrl}" target="_blank" rel="noopener">Download ${item.original_name}</a>
+                                </div>
+                            `;
+                        }
+
+                        listEl.querySelectorAll('.list-group-item').forEach(el => el.classList.remove('active'));
+                        button.classList.add('active');
+                    });
+
+                    if (index === 0) {
+                        setTimeout(() => button.click(), 0);
+                    }
+
+                    listEl.appendChild(button);
+                });
+            }
+
+            if (typeof bootstrap === 'undefined') {
+                return;
+            }
+
+            const modalElement = document.getElementById('attachmentViewerModal');
+            const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+            modal.show();
+        } catch (error) {
+            showAttachmentModal('Failed to load attachments: ' + error.message);
+        }
+    }
+
+    let pendingReview = { incidentN: null, action: null };
+
+    function showReviewConfirm(incidentN, action) {
+        const messageEl = document.getElementById('reviewConfirmMessage');
+        const actionLabel = action === 'approve' ? 'approve' : 'reject';
+        if (messageEl) {
+            messageEl.textContent = `Are you sure you want to ${actionLabel} this incident?`;
+        }
+
+        pendingReview = { incidentN, action };
+
+        if (typeof bootstrap === 'undefined') {
+            if (confirm(`Are you sure you want to ${actionLabel} this incident?`)) {
+                submitReview();
+            }
+            return;
+        }
+
+        const modalElement = document.getElementById('reviewConfirmModal');
+        const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+        modal.show();
+    }
+
+    function submitReview() {
+        const { incidentN, action } = pendingReview;
+        if (!incidentN || !action) {
+            return;
+        }
+
+        if (typeof bootstrap !== 'undefined') {
+            const modalElement = document.getElementById('reviewConfirmModal');
+            const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+            modal.hide();
+        }
+
+        performReview(incidentN, action);
+    }
+
     function deleteRow(index) {
         if (confirm('Are you sure you want to delete this row?')) {
             tableData.splice(index, 1);
             renderTable();
             alert('Row deleted successfully!');
         }
+    }
+
+    async function uploadIncidentAttachments() {
+        if (currentIncidentIndex === null) {
+            showAttachmentModal('Please save the incident before uploading attachments.');
+            return;
+        }
+
+        const row = tableData[currentIncidentIndex];
+        const incidentN = row ? row['N'] : null;
+        if (!incidentN || row._local) {
+            showAttachmentModal('Please save the incident to the database before uploading attachments.');
+            return;
+        }
+
+        if (!incidentAttachmentsInput || !incidentAttachmentsInput.files || incidentAttachmentsInput.files.length === 0) {
+            showAttachmentModal('Please select at least one file to upload.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('incident_n', incidentN);
+        Array.from(incidentAttachmentsInput.files).forEach((file) => {
+            formData.append('attachments[]', file);
+        });
+
+        try {
+            const response = await fetch(attachmentUploadUrl, {
+                method: 'POST',
+                body: formData,
+            });
+            const result = await response.json();
+            if (!response.ok) {
+                showAttachmentModal(result.message || 'Upload failed.');
+                return;
+            }
+
+            row.attachments_count = result.attachments_count || row.attachments_count || 0;
+            row.review_status = 'pending';
+            incidentAttachmentsInput.value = '';
+            renderTable();
+            updateIncidentAttachmentSection(row);
+            showAttachmentModal('Attachments uploaded successfully.');
+        } catch (error) {
+            showAttachmentModal('Upload failed: ' + error.message);
+        }
+    }
+
+    async function performReview(incidentN, action) {
+        if (!incidentN) {
+            return;
+        }
+
+        const endpoint = action === 'approve' ? `${approveUrl}/${incidentN}` : `${rejectUrl}/${incidentN}`;
+        try {
+            const response = await fetch(endpoint, { method: 'POST' });
+            const result = await response.json();
+            if (!response.ok) {
+                showAttachmentModal(result.message || 'Update failed.');
+                return;
+            }
+
+            tableData = tableData.map((row) => {
+                if (row['N'] === incidentN) {
+                    return {
+                        ...row,
+                        review_status: result.status || (action === 'approve' ? 'approved' : 'rejected'),
+                    };
+                }
+                return row;
+            });
+            renderTable();
+            showAttachmentModal('Incident updated successfully.');
+        } catch (error) {
+            showAttachmentModal('Update failed: ' + error.message);
+        }
+    }
+
+    function reviewIncident(incidentN, action) {
+        showReviewConfirm(incidentN, action);
+    }
+
+    const reviewConfirmAction = document.getElementById('reviewConfirmAction');
+    if (reviewConfirmAction) {
+        reviewConfirmAction.addEventListener('click', submitReview);
     }
 </script>
 <?= $this->endSection() ?>

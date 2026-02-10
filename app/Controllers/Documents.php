@@ -36,6 +36,8 @@ class Documents extends BaseController
             'myDocuments' => [],
             'pendingDocuments' => [],
             'approvedDocuments' => [],
+            'provinces' => $this->getRegion1Provinces(),
+            'municipalities' => $this->getRegion1Municipalities(),
         ];
 
         if ($roleName === 'LGU') {

@@ -7,8 +7,8 @@ use CodeIgniter\Model;
 class IncidentReportModel extends Model
 {
     protected $table = 'incident_reports';
-    protected $primaryKey = 'n';
-    protected $useAutoIncrement = false;
+    protected $primaryKey = 'id';
+    protected $useAutoIncrement = true;
     protected $returnType = 'array';
     protected $useSoftDeletes = false;
     protected $protectFields = true;
@@ -29,6 +29,9 @@ class IncidentReportModel extends Model
         'region',
         'occupation',
         'remarks',
+        'review_status',
+        'reviewed_by',
+        'reviewed_at',
     ];
 
     protected $useTimestamps = true;

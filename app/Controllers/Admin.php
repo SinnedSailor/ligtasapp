@@ -189,7 +189,10 @@ class Admin extends BaseController
             return redirect()->to('/login')->with('error', 'Admin user already exists');
         }
 
-        return view('admin/create_first_admin');
+        return view('admin/create_first_admin', [
+            'provinces' => $this->getRegion1Provinces(),
+            'municipalities' => $this->getRegion1Municipalities(),
+        ]);
     }
 
     /**
@@ -230,6 +233,10 @@ class Admin extends BaseController
 
         if (!$hasUppercase || !$hasLowercase || !$hasNumber || !$hasSpecial || strlen($data['password']) < 8) {
             return redirect()->back()->with('error', 'Password must contain at least 8 characters, one uppercase, one lowercase, one number, and one special character')->withInput();
+        }
+
+        if (!$this->isValidRegion1Location((string) $data['province'], (string) $data['municipality'])) {
+            return redirect()->back()->with('error', 'Please select a valid Region 1 province and municipality')->withInput();
         }
 
         // Save admin to database

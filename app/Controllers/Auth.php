@@ -58,6 +58,7 @@ class Auth extends BaseController
             'last_name' => $user['last_name'],
             'province' => $user['province'],
             'municipality' => $user['municipality'],
+            'contact_number' => $user['contact_number'] ?? null,
             'role_id' => $user['role_id'],
             'role_name' => $user['role_name'] ?? 'No Role',
             'is_admin' => $user['is_admin'],
@@ -77,6 +78,8 @@ class Auth extends BaseController
             'hideNavbar' => true,
             'hideSidebar' => true,
             'hideFooter' => true,
+            'provinces' => $this->getRegion1Provinces(),
+            'municipalities' => $this->getRegion1Municipalities(),
         ]);
     }
 
@@ -107,6 +110,10 @@ class Auth extends BaseController
 
         if (!$hasUppercase || !$hasLowercase || !$hasNumber || !$hasSpecial || strlen($data['password']) < 8) {
             return redirect()->back()->with('error', 'Password must contain at least 8 characters, one uppercase, one lowercase, one number, and one special character')->withInput();
+        }
+
+        if (!$this->isValidRegion1Location((string) $data['province'], (string) $data['municipality'])) {
+            return redirect()->back()->with('error', 'Please select a valid Region 1 province and municipality')->withInput();
         }
 
         // Save to database
@@ -141,6 +148,7 @@ class Auth extends BaseController
             'last_name',
             'province',
             'municipality',
+            'contact_number',
             'role_id',
             'is_admin',
             'logged_in'
@@ -165,13 +173,21 @@ class Auth extends BaseController
             return redirect()->to('/login');
         }
 
-        $incidentReportModel = new IncidentReportModel();
-        $rows = $incidentReportModel
-            ->orderBy('n', 'asc')
-            ->findAll();
+        $db = \Config\Database::connect();
+        $rows = $db->table('incident_reports ir')
+            ->select('ir.*, COUNT(ira.id) as attachments_count')
+            ->join('incident_report_attachments ira', 'ira.incident_n = ir.n', 'left')
+            ->groupBy('ir.n')
+            ->orderBy('ir.n', 'asc')
+            ->get()
+            ->getResultArray();
 
         return view('incident_report', [
             'initialRows' => $rows,
+            'roleName' => strtoupper(trim((string) session()->get('role_name'))),
+            'isAdmin' => (bool) session()->get('is_admin'),
+            'provinces' => $this->getRegion1Provinces(),
+            'municipalities' => $this->getRegion1Municipalities(),
         ]);
     }
 
@@ -190,6 +206,71 @@ class Auth extends BaseController
             return redirect()->to('/login');
         }
 
-        return view('user_profile');
+        $userModel = new UserModel();
+        $userId = (int) session()->get('user_id');
+        $profile = $userModel->find($userId) ?? [];
+
+        return view('user_profile', [
+            'provinces' => $this->getRegion1Provinces(),
+            'municipalities' => $this->getRegion1Municipalities(),
+            'profile' => $profile,
+        ]);
+    }
+
+    public function update_profile()
+    {
+        if (!session()->get('logged_in')) {
+            return redirect()->to('/login');
+        }
+
+        $userId = (int) session()->get('user_id');
+        $data = [
+            'first_name' => trim((string) $this->request->getPost('first_name')),
+            'last_name' => trim((string) $this->request->getPost('last_name')),
+            'username' => trim((string) $this->request->getPost('username')),
+            'contact_number' => trim((string) $this->request->getPost('contact_number')),
+            'province' => trim((string) $this->request->getPost('province')),
+            'municipality' => trim((string) $this->request->getPost('municipality')),
+        ];
+
+        if ($data['first_name'] === '' || $data['last_name'] === '' || $data['username'] === '') {
+            return redirect()->back()->with('error', 'Please complete all required fields.')->withInput();
+        }
+
+        if ($data['contact_number'] !== '' && !preg_match('/^[0-9]{11}$/', $data['contact_number'])) {
+            return redirect()->back()->with('error', 'Please enter a valid 11-digit contact number.')->withInput();
+        }
+
+        if (!$this->isValidRegion1Location($data['province'], $data['municipality'])) {
+            return redirect()->back()->with('error', 'Please select a valid Region 1 province and municipality.')->withInput();
+        }
+
+        $userModel = new UserModel();
+
+        $existingUsername = $userModel
+            ->where('username', $data['username'])
+            ->where('id !=', $userId)
+            ->first();
+        if ($existingUsername) {
+            return redirect()->back()->with('error', 'This username is already taken.')->withInput();
+        }
+
+        $userModel->skipValidation(true);
+        if (!$userModel->update($userId, $data)) {
+            $errors = $userModel->errors();
+            $errorMessage = is_array($errors) ? implode(', ', $errors) : 'Profile update failed.';
+            return redirect()->back()->with('error', $errorMessage)->withInput();
+        }
+
+        session()->set([
+            'first_name' => $data['first_name'],
+            'last_name' => $data['last_name'],
+            'username' => $data['username'],
+            'province' => $data['province'],
+            'municipality' => $data['municipality'],
+            'contact_number' => $data['contact_number'],
+        ]);
+
+        return redirect()->to('/user-profile')->with('profile_success', 'Profile updated successfully!');
     }
 }

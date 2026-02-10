@@ -20,6 +20,7 @@ class UserModel extends Model
         'password',
         'province',
         'municipality',
+        'contact_number',
         'role_id',
         'is_admin'
     ];

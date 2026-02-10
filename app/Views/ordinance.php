@@ -181,6 +181,61 @@
     .preview-modal {
         overscroll-behavior: contain;
     }
+
+    .doc-filter-card {
+        border: 1px solid #e9ecef;
+        border-radius: 10px;
+        padding: 16px;
+        background: #fff;
+        margin-top: 20px;
+    }
+
+    .filter-row {
+        display: grid;
+        gap: 16px;
+    }
+
+    .filter-group {
+        display: grid;
+        gap: 8px;
+    }
+
+    .filter-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    .filter-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .filter-btn {
+        border: 1px solid #cbd5f5;
+        background: #f8fafc;
+        color: #0f172a;
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .filter-btn:hover {
+        border-color: #09637E;
+        color: #09637E;
+    }
+
+    .filter-btn.active {
+        background: #09637E;
+        border-color: #09637E;
+        color: #fff;
+    }
 </style>
 <?= $this->endSection() ?>
 
@@ -221,6 +276,41 @@
 <?php if (session()->getFlashdata('error')): ?>
     <div class="alert alert-danger">
         <?= esc(session()->getFlashdata('error')) ?>
+    </div>
+<?php endif; ?>
+
+<?php if ($isLgu || $canReview || $canViewApproved): ?>
+    <div class="doc-filter-card">
+        <div class="section-title">Browse Documents</div>
+        <div class="filter-row">
+            <div class="filter-group">
+                <div class="filter-label">Document</div>
+                <div class="filter-buttons" id="docTypeButtons">
+                    <button class="filter-btn active" type="button" data-doc-type="">All</button>
+                    <button class="filter-btn" type="button" data-doc-type="ordinance">Ordinance</button>
+                    <button class="filter-btn" type="button" data-doc-type="pops">POPS</button>
+                    <button class="filter-btn" type="button" data-doc-type="budget">Budget</button>
+                </div>
+            </div>
+            <div class="filter-group" id="provinceGroup" hidden>
+                <div class="filter-label">Province</div>
+                <div class="filter-buttons" id="provinceButtons">
+                    <button class="filter-btn active" type="button" data-province="">All Provinces</button>
+                    <?php foreach (($provinces ?? []) as $province): ?>
+                        <button class="filter-btn" type="button" data-province="<?= esc($province) ?>">
+                            <?= esc($province) ?>
+                        </button>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <div class="filter-group" id="municipalityGroup" hidden>
+                <div class="filter-label">Municipality</div>
+                <div class="filter-buttons" id="municipalityButtons"></div>
+            </div>
+            <div class="filter-group">
+                <button class="btn btn-outline-secondary btn-sm mt-2" type="button" onclick="clearFilters()">Clear Filters</button>
+            </div>
+        </div>
     </div>
 <?php endif; ?>
 
@@ -285,7 +375,7 @@
                         </thead>
                         <tbody>
                             <?php foreach ($myDocuments as $doc): ?>
-                                <tr>
+                                <tr class="doc-filter-row" data-doc-type="<?= esc($doc['doc_type']) ?>" data-province="<?= esc($doc['province'] ?? '') ?>" data-municipality="<?= esc($doc['municipality'] ?? '') ?>">
                                     <td><?= esc($docLabels[$doc['doc_type']] ?? strtoupper($doc['doc_type'])) ?></td>
                                     <td><?= esc($doc['original_name']) ?></td>
                                     <td>
@@ -335,7 +425,7 @@
                         </thead>
                         <tbody>
                             <?php foreach ($pendingDocuments as $doc): ?>
-                                <tr>
+                                <tr class="doc-filter-row" data-doc-type="<?= esc($doc['doc_type']) ?>" data-province="<?= esc($doc['province'] ?? '') ?>" data-municipality="<?= esc($doc['municipality'] ?? '') ?>">
                                     <td><?= esc($docLabels[$doc['doc_type']] ?? strtoupper($doc['doc_type'])) ?></td>
                                     <td><?= esc($doc['original_name']) ?></td>
                                     <td><?= esc(trim($doc['first_name'] . ' ' . $doc['last_name'])) ?></td>
@@ -380,7 +470,7 @@
                         </thead>
                         <tbody>
                             <?php foreach ($approvedDocuments as $doc): ?>
-                                <tr>
+                                <tr class="doc-filter-row" data-doc-type="<?= esc($doc['doc_type']) ?>" data-province="<?= esc($doc['province'] ?? '') ?>" data-municipality="<?= esc($doc['municipality'] ?? '') ?>">
                                     <td><?= esc($docLabels[$doc['doc_type']] ?? strtoupper($doc['doc_type'])) ?></td>
                                     <td><?= esc($doc['original_name']) ?></td>
                                     <td><?= esc(trim($doc['first_name'] . ' ' . $doc['last_name'])) ?></td>
@@ -439,6 +529,7 @@
 
 <?= $this->section('pageScripts') ?>
 <script>
+    const municipalityMap = <?= json_encode($municipalities ?? []) ?>;
     const previewModal = document.getElementById('documentPreviewModal');
     const previewFrame = document.getElementById('previewFrame');
     const previewTitle = document.getElementById('previewTitle');
@@ -498,5 +589,114 @@
             uploadForm.setAttribute('aria-busy', 'true');
         });
     }
+
+    const docTypeButtons = document.querySelectorAll('#docTypeButtons .filter-btn');
+    const provinceGroup = document.getElementById('provinceGroup');
+    const provinceButtons = document.querySelectorAll('#provinceButtons .filter-btn');
+    const municipalityGroup = document.getElementById('municipalityGroup');
+    const municipalityButtons = document.getElementById('municipalityButtons');
+    const documentRows = document.querySelectorAll('.doc-filter-row');
+
+    let selectedDocType = '';
+    let selectedProvince = '';
+    let selectedMunicipality = '';
+
+    function setActiveButton(buttons, selector) {
+        buttons.forEach((button) => {
+            button.classList.toggle('active', button === selector);
+        });
+    }
+
+    function applyFilters() {
+        documentRows.forEach((row) => {
+            const rowDocType = row.dataset.docType || '';
+            const rowProvince = row.dataset.province || '';
+            const rowMunicipality = row.dataset.municipality || '';
+
+            const matchesDocType = !selectedDocType || rowDocType === selectedDocType;
+            const matchesProvince = !selectedProvince || rowProvince === selectedProvince;
+            const matchesMunicipality = !selectedMunicipality || rowMunicipality === selectedMunicipality;
+
+            row.style.display = matchesDocType && matchesProvince && matchesMunicipality ? '' : 'none';
+        });
+    }
+
+    function renderMunicipalityButtons(province) {
+        municipalityButtons.innerHTML = '';
+
+        const allButton = document.createElement('button');
+        allButton.type = 'button';
+        allButton.className = 'filter-btn active';
+        allButton.dataset.municipality = '';
+        allButton.textContent = 'All Municipalities';
+        municipalityButtons.appendChild(allButton);
+
+        const list = municipalityMap[province] || [];
+        list.forEach((municipality) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'filter-btn';
+            button.dataset.municipality = municipality;
+            button.textContent = municipality;
+            municipalityButtons.appendChild(button);
+        });
+
+        municipalityButtons.querySelectorAll('.filter-btn').forEach((button) => {
+            button.addEventListener('click', () => {
+                selectedMunicipality = button.dataset.municipality || '';
+                setActiveButton(municipalityButtons.querySelectorAll('.filter-btn'), button);
+                applyFilters();
+                window.clearFilters = function() {
+                    selectedDocType = '';
+                    selectedProvince = '';
+                    selectedMunicipality = '';
+                    setActiveButton(docTypeButtons, docTypeButtons[0]);
+                    setActiveButton(provinceButtons, provinceButtons[0]);
+                    municipalityGroup.hidden = true;
+                    provinceGroup.hidden = true;
+                    applyFilters();
+                };
+            });
+        });
+    }
+
+    docTypeButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+            selectedDocType = button.dataset.docType || '';
+            selectedProvince = '';
+            selectedMunicipality = '';
+            setActiveButton(docTypeButtons, button);
+
+            if (selectedDocType) {
+                provinceGroup.hidden = false;
+                municipalityGroup.hidden = true;
+                setActiveButton(provinceButtons, provinceButtons[0]);
+            } else {
+                provinceGroup.hidden = true;
+                municipalityGroup.hidden = true;
+            }
+
+            applyFilters();
+        });
+    });
+
+    provinceButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+            selectedProvince = button.dataset.province || '';
+            selectedMunicipality = '';
+            setActiveButton(provinceButtons, button);
+
+            if (selectedProvince) {
+                municipalityGroup.hidden = false;
+                renderMunicipalityButtons(selectedProvince);
+            } else {
+                municipalityGroup.hidden = true;
+            }
+
+            applyFilters();
+        });
+    });
+
+    applyFilters();
 </script>
 <?= $this->endSection() ?>

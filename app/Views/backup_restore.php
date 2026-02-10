@@ -322,6 +322,7 @@
                 Upload Backup File
             </button>
             <input type="file" id="restoreFile" style="display: none;" accept=".zip,.backup" onchange="handleRestore(event)">
+                    <button type="button" class="btn btn-outline-secondary btn-sm mt-2" onclick="document.getElementById('restoreFile').value = null">Clear</button>
         </div>
     </div>
 

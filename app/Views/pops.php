@@ -245,6 +245,7 @@
             <div class="upload-text">Click to upload or drag and drop</div>
             <div class="upload-hint">Supported formats: PDF, DOC, DOCX (Max 10MB each)</div>
             <input type="file" id="fileInput" class="file-input" multiple accept=".pdf,.doc,.docx" onchange="handleFiles(this.files)">
+                        <button type="button" class="btn btn-outline-secondary btn-sm mt-2" onclick="document.getElementById('fileInput').value = null">Clear</button>
             <button class="upload-btn">Browse Files</button>
         </div>
 

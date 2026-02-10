@@ -55,4 +55,161 @@ abstract class BaseController extends Controller
             }
         }
     }
+
+    protected function getRegion1Provinces(): array
+    {
+        return [
+            'Ilocos Norte',
+            'Ilocos Sur',
+            'La Union',
+            'Pangasinan',
+        ];
+    }
+
+    protected function getRegion1Municipalities(): array
+    {
+        return [
+            'Ilocos Norte' => [
+                'Laoag City',
+                'Batac City',
+                'Pagudpud',
+                'Bangui',
+                'Pasuquin',
+                'Burgos',
+                'Bacarra',
+                'Vintar',
+                'Dumalneg',
+                'Solsona',
+                'Dingras',
+                'Nueva Era',
+                'Marcos',
+                'Banna',
+                'Sarrat',
+                'Carasi',
+                'Piddig',
+                'Pinili',
+                'San Nicolas',
+                'Badoc',
+                'Currimao',
+                'Paoay',
+            ],
+            'Ilocos Sur' => [
+                'Vigan City',
+                'Candon City',
+                'Santa Cruz',
+                'Santa Maria',
+                'Narvacan',
+                'Santiago',
+                'Bantay',
+                'Caoayan',
+                'Santa Catalina',
+                'Magsingal',
+                'San Vicente',
+                'San Ildefonso',
+                'San Juan',
+                'Cabugao',
+                'Sinait',
+                'San Esteban',
+                'Burgos',
+                'Santa Lucia',
+                'Lidlidda',
+                'Tagudin',
+                'Suyo',
+                'Alilem',
+                'Sugpon',
+                'Sudipen',
+                'Banayoyo',
+                'Galimuyod',
+                'Gregorio del Pilar',
+                'Sigay',
+                'Salcedo',
+                'Santa',
+                'Quirino',
+                'Cervantes',
+            ],
+            'La Union' => [
+                'San Fernando City',
+                'Bauang',
+                'Naguilian',
+                'San Juan',
+                'Bacnotan',
+                'Balaoan',
+                'Luna',
+                'Bangar',
+                'Santol',
+                'San Gabriel',
+                'Sudipen',
+                'Caba',
+                'Aringay',
+                'Tubao',
+                'Pugo',
+                'Rosario',
+                'Santo Tomas',
+                'Agoo',
+                'Burgos',
+            ],
+            'Pangasinan' => [
+                'Dagupan City',
+                'San Carlos City',
+                'Urdaneta City',
+                'Alaminos City',
+                'Lingayen',
+                'Mangaldan',
+                'Manaoag',
+                'Pozorrubio',
+                'Sison',
+                'Binalonan',
+                'Laoac',
+                'San Fabian',
+                'San Jacinto',
+                'Rosales',
+                'Umingan',
+                'Balungao',
+                'Santa Maria',
+                'Alcala',
+                'Bautista',
+                'Bayambang',
+                'Bugallon',
+                'Infanta',
+                'Labrador',
+                'Mabini',
+                'Malasiqui',
+                'Mapandan',
+                'Natividad',
+                'San Manuel',
+                'San Nicolas',
+                'San Quintin',
+                'Santa Barbara',
+                'Tayug',
+                'Uyong',
+                'Villasis',
+                'Asingan',
+                'Binmaley',
+                'Bolinao',
+                'Burgos',
+                'Dasol',
+                'Sual',
+            ],
+        ];
+    }
+
+    protected function isValidRegion1Location(string $province, string $municipality): bool
+    {
+        $province = trim($province);
+        $municipality = trim($municipality);
+
+        if ($province === '' || $municipality === '') {
+            return false;
+        }
+
+        $provinces = $this->getRegion1Provinces();
+        if (!in_array($province, $provinces, true)) {
+            return false;
+        }
+
+        $municipalities = $this->getRegion1Municipalities();
+        $list = $municipalities[$province] ?? [];
+
+        return in_array($municipality, $list, true);
+    }
 }

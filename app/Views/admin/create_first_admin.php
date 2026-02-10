@@ -126,12 +126,19 @@ $hideFooter = true;
 
                 <div class="mb-3">
                     <label for="province" class="form-label">Province</label>
-                    <input type="text" class="form-control" id="province" name="province" value="<?= old('province') ?>" placeholder="Enter province">
+                    <select class="form-control" id="province" name="province" required>
+                        <option value="">Select province</option>
+                        <?php foreach (($provinces ?? []) as $province): ?>
+                            <option value="<?= esc($province) ?>" <?= (old('province') === $province) ? 'selected' : '' ?>><?= esc($province) ?></option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
 
                 <div class="mb-3">
                     <label for="municipality" class="form-label">Municipality</label>
-                    <input type="text" class="form-control" id="municipality" name="municipality" value="<?= old('municipality') ?>" placeholder="Enter municipality">
+                    <select class="form-control" id="municipality" name="municipality" required>
+                        <option value="">Select municipality</option>
+                    </select>
                 </div>
 
                 <div class="mb-3">
@@ -179,4 +186,39 @@ $hideFooter = true;
         </div>
     </div>
 </div>
+<?= $this->endSection() ?>
+
+<?= $this->section('pageScripts') ?>
+<script>
+    const municipalities = <?= json_encode($municipalities ?? []) ?>;
+
+    function updateMunicipalities() {
+        const provinceInput = document.getElementById('province');
+        const municipalityInput = document.getElementById('municipality');
+        const province = provinceInput.value;
+        const previousValue = municipalityInput.value;
+
+        municipalityInput.innerHTML = '<option value="">Select municipality</option>';
+
+        if (province && municipalities[province]) {
+            municipalities[province].forEach((mun) => {
+                const option = document.createElement('option');
+                option.value = mun;
+                option.textContent = mun;
+                if (mun === previousValue) {
+                    option.selected = true;
+                }
+                municipalityInput.appendChild(option);
+            });
+        }
+
+        if (previousValue && (!municipalities[province] || !municipalities[province].includes(previousValue))) {
+            municipalityInput.value = '';
+        }
+    }
+
+    document.getElementById('province').addEventListener('change', updateMunicipalities);
+    document.getElementById('province').addEventListener('input', updateMunicipalities);
+    updateMunicipalities();
+</script>
 <?= $this->endSection() ?>

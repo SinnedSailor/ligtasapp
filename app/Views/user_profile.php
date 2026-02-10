@@ -76,14 +76,78 @@
         color: #09637E;
         font-weight: 600;
     }
+
+    .success-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.55);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        z-index: 3000;
+    }
+
+    .success-modal.show {
+        display: flex;
+    }
+
+    .success-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 24px;
+        max-width: 420px;
+        width: 100%;
+        text-align: center;
+        box-shadow: 0 16px 40px rgba(15, 23, 42, 0.25);
+    }
+
+    .success-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: #16a34a;
+        color: #fff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        margin-bottom: 16px;
+    }
+
+    .success-message {
+        font-size: 18px;
+        font-weight: 600;
+        color: #0f172a;
+        margin-bottom: 8px;
+    }
+
+    .success-subtext {
+        color: #64748b;
+        margin-bottom: 16px;
+    }
 </style>
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
+<?php
+    $profileSuccess = session()->getFlashdata('profile_success');
+    $profileError = session()->getFlashdata('error');
+    $selectedProvince = trim((string) ($profile['province'] ?? session()->get('province') ?? ''));
+    $selectedMunicipality = trim((string) ($profile['municipality'] ?? session()->get('municipality') ?? ''));
+    $provinceList = $provinces ?? [];
+    $provinceSelectedInList = $selectedProvince !== '' && in_array($selectedProvince, $provinceList, true);
+?>
 <div class="page-header">
     <h3 class="page-title">User Profile</h3>
     <p class="text-muted">Manage your account information and settings.</p>
 </div>
+
+<?php if (!empty($profileError)): ?>
+    <div class="alert alert-danger">
+        <?= esc($profileError) ?>
+    </div>
+<?php endif; ?>
 
 <div class="row">
     <div class="col-lg-8 grid-margin">
@@ -97,6 +161,7 @@
                         <i class="ti-camera"></i> Change Photo
                     </div>
                     <input type="file" id="profilePicture" class="d-none" accept="image/*" onchange="previewImage(event)">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm mt-2" onclick="document.getElementById('profilePicture').value = null">Clear</button>
                 </div>
             </div>
 
@@ -104,32 +169,33 @@
                 Keep your profile information up to date for better communication.
             </div>
 
-            <form id="profileForm" onsubmit="saveProfile(event)">
+            <form id="profileForm" action="<?= base_url('/user-profile/update') ?>" method="post">
+                <?= csrf_field() ?>
                 <div class="form-section">
                     <h5>Personal Information</h5>
                     <div class="form-row">
                         <div class="form-group">
                             <label for="firstName">First Name *</label>
-                            <input type="text" class="form-control" id="firstName" value="<?= session()->get('first_name') ?? '' ?>" required oninput="this.value = this.value.toUpperCase()">
+                            <input type="text" class="form-control" id="firstName" name="first_name" value="<?= esc($profile['first_name'] ?? session()->get('first_name') ?? '') ?>" required oninput="this.value = this.value.toUpperCase()">
                         </div>
                         <div class="form-group">
                             <label for="lastName">Last Name *</label>
-                            <input type="text" class="form-control" id="lastName" value="<?= session()->get('last_name') ?? '' ?>" required oninput="this.value = this.value.toUpperCase()">
+                            <input type="text" class="form-control" id="lastName" name="last_name" value="<?= esc($profile['last_name'] ?? session()->get('last_name') ?? '') ?>" required oninput="this.value = this.value.toUpperCase()">
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label for="username">Username *</label>
-                            <input type="text" class="form-control" id="username" value="<?= session()->get('username') ?? '' ?>" required>
+                            <input type="text" class="form-control" id="username" name="username" value="<?= esc($profile['username'] ?? session()->get('username') ?? '') ?>" required>
                         </div>
                         <div class="form-group">
                             <label for="contactNumber">Contact Number *</label>
-                            <input type="tel" class="form-control" id="contactNumber" placeholder="e.g., 09123456789" inputmode="numeric" maxlength="11" pattern="[0-9]{11}" title="Please enter 11-digit phone number (numbers only)" required oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                            <input type="tel" class="form-control" id="contactNumber" name="contact_number" value="<?= esc($profile['contact_number'] ?? session()->get('contact_number') ?? '') ?>" placeholder="e.g., 09123456789" inputmode="numeric" maxlength="11" pattern="[0-9]{11}" title="Please enter 11-digit phone number (numbers only)" required oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="email">Email Address *</label>
-                        <input type="email" class="form-control" id="email" value="<?= session()->get('email') ?? '' ?>" disabled>
+                        <input type="email" class="form-control" id="email" value="<?= esc($profile['email'] ?? session()->get('email') ?? '') ?>" disabled>
                     </div>
                 </div>
 
@@ -138,18 +204,23 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="province">Province *</label>
-                            <input type="text" class="form-control" id="province" list="provinceList" value="<?= session()->get('province') ?? '' ?>" required placeholder="Search or select province">
-                            <datalist id="provinceList">
-                                <option value="Ilocos Norte">
-                                <option value="Ilocos Sur">
-                                <option value="La Union">
-                                <option value="Pangasinan">
-                            </datalist>
+                            <select class="form-control" id="province" name="province" required>
+                                <option value="">Select province</option>
+                                <?php if (!$provinceSelectedInList && $selectedProvince !== ''): ?>
+                                    <option value="<?= esc($selectedProvince) ?>" selected>
+                                        <?= esc($selectedProvince) ?>
+                                    </option>
+                                <?php endif; ?>
+                                <?php foreach ($provinceList as $province): ?>
+                                    <option value="<?= esc($province) ?>" <?= ($selectedProvince === $province) ? 'selected' : '' ?>><?= esc($province) ?></option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label for="municipality">Municipality *</label>
-                            <input type="text" class="form-control" id="municipality" list="municipalityList" value="<?= session()->get('municipality') ?? '' ?>" required placeholder="Search or select municipality">
-                            <datalist id="municipalityList"></datalist>
+                            <select class="form-control" id="municipality" name="municipality" required>
+                                <option value="">Select municipality</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -174,6 +245,17 @@
         </div>
     </div>
 </div>
+
+<div class="success-modal" id="profileSuccessModal" aria-hidden="true">
+    <div class="success-card">
+        <div class="success-icon">
+            <i class="ti-check"></i>
+        </div>
+        <div class="success-message">Profile updated successfully!</div>
+        <div class="success-subtext">Your changes have been saved.</div>
+        <button type="button" class="btn btn-primary" id="closeSuccessModal">OK</button>
+    </div>
+</div>
 <?= $this->endSection() ?>
 
 <?= $this->section('pageScripts') ?>
@@ -190,18 +272,6 @@
         }
     }
 
-    function saveProfile(event) {
-        event.preventDefault();
-
-        const contactNumber = document.getElementById('contactNumber').value;
-        if (contactNumber && !/^[0-9]{11}$/.test(contactNumber)) {
-            alert('Please enter a valid 11-digit contact number.');
-            return;
-        }
-
-        alert('Profile updated successfully!');
-    }
-
     function forgotPassword(event) {
         event.preventDefault();
         const email = document.getElementById('email').value;
@@ -210,38 +280,58 @@
         }
     }
 
-    const municipalities = {
-        'Ilocos Norte': ['Laoag City', 'Batac City', 'Pagudpud', 'Bangui', 'Pasuquin', 'Burgos', 'Bacarra', 'Vintar', 'Dumalneg', 'Solsona', 'Dingras', 'Nueva Era', 'Marcos', 'Banna', 'Sarrat', 'Carasi', 'Piddig', 'Pinili', 'San Nicolas', 'Badoc', 'Currimao', 'Paoay'],
-        'Ilocos Sur': ['Vigan City', 'Candon City', 'Santa Cruz', 'Santa Maria', 'Narvacan', 'Santiago', 'Bantay', 'Caoayan', 'Santa Catalina', 'Magsingal', 'San Vicente', 'San Ildefonso', 'San Juan', 'Cabugao', 'Sinait', 'San Esteban', 'Burgos', 'Santa Lucia', 'Lidlidda', 'Tagudin', 'Suyo', 'Alilem', 'Sugpon', 'Sudipen', 'Banayoyo', 'Galimuyod', 'Gregorio del Pilar', 'Sigay', 'Salcedo', 'Santa', 'Quirino', 'Cervantes'],
-        'La Union': ['San Fernando City', 'Bauang', 'Naguilian', 'San Juan', 'Bacnotan', 'Balaoan', 'Luna', 'Bangar', 'Santol', 'San Gabriel', 'Sudipen', 'Caba', 'Aringay', 'Tubao', 'Pugo', 'Rosario', 'Santo Tomas', 'Agoo', 'Burgos'],
-        'Pangasinan': ['Dagupan City', 'San Carlos City', 'Urdaneta City', 'Alaminos City', 'Lingayen', 'Mangaldan', 'Manaoag', 'Pozorrubio', 'Sison', 'Binalonan', 'Laoac', 'San Fabian', 'San Jacinto', 'Rosales', 'Umingan', 'Balungao', 'Santa Maria', 'Alcala', 'Bautista', 'Bayambang', 'Bugallon', 'Infanta', 'Labrador', 'Mabini', 'Malasiqui', 'Mapandan', 'Natividad', 'San Manuel', 'San Nicolas', 'San Quintin', 'Santa Barbara', 'Tayug', 'Uyong', 'Villasis', 'Asingan', 'Binmaley', 'Bolinao', 'Burgos', 'Dasol', 'Sual']
-    };
+    const municipalities = <?= json_encode($municipalities ?? []) ?>;
 
-    document.getElementById('province').addEventListener('change', function() {
-        const province = this.value;
-        const municipalityDatalist = document.getElementById('municipalityList');
-        municipalityDatalist.innerHTML = '';
+    function updateMunicipalities() {
+        const provinceInput = document.getElementById('province');
+        const municipalityInput = document.getElementById('municipality');
+        const province = provinceInput.value;
+        const previousValue = municipalityInput.value || '<?= addslashes($selectedMunicipality) ?>';
+
+        municipalityInput.innerHTML = '<option value="">Select municipality</option>';
 
         if (province && municipalities[province]) {
-            municipalities[province].forEach(mun => {
+            municipalities[province].forEach((mun) => {
                 const option = document.createElement('option');
                 option.value = mun;
-                municipalityDatalist.appendChild(option);
+                option.textContent = mun;
+                if (mun === previousValue) {
+                    option.selected = true;
+                }
+                municipalityInput.appendChild(option);
             });
         }
+
+        if (previousValue && (!municipalities[province] || !municipalities[province].includes(previousValue))) {
+            const option = document.createElement('option');
+            option.value = previousValue;
+            option.textContent = previousValue;
+            option.selected = true;
+            municipalityInput.appendChild(option);
+        }
+    }
+
+    document.getElementById('province').addEventListener('change', updateMunicipalities);
+    document.getElementById('province').addEventListener('input', updateMunicipalities);
+    updateMunicipalities();
+
+    const successModal = document.getElementById('profileSuccessModal');
+    const closeSuccessModal = document.getElementById('closeSuccessModal');
+
+    if (<?= $profileSuccess ? 'true' : 'false' ?>) {
+        successModal.classList.add('show');
+        successModal.setAttribute('aria-hidden', 'false');
+    }
+
+    closeSuccessModal.addEventListener('click', () => {
+        successModal.classList.remove('show');
+        successModal.setAttribute('aria-hidden', 'true');
     });
 
-    document.getElementById('province').addEventListener('input', function() {
-        const province = this.value;
-        const municipalityDatalist = document.getElementById('municipalityList');
-        municipalityDatalist.innerHTML = '';
-
-        if (province && municipalities[province]) {
-            municipalities[province].forEach(mun => {
-                const option = document.createElement('option');
-                option.value = mun;
-                municipalityDatalist.appendChild(option);
-            });
+    successModal.addEventListener('click', (event) => {
+        if (event.target === successModal) {
+            successModal.classList.remove('show');
+            successModal.setAttribute('aria-hidden', 'true');
         }
     });
 </script>
