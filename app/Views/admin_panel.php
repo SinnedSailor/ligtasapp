@@ -206,59 +206,27 @@
         <h3 class="page-title mb-1"><i class="bi bi-shield-lock me-2"></i>Admin Panel</h3>
         <div class="text-muted">Manage users, roles, and administrative access.</div>
     </div>
-    <a href="<?= base_url('/dashboard') ?>" class="btn btn-light btn-sm">
-        <i class="bi bi-arrow-left"></i> Back to Dashboard
-    </a>
 </div>
 
-<div class="row">
-    <div class="col-md-4 grid-margin">
-        <div class="card admin-card h-100">
-            <div class="card-body">
-                <h4 class="card-title"><i class="bi bi-people-fill me-2"></i>User Management</h4>
-                <p class="text-muted">Manage all users in the system, assign roles, and control admin privileges.</p>
-                <button class="btn btn-primary btn-sm w-100" onclick="document.getElementById('user-management-section').scrollIntoView({behavior: 'smooth'});">
-                    View Users
-                </button>
+<div class="card admin-card mb-4">
+    <div class="card-body">
+        <h4 class="card-title"><i class="bi bi-bar-chart-fill me-2"></i>System Statistics</h4>
+        <div id="admin-stats" class="stats-grid" style="grid-template-columns: repeat(4, 1fr);">
+            <div class="stat-item">
+                <div class="stat-number">-</div>
+                <div class="stat-label">Total Users</div>
             </div>
-        </div>
-    </div>
-    <div class="col-md-4 grid-margin">
-        <div class="card admin-card h-100">
-            <div class="card-body">
-                <h4 class="card-title"><i class="bi bi-shield-lock me-2"></i>System Roles</h4>
-                <p class="text-muted">Available roles in the system:</p>
-                <div class="roles-container">
-                    <span class="role-badge role-admin">ADMIN</span>
-                    <span class="role-badge role-focal">FOCAL</span>
-                    <span class="role-badge role-lgu">LGU</span>
-                    <span class="role-badge role-province">PROVINCE</span>
-                </div>
+            <div class="stat-item">
+                <div class="stat-number">-</div>
+                <div class="stat-label">Admin Users</div>
             </div>
-        </div>
-    </div>
-    <div class="col-md-4 grid-margin">
-        <div class="card admin-card h-100">
-            <div class="card-body">
-                <h4 class="card-title"><i class="bi bi-bar-chart-fill me-2"></i>System Statistics</h4>
-                <div id="admin-stats" class="stats-grid">
-                    <div class="stat-item">
-                        <div class="stat-number">-</div>
-                        <div class="stat-label">Total Users</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">-</div>
-                        <div class="stat-label">Admin Users</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">-</div>
-                        <div class="stat-label">Regular Users</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">-</div>
-                        <div class="stat-label">Unassigned</div>
-                    </div>
-                </div>
+            <div class="stat-item">
+                <div class="stat-number">-</div>
+                <div class="stat-label">Regular Users</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">-</div>
+                <div class="stat-label">Unassigned</div>
             </div>
         </div>
     </div>

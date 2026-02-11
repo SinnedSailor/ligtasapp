@@ -9,34 +9,65 @@ $hideFooter = true;
 <?= $this->section('pageStyles') ?>
 <style>
     .auth-page {
-        min-height: calc(100vh - 40px);
+        min-height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 30px 15px;
+        background: #f5f7fa;
+        padding: 0;
     }
 
-    .auth-card {
+    .perfect-fit-register-container {
+        background: #fff;
+        border-radius: 30px;
+        box-shadow: 0 10px 25px rgba(9, 99, 126, 0.15);
+        padding: 40px 32px;
         width: 100%;
-        max-width: 520px;
+        max-width: 700px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 
-    .auth-form-card {
-        padding: 2.5rem;
+    .perfect-fit-register-container form {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .form-row {
+        display: flex;
+        gap: 1rem;
+        width: 100%;
+    }
+
+    .form-row .form-group {
+        flex: 1;
+        margin-bottom: 0;
+    }
+
+    .form-group {
+        width: 100%;
+    }
+
+    .form-group input, .form-group select {
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .iwas-header {
         text-align: center;
         margin-bottom: 2rem;
         padding-bottom: 1.5rem;
-        border-bottom: 2px solid #09637E;
+        border-bottom: 2px solid #002C76;
     }
 
     .iwas-logo-circle {
         width: 70px;
         height: 70px;
         margin: 0 auto 1rem;
-        background: linear-gradient(135deg, #09637E 0%, #0B4F63 100%);
+        background: linear-gradient(135deg, #002C76 0%, #0B4F63 100%);
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -50,7 +81,7 @@ $hideFooter = true;
     }
 
     .iwas-header h3 {
-        color: #09637E;
+        color: #002C76;
         font-weight: 700;
         margin: 0.5rem 0;
         font-size: 28px;
@@ -71,7 +102,7 @@ $hideFooter = true;
     }
 
     .form-group input:focus {
-        border-color: #09637E;
+        border-color: #002C76;
         box-shadow: 0 0 0 3px rgba(9, 99, 126, 0.1);
         background-color: #f8fafb;
     }
@@ -81,7 +112,7 @@ $hideFooter = true;
     }
 
     .auth-form-btn {
-        background: linear-gradient(135deg, #09637E 0%, #0B4F63 100%);
+        background: linear-gradient(135deg, #002C76 0%, #0B4F63 100%);
         border: none;
         color: #fff;
         font-weight: 600;
@@ -91,10 +122,12 @@ $hideFooter = true;
         text-transform: uppercase;
         letter-spacing: 0.5px;
         font-size: 13px;
+        width: 100%;
+        margin: 0 auto;
     }
 
     .auth-form-btn:hover {
-        background: linear-gradient(135deg, #0B4F63 0%, #09637E 100%);
+        background: linear-gradient(135deg, #0B4F63 0%, #002C76 100%);
         box-shadow: 0 6px 20px rgba(9, 99, 126, 0.3);
         color: #fff;
         transform: translateY(-2px);
@@ -106,7 +139,7 @@ $hideFooter = true;
     }
 
     .text-center.mt-4 a {
-        color: #09637E;
+        color: #002C76;
         font-weight: 600;
         text-decoration: none;
         transition: all 0.3s ease;
@@ -126,7 +159,7 @@ $hideFooter = true;
     }
 
     .welcome-text {
-        color: #09637E;
+        color: #002C76;
         font-weight: 600;
         margin-bottom: 0.25rem;
     }
@@ -141,50 +174,45 @@ $hideFooter = true;
 
 <?= $this->section('content') ?>
 <div class="auth-page">
-    <div class="auth-form-card auth-form-light text-left auth-card">
+    <div class="perfect-fit-register-container">
         <div class="iwas-header">
             <div class="iwas-logo-circle">
                 <i class="ti-water"></i>
             </div>
-            <h3>IWAS</h3>
-            <p>Integrated Water Safety Program</p>
+            <h3>LIGTAS</h3>
+            <p>Local Incident Gathering and Tracking for Aquatic Safety</p>
         </div>
-
         <div class="mb-4">
             <h4 class="welcome-text">Create your account</h4>
             <p class="subtitle-text m-0">Fill in the details to register</p>
         </div>
-
         <?php if (session()->has('error')): ?>
             <div class="alert alert-danger mt-3">
                 <i class="ti-alert mr-2"></i><?= session()->getFlashdata('error') ?>
             </div>
         <?php endif; ?>
-
         <form class="pt-2" action="<?= base_url('/store-register') ?>" method="POST">
             <?= csrf_field() ?>
+            <div class="form-row">
+                <div class="form-group">
+                    <input type="text" class="form-control form-control-lg" name="first_name" placeholder="First Name" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control form-control-lg" name="last_name" placeholder="Last Name" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <input type="text" class="form-control form-control-lg" name="username" placeholder="Username" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" class="form-control form-control-lg" name="email" placeholder="Email" required>
+                </div>
+            </div>
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <input type="text" class="form-control form-control-lg" name="first_name" placeholder="First Name" required>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <input type="text" class="form-control form-control-lg" name="last_name" placeholder="Last Name" required>
-                    </div>
-                </div>
-            </div>
-            <div class="form-group">
-                <input type="text" class="form-control form-control-lg" name="username" placeholder="Username" required>
-            </div>
-            <div class="form-group">
-                <input type="email" class="form-control form-control-lg" name="email" placeholder="Email" required>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <select class="form-control form-control-lg" id="province" name="province" required>
+                        <select class="form-control form-control-md" id="province" name="province" required>
                             <option value="">Select province</option>
                             <?php foreach (($provinces ?? []) as $province): ?>
                                 <option value="<?= esc($province) ?>" <?= (old('province') === $province) ? 'selected' : '' ?>><?= esc($province) ?></option>
@@ -194,7 +222,7 @@ $hideFooter = true;
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <select class="form-control form-control-lg" id="municipality" name="municipality" required>
+                        <select class="form-control form-control-md" id="municipality" name="municipality" required>
                             <option value="">Select municipality</option>
                         </select>
                     </div>

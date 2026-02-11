@@ -146,12 +146,6 @@
 ?>
 <div class="page-header">
     <h3 class="page-title">Incident Report</h3>
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="<?= base_url('/dashboard') ?>">Dashboard</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Incident Report</li>
-        </ol>
-    </nav>
 </div>
 
 <div class="row">

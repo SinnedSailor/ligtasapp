@@ -1,9 +1,10 @@
+        
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= esc($title ?? 'IWAS') ?></title>
+    <title><?= esc($title ?? 'LIGTAS') ?></title>
     <link rel="stylesheet" href="<?= base_url('assets/staradmin/vendors/feather/feather.css') ?>">
     <link rel="stylesheet" href="<?= base_url('assets/staradmin/vendors/ti-icons/css/themify-icons.css') ?>">
     <link rel="stylesheet" href="<?= base_url('assets/staradmin/vendors/css/vendor.bundle.base.css') ?>">
@@ -11,15 +12,18 @@
     <link rel="shortcut icon" href="<?= base_url('assets/staradmin/images/favicon.png') ?>" />
     <style>
         :root {
-            --iwas-primary: #0B5FB3;
-            --iwas-primary-dark: #094D8F;
-            --iwas-secondary: #C73A3A;
-            --iwas-secondary-dark: #A43030;
-            --iwas-header: #0B5FB3;
+            --LIGTAS-primary: #0B5FB3;
+            --LIGTAS-primary-dark: #094D8F;
+            --LIGTAS-secondary: #C73A3A;
+            --LIGTAS-secondary-dark: #A43030;
+            --LIGTAS-header: #D4F6FF;
+            --LIGTAS-main-bg: #FBFBFB;
+            --LIGTAS-sidebar: FBFBFB;
+            --LIGTAS-padding: #D4F6FF;
         }
 
         .navbar {
-            background: var(--iwas-primary) !important;
+            background: #002C76 !important;
             position: fixed;
             width: 100%;
             z-index: 1030;
@@ -27,14 +31,14 @@
         }
 
         .navbar .navbar-brand-wrapper {
-            background: var(--iwas-primary) !important;
+            background: #002C76 !important;
             height: 70px;
             display: flex;
             align-items: center;
         }
 
         .navbar .navbar-menu-wrapper {
-            background: var(--iwas-primary) !important;
+            background: #002C76 !important;
             height: 70px;
             display: flex;
             align-items: center;
@@ -48,36 +52,40 @@
 
         .navbar .navbar-nav .nav-link:hover,
         .navbar .navbar-nav .nav-link:focus {
-            color: #ffffff !important;
+            color: #002C76 !important;
         }
 
         .navbar .navbar-nav .nav-link.active,
         .navbar .navbar-nav .show > .nav-link {
-            color: #ffd86b !important;
+            color: #002C76 !important;
         }
 
         .page-body-wrapper {
+            background: var(--LIGTAS-main-bg);
             padding-top: 70px;
         }
 
         .page-body-wrapper.no-navbar {
+            background: var(--LIGTAS-main-bg);
             padding-top: 0;
         }
 
         .main-panel.full-width {
             margin-left: 0 !important;
             width: 100%;
+            background: var(--LIGTAS-main-bg);
         }
 
         .main-panel {
             margin-left: 260px;
             width: calc(100% - 260px);
+            background: var(--LIGTAS-main-bg);
         }
 
         .sidebar,
         .sidebar .nav .nav-item.active > .nav-link,
         .sidebar .nav .nav-item:hover > .nav-link {
-            background: var(--iwas-primary);
+            background: var(--LIGTAS-sidebar);
         }
 
         .sidebar .nav .nav-item.active > .nav-link {
@@ -91,34 +99,21 @@
         .sidebar .nav .nav-item:hover > .nav-link,
         .sidebar .nav .nav-item:hover > .nav-link i,
         .sidebar .nav .nav-item:hover > .nav-link .menu-title {
-            color: var(--iwas-primary) !important;
+            color: var(--LIGTAS-primary) !important;
         }
 
         .sidebar .nav .nav-item .nav-link,
+        .sidebar .nav .nav-item .nav-link,
         .sidebar .nav .nav-item .nav-link i,
         .sidebar .nav .nav-item .menu-title {
-            color: #f5f9ff !important;
+            color: #002C76 !important;
+            font-weight: 700;
         }
 
         .sidebar .nav .nav-item.active > .nav-link,
         .sidebar .nav .nav-item.active > .nav-link i,
         .sidebar .nav .nav-item.active > .nav-link .menu-title {
-            color: var(--iwas-primary) !important;
-        }
-
-        .page-body-wrapper {
-            background: #f4f8fc;
-        }
-
-        .card {
-            border-radius: 12px;
-            box-shadow: 0 8px 18px rgba(11, 95, 179, 0.08);
-        }
-
-        .page-header {
-            background: linear-gradient(135deg, rgba(11, 95, 179, 0.15), rgba(11, 95, 179, 0.04));
-            border-radius: 12px;
-            padding: 16px 20px;
+            color: var(--LIGTAS-primary) !important;
         }
 
         .sidebar,
@@ -126,6 +121,7 @@
             height: 100vh;
             overflow: hidden !important;
             overscroll-behavior: contain;
+            background: var(--LIGTAS-sidebar);
         }
 
         .sidebar-offcanvas {
@@ -133,6 +129,7 @@
             top: 70px;
             bottom: 0;
             left: 0;
+            background: var(--LIGTAS-sidebar);
         }
 
         .page-body-wrapper.no-navbar .sidebar-offcanvas {
@@ -153,7 +150,7 @@
         .sidebar .nav .nav-item .nav-link,
         .navbar .navbar-brand-wrapper .navbar-brand img,
         .navbar .navbar-brand-wrapper .navbar-brand-mini img {
-            color: #fff;
+            color: #1f2937;
         }
 
         .sidebar-profile {
@@ -166,29 +163,63 @@
         }
 
         .sidebar-profile .avatar {
-            width: 56px;
-            height: 56px;
+            width: 96px;
+            height: 96px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.18);
+            background: #002C76;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #fff;
             font-weight: 700;
             margin-bottom: 8px;
+            border: 2px solid #fff;
+            font-size: 2.5rem;
+            position: relative;
+            transition: box-shadow 0.2s;
+        }
+        .sidebar-profile .avatar:hover {
+            box-shadow: 0 0 0 4px #d4f6ff;
+            cursor: pointer;
+        }
+        .sidebar-profile .edit-avatar {
+            display: none;
+            position: absolute;
+            right: -10px;
+            bottom: 8px;
+            background: #fff;
+            border-radius: 50%;
+            border: 1.5px solid #002C76;
+            width: 32px;
+            height: 32px;
+            align-items: center;
+            justify-content: center;
+            color: #002C76;
+            font-size: 1.2rem;
+            z-index: 2;
+        }
+        .sidebar-profile .avatar:hover .edit-avatar {
+            display: flex;
         }
 
         .sidebar-profile .name {
-            color: #f5f9ff;
-            font-weight: 600;
-            font-size: 14px;
+            color: #002C76;
+            background: #fff;
+            font-weight: 700;
+            font-size: 15px;
             text-align: center;
+            border-radius: 6px;
+            padding: 2px 8px;
+            margin-bottom: 2px;
         }
 
         .sidebar-profile .role {
-            color: rgba(245, 249, 255, 0.8);
+            color: #002C76;
+            background: #fff;
             font-size: 12px;
             text-align: center;
+            border-radius: 6px;
+            padding: 1px 8px;
         }
 
         .sidebar-profile .actions {
@@ -206,16 +237,18 @@
             gap: 6px;
             padding: 6px 10px;
             border-radius: 8px;
-            background: rgba(255, 255, 255, 0.12);
-            color: #f5f9ff;
-            font-size: 12px;
-            font-weight: 600;
+            background: #002C76;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
             text-decoration: none;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 8px rgba(0,44,118,0.08);
         }
 
         .sidebar-profile .action-link:hover {
-            background: rgba(255, 255, 255, 0.2);
-            color: #ffffff;
+            background: #094D8F;
+            color: #ffd86b;
         }
 
         .navbar .navbar-brand,
@@ -229,32 +262,32 @@
         .page-title,
         .card-title,
         .stat-number {
-            color: var(--iwas-primary) !important;
+            color: var(--LIGTAS-primary) !important;
         }
 
         .btn-primary,
         .btn-primary:focus,
         .btn-primary:active {
-            background-color: var(--iwas-primary) !important;
-            border-color: var(--iwas-primary) !important;
+            background-color: var(--LIGTAS-primary) !important;
+            border-color: var(--LIGTAS-primary) !important;
         }
 
         .btn-primary:hover {
-            background-color: var(--iwas-primary-dark) !important;
-            border-color: var(--iwas-primary-dark) !important;
+            background-color: var(--LIGTAS-primary-dark) !important;
+            border-color: var(--LIGTAS-primary-dark) !important;
         }
 
         .btn-secondary,
         .btn-secondary:focus,
         .btn-secondary:active {
-            background-color: var(--iwas-secondary) !important;
-            border-color: var(--iwas-secondary) !important;
+            background-color: var(--LIGTAS-secondary) !important;
+            border-color: var(--LIGTAS-secondary) !important;
             color: #fff !important;
         }
 
         .btn-secondary:hover {
-            background-color: var(--iwas-secondary-dark) !important;
-            border-color: var(--iwas-secondary-dark) !important;
+            background-color: var(--LIGTAS-secondary-dark) !important;
+            border-color: var(--LIGTAS-secondary-dark) !important;
         }
 
         .btn-light,
@@ -274,6 +307,9 @@
             justify-content: center;
             font-weight: 700;
             font-size: 14px;
+        }
+        .container-scroller {
+            background: #D4F6FF !important;
         }
     </style>
     <?= $this->renderSection('pageStyles') ?>
@@ -305,11 +341,11 @@
         <?php if (!$hideNavbar): ?>
             <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
                 <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
-                    <a class="navbar-brand brand-logo fw-bold" href="<?= base_url('/dashboard') ?>">IWAS</a>
+                    <a class="navbar-brand brand-logo fw-bold" href="<?= base_url('/dashboard') ?>">LIGTAS</a>
                     <a class="navbar-brand brand-logo-mini fw-bold" href="<?= base_url('/dashboard') ?>">I</a>
                 </div>
                 <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
-                    <h6 class="mb-0 d-none d-md-block text-primary">Integrated Water Safety Program</h6>
+                    <h6 class="mb-0 d-none d-md-block text-primary">Local Incident Gathering and Tracking for Aquatic Safety</h6>
                     <ul class="navbar-nav navbar-nav-right"></ul>
                     <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-bs-toggle="offcanvas">
                         <span class="ti-layout-grid2"></span>
@@ -320,21 +356,21 @@
 
         <div class="container-fluid <?= $pageBodyClass ?>">
             <?php if (!$hideSidebar): ?>
-                <nav class="sidebar sidebar-offcanvas" id="sidebar">
-                    <div class="sidebar-profile">
-                        <div class="avatar"><?= esc($initials) ?></div>
-                        <div class="name">
-                            <?= esc(trim(($firstName ?? '') . ' ' . ($lastName ?? '')) ?: ($username ?? 'User')) ?>
+                <nav class="sidebar sidebar-offcanvas d-flex flex-column" id="sidebar" style="height: 100vh;">
+                    <div>
+                        <div class="sidebar-profile">
+                            <div class="avatar position-relative">
+                                <?= esc($initials) ?>
+                                <a href="<?= base_url('/user-profile') ?>" class="edit-avatar" title="Edit Profile">
+                                    <i class="ti-pencil"></i>
+                                </a>
+                            </div>
+                            <div class="name">
+                                <?= esc(trim(($firstName ?? '') . ' ' . ($lastName ?? '')) ?: ($username ?? 'User')) ?>
+                            </div>
+                            <div class="role"><?= esc(session()->get('role_name') ?? 'User') ?></div>
                         </div>
-                        <div class="role"><?= esc(session()->get('role_name') ?? 'User') ?></div>
-                        <div class="actions">
-                            <a class="action-link" href="<?= base_url('/logout') ?>">
-                                <i class="ti-power-off"></i>
-                                Logout
-                            </a>
-                        </div>
-                    </div>
-                    <ul class="nav">
+                        <ul class="nav flex-grow-1">
                         <li class="nav-item <?= $root === '' || $root === 'dashboard' ? 'active' : '' ?>">
                             <a class="nav-link" href="<?= base_url('/dashboard') ?>">
                                 <i class="ti-home menu-icon"></i>
@@ -355,12 +391,6 @@
                                 <span class="menu-title">Incident Report</span>
                             </a>
                         </li>
-                        <li class="nav-item <?= $root === 'user-profile' ? 'active' : '' ?>">
-                            <a class="nav-link" href="<?= base_url('/user-profile') ?>">
-                                <i class="ti-user menu-icon"></i>
-                                <span class="menu-title">User Profile</span>
-                            </a>
-                        </li>
                         <?php if (session()->get('is_admin')): ?>
                             <li class="nav-item <?= $root === 'admin-panel' ? 'active' : '' ?>">
                                 <a class="nav-link" href="<?= base_url('/admin-panel') ?>">
@@ -370,6 +400,14 @@
                             </li>
                         <?php endif; ?>
                     </ul>
+                        <div class="mt-auto mb-3 d-flex justify-content-center">
+                            <a class="btn btn-md d-flex align-items-center justify-content-center gap-2"
+                               href="<?= base_url('/logout') ?>"
+                               style="background:#002C76;color:#fff;width:180px;border:2px solid #002C76;">
+                                <i class="ti-power-off"></i>
+                                Logout
+                            </a>
+                        </div>
                 </nav>
             <?php endif; ?>
 
@@ -380,8 +418,8 @@
                 <?php if (!$hideFooter): ?>
                     <footer class="footer">
                         <div class="d-sm-flex justify-content-center justify-content-sm-between">
-                            <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">IWAS 2026</span>
-                            <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Integrated Water Safety Program</span>
+                            <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">LIGTAS 2026</span>
+                            <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Local Incident Gathering and Tracking for Aquatic Safety</span>
                         </div>
                     </footer>
                 <?php endif; ?>

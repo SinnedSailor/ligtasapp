@@ -15,8 +15,8 @@
     }
 
     .stat-card {
-        background: rgba(9, 99, 126, 0.06);
-        border: 1px solid rgba(9, 99, 126, 0.12);
+        background: #FFFCFB;
+        border: 1px solid #FFFCFB;
     }
 
     .stat-number {
@@ -42,6 +42,10 @@
     .page-header .page-title,
     .page-header .text-muted {
         color: #fff !important;
+    }
+
+    .content-wrapper {
+        background: #E8F9FF !important;
     }
 </style>
 <?= $this->endSection() ?>

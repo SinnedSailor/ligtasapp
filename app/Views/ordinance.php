@@ -285,11 +285,13 @@
         <div class="filter-row">
             <div class="filter-group">
                 <div class="filter-label">Document</div>
-                <div class="filter-buttons" id="docTypeButtons">
-                    <button class="filter-btn active" type="button" data-doc-type="">All</button>
-                    <button class="filter-btn" type="button" data-doc-type="ordinance">Ordinance</button>
-                    <button class="filter-btn" type="button" data-doc-type="pops">POPS</button>
-                    <button class="filter-btn" type="button" data-doc-type="budget">Budget</button>
+                <div>
+                    <select class="form-control" id="docTypeDropdown" onchange="filterDocumentsByDropdown()">
+                        <option value="">All</option>
+                        <option value="ordinance">Ordinance</option>
+                        <option value="pops">POPS</option>
+                        <option value="budget">Budget</option>
+                    </select>
                 </div>
             </div>
             <div class="filter-group" id="provinceGroup" hidden>
@@ -335,7 +337,7 @@
 
             <div class="document-card">
                 <h5><i class="ti-wallet"></i> Annual Budget Report</h5>
-                <p class="text-muted">Annual budget reports for water safety programs.</p>
+                <p class="text-muted">Annual budget reports for LIGTAS (Local Incident Gathering and Tracking for Aquatic Safety).</p>
                 <input type="file" name="budget_files[]" class="form-control" multiple accept=".pdf,.doc,.docx">
             </div>
         </div>

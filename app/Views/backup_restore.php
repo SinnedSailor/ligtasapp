@@ -344,7 +344,7 @@
             <tbody id="backupHistoryBody">
                 <tr>
                     <td>2026-02-03 10:30 AM</td>
-                    <td>IWAS_backup_20260203_1030.zip</td>
+                    <td>LIGTAS_backup_20260203_1030.zip</td>
                     <td>45.2 MB</td>
                     <td><span class="status-badge status-success">Success</span></td>
                     <td class="history-actions">
@@ -361,7 +361,7 @@
                 </tr>
                 <tr>
                     <td>2026-02-02 03:15 PM</td>
-                    <td>IWAS_backup_20260202_1515.zip</td>
+                    <td>LIGTAS_backup_20260202_1515.zip</td>
                     <td>43.8 MB</td>
                     <td><span class="status-badge status-success">Success</span></td>
                     <td class="history-actions">
@@ -378,7 +378,7 @@
                 </tr>
                 <tr>
                     <td>2026-02-01 09:00 AM</td>
-                    <td>IWAS_backup_20260201_0900.zip</td>
+                    <td>LIGTAS_backup_20260201_0900.zip</td>
                     <td>42.5 MB</td>
                     <td><span class="status-badge status-success">Success</span></td>
                     <td class="history-actions">
@@ -406,7 +406,7 @@
             alert('Creating backup... Please wait.');
 
             setTimeout(() => {
-                alert('Backup created successfully!\n\nFile: IWAS_backup_' + new Date().toISOString().slice(0, 10).replace(/-/g, '') + '.zip\nSize: ~45 MB');
+                alert('Backup created successfully!\n\nFile: LIGTAS_backup_' + new Date().toISOString().slice(0, 10).replace(/-/g, '') + '.zip\nSize: ~45 MB');
             }, 2000);
         }
     }
@@ -425,7 +425,7 @@
     }
 
     function downloadBackup(id) {
-        alert('Downloading backup file: IWAS_backup_' + id + '.zip\n\nIn production, this would download the actual backup file.');
+        alert('Downloading backup file: LIGTAS_backup_' + id + '.zip\n\nIn production, this would download the actual backup file.');
     }
 
     function restoreBackup(id) {
@@ -440,7 +440,7 @@
 
     function deleteBackup(id) {
         if (confirm('Delete this backup?\n\nThis action cannot be undone.')) {
-            alert('Backup deleted: IWAS_backup_' + id + '.zip');
+            alert('Backup deleted: LIGTAS_backup_' + id + '.zip');
         }
     }
 </script>
