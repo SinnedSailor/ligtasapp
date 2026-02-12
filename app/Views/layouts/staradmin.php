@@ -1,4 +1,3 @@
-        
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -350,6 +349,10 @@
                     <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-bs-toggle="offcanvas">
                         <span class="ti-layout-grid2"></span>
                     </button>
+                    <!-- Logout Icon Button -->
+                    <a href="<?= base_url('/logout') ?>" title="Log out" class="ms-3" style="color: #fff; font-size: 1.5rem; display: flex; align-items: center;">
+                        <i class="ti-power-off"></i>
+                    </a>
                 </div>
             </nav>
         <?php endif; ?>
@@ -400,14 +403,7 @@
                             </li>
                         <?php endif; ?>
                     </ul>
-                        <div class="mt-auto mb-3 d-flex justify-content-center">
-                            <a class="btn btn-md d-flex align-items-center justify-content-center gap-2"
-                               href="<?= base_url('/logout') ?>"
-                               style="background:#002C76;color:#fff;width:180px;border:2px solid #002C76;">
-                                <i class="ti-power-off"></i>
-                                Logout
-                            </a>
-                        </div>
+                        
                 </nav>
             <?php endif; ?>
 

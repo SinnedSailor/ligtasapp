@@ -5,7 +5,6 @@ $hideFooter = true;
 ?>
 
 <?= $this->extend('layouts/staradmin') ?>
-
 <?= $this->section('pageStyles') ?>
 <style>
     .auth-page {
@@ -14,7 +13,7 @@ $hideFooter = true;
         align-items: center;
         justify-content: center;
         padding: 30px 15px;
-        background: url('<?= base_url('assets/staradmin/images/water_background.jpg') ?>') no-repeat center center;
+        background: url('<?= base_url('assets/staradmin/images/water.jpg') ?>') no-repeat center center;
         background-size: cover;
     }
     .split-container {
@@ -151,7 +150,7 @@ $hideFooter = true;
 <div class="auth-page">
     <div class="split-container">
         <div class="split-left">
-            <img src="<?= base_url('assets/staradmin/images/login_illustration.png') ?>" alt="login-illustration" />
+            <img src="<?= base_url('assets/staradmin/images/lifeguards_blue.png') ?>" alt="login-illustration" />
         </div>
         <div class="split-right">
             <div class="login-form-wrapper">
