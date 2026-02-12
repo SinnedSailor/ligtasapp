@@ -4,13 +4,133 @@ namespace App\Controllers;
 
 use App\Models\IncidentReportModel;
 
+
 class IncidentReport extends BaseController
 {
     private IncidentReportModel $incidentReportModel;
+
     public function __construct()
     {
         $this->incidentReportModel = new IncidentReportModel();
     }
+
+    /**
+     * Update a single incident by N (number)
+     * Expects JSON body with fields to update
+     */
+    public function updateIncident($n)
+    {
+        if (!session()->get('logged_in')) {
+            return $this->response->setStatusCode(401)->setJSON([
+                'message' => 'Unauthorized.',
+            ]);
+        }
+
+        $incident = $this->incidentReportModel->where('n', $n)->first();
+        if (!$incident) {
+            return $this->response->setStatusCode(404)->setJSON([
+                'message' => 'Incident not found.',
+            ]);
+        }
+
+        $data = $this->request->getJSON(true);
+        if (!is_array($data)) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'message' => 'Invalid data.'
+            ]);
+        }
+
+        // Remove fields that should not be updated
+        unset($data['n']);
+        unset($data['id']);
+
+        $this->incidentReportModel->update($incident['id'], $data);
+
+        return $this->response->setJSON([
+            'message' => 'Incident updated successfully.'
+        ]);
+    }
+
+        /**
+         * Generate incident report (excluding victim names)
+         * Returns JSON or downloadable file (CSV)
+         */
+        public function generateReport()
+        {
+            if (!session()->get('logged_in')) {
+                return $this->response->setStatusCode(401)->setJSON([
+                    'message' => 'Unauthorized.',
+                ]);
+            }
+
+            // Fetch all incidents
+            $incidents = $this->incidentReportModel->findAll();
+
+            // Columns to include (excluding victim name)
+            $columns = [
+                'n',
+                'month_of_incident',
+                'year_of_incident',
+                'province',
+                'municipality',
+                'location_category',
+                'age',
+                'gender',
+                'occasion',
+                'factors',
+                'residence',
+                'occupation',
+                'remarks',
+            ];
+
+            // Prepare data
+            $data = [];
+            foreach ($incidents as $incident) {
+                $row = [];
+                foreach ($columns as $col) {
+                    $row[$col] = $incident[$col] ?? '';
+                }
+                $data[] = $row;
+            }
+
+            // Optionally: return as CSV file
+            if ($this->request->getGet('format') === 'csv') {
+                $filename = 'incident_report_' . date('Ymd_His') . '.csv';
+                $csv = $this->arrayToCsv($data, $columns);
+                return $this->response
+                    ->setHeader('Content-Type', 'text/csv')
+                    ->setHeader('Content-Disposition', 'attachment; filename="' . $filename . '"')
+                    ->setBody($csv);
+            }
+
+            // Default: return as JSON
+            return $this->response->setJSON([
+                'columns' => $columns,
+                'data' => $data,
+            ]);
+        }
+
+        /**
+         * Helper: Convert array to CSV
+         */
+        private function arrayToCsv(array $data, array $columns): string
+        {
+            $output = fopen('php://temp', 'r+');
+            // Write header
+            fputcsv($output, $columns);
+            // Write rows
+            foreach ($data as $row) {
+                $line = [];
+                foreach ($columns as $col) {
+                    $line[] = $row[$col] ?? '';
+                }
+                fputcsv($output, $line);
+            }
+            rewind($output);
+            $csv = stream_get_contents($output);
+            fclose($output);
+            return $csv;
+        }
 
     public function import()
     {

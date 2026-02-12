@@ -1,7 +1,8 @@
+
 <?= $this->extend('layouts/staradmin') ?>
 <?php $hasInitialRows = !empty($initialRows); ?>
 
-<?= $this->section('pageStyles') ?>
+<?= $this->section('pageStyles'); ?>
 <style>
     .file-name {
         color: #6c757d;
@@ -133,6 +134,8 @@
         overflow: hidden;
     }
 </style>
+    <!-- CSRF token for AJAX -->
+    <meta name="csrf-token" content="<?= csrf_hash() ?>">
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
@@ -170,11 +173,16 @@
                 <?php endif; ?>
 
                 <div class="d-flex flex-wrap gap-2 mb-3">
-                    <button class="btn btn-primary btn-sm" onclick="openIncidentModal()">
-                        <i class="ti-plus"></i> Add Incident
-                    </button>
+                    <?php if ($isLgu || $isAdmin): ?>
+                        <button class="btn btn-primary btn-sm" onclick="openIncidentModal()">
+                            <i class="ti-plus"></i> Add Incident
+                        </button>
+                    <?php endif; ?>
                     <button id="saveButton" class="btn btn-success btn-sm" onclick="openSaveModal()" style="<?= $hasInitialRows ? 'display:none;' : '' ?>">
                         <i class="ti-save"></i> Save to Database
+                    </button>
+                    <button id="generateReportButton" class="btn btn-info btn-sm" onclick="downloadIncidentReport()">
+                        <i class="ti-bar-chart"></i> Generate Report
                     </button>
                 </div>
 
@@ -371,9 +379,9 @@
                         <div class="col-md-4">
                             <label class="form-label" for="incidentGender">Sex</label>
                             <select class="form-select form-select-sm" id="incidentGender" style="background-color: #fff; color: #222; font-weight: 500;">
-                                <option value="" disabled selected style="color: #888; font-weight: 400;">Select gender</option>
-                                <option value="m" style="color: #222; font-weight: 500;">Male</option>
-                                <option value="f" style="color: #222; font-weight: 500;">Female</option>
+                                <option value="" disabled selected style="color: #888; font-weight: 400;">Select sex</option>
+                                <option value="Male" style="color: #222; font-weight: 500;">Male</option>
+                                <option value="Female" style="color: #222; font-weight: 500;">Female</option>
                             </select>
                         </div>
                         <div class="col-md-6">
@@ -398,7 +406,7 @@
                         </div>
                     </div>
 
-                    <?php if ($isLgu): ?>
+                    <?php if ($isLgu || $isAdmin): ?>
                         <div class="border-top pt-3 mt-3" id="incidentAttachmentSection">
                             <div class="d-flex align-items-center justify-content-between mb-2">
                                 <h6 class="mb-0">Attachments</h6>
@@ -902,14 +910,14 @@
         }
     }
 
-    function saveIncidentFromModal() {
+    async function saveIncidentFromModal() {
         const genderField = incidentFieldMap.find(field => field.column === 'Gender of the Person');
         if (genderField) {
             const genderInput = document.getElementById(genderField.id);
             if (genderInput && genderInput.value) {
-                const gender = genderInput.value.toLowerCase();
-                if (gender !== 'm' && gender !== 'f' && gender !== '') {
-                    alert('Gender must be "m" or "f" only!');
+                const gender = genderInput.value;
+                if (gender !== 'Male' && gender !== 'Female' && gender !== '') {
+                    alert('Sex must be "Male" or "Female" only!');
                     return;
                 }
             }
@@ -925,6 +933,49 @@
             }
             row[field.column] = input.value;
         });
+
+        if (isEdit && row['N']) {
+            // Map frontend fields to backend/database fields
+            function mapIncidentFields(row) {
+                return {
+                    month_of_incident: row['Month of Incident'],
+                    year_of_incident: row['Year of Incident'],
+                    province: row['Province'],
+                    municipality: row['Municipality/City where Incidence Occurred'],
+                    name_of_victim: row['Name of Victim'],
+                    location_category: row['Location Category'],
+                    age: row['Age of the Person'],
+                    gender: row['Gender of the Person'],
+                    occasion: row['Occasion'],
+                    factors: row['Other Factors'],
+                    residence: row["Person's Residence"],
+                    occupation: row['Occupation of the Victim'],
+                    remarks: row['Remarks'],
+                    // add other fields as needed
+                };
+            }
+            try {
+                // Get CSRF token from meta tag
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                const mappedData = mapIncidentFields(row);
+                const response = await fetch(`/incident-report/update/${row['N']}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify(mappedData)
+                });
+                const result = await response.json();
+                if (!response.ok) {
+                    alert(result.message || 'Update failed.');
+                    return;
+                }
+            } catch (error) {
+                alert('Update failed: ' + error.message);
+                return;
+            }
+        }
 
         if (!isEdit) {
             tableData.push(row);
@@ -1489,6 +1540,15 @@
     const reviewConfirmAction = document.getElementById('reviewConfirmAction');
     if (reviewConfirmAction) {
         reviewConfirmAction.addEventListener('click', submitReview);
+    }
+</script>
+<?= $this->endSection() ?>
+
+<?= $this->section('pageScripts') ?>
+<script>
+    function downloadIncidentReport() {
+        // Download as CSV
+        window.open('/incident-report/generateReport?format=csv', '_blank');
     }
 </script>
 <?= $this->endSection() ?>

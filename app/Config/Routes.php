@@ -1,3 +1,4 @@
+
 <?php
 
 use CodeIgniter\Router\RouteCollection;
@@ -19,12 +20,14 @@ $routes->get('/logout', 'Auth::logout');
 $routes->get('/ordinance', 'Documents::index');
 $routes->get('/incident-report', 'Auth::incident_report');
 $routes->post('/incident-report/import', 'IncidentReport::import');
+$routes->post('/incident-report/update/(:num)', 'IncidentReport::updateIncident/$1');
 $routes->post('/incident-report/attachments/upload', 'IncidentReport::uploadAttachment');
 $routes->get('/incident-report/attachments/(:num)', 'IncidentReport::listAttachments/$1');
 $routes->get('/incident-report/attachments/view/(:num)', 'IncidentReport::viewAttachment/$1');
 $routes->get('/incident-report/attachments/download/(:num)', 'IncidentReport::downloadAttachment/$1');
 $routes->post('/incident-report/approve/(:num)', 'IncidentReport::approve/$1');
 $routes->post('/incident-report/reject/(:num)', 'IncidentReport::reject/$1');
+$routes->get('/incident-report/generateReport', 'IncidentReport::generateReport');
 $routes->get('/pops', 'Documents::index');
 $routes->get('/user-profile', 'Auth::user_profile');
 $routes->post('/user-profile/update', 'Auth::update_profile');
