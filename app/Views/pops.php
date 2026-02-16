@@ -238,130 +238,50 @@
     </div>
 
     <div class="upload-card">
-        <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
-            <div class="upload-icon">
-                <i class="bi bi-cloud-arrow-up"></i>
-            </div>
-            <div class="upload-text">Click to upload or drag and drop</div>
-            <div class="upload-hint">Supported formats: PDF, DOC, DOCX (Max 10MB each)</div>
-            <input type="file" id="fileInput" class="file-input" multiple accept=".pdf,.doc,.docx" onchange="handleFiles(this.files)">
-                        <button type="button" class="btn btn-outline-secondary btn-sm mt-2" onclick="document.getElementById('fileInput').value = null">Clear</button>
-            <button class="upload-btn">Browse Files</button>
-        </div>
-
-        <div class="files-list" id="filesList" style="display: none;">
-            <h3>
-                <i class="bi bi-files"></i>
-                Uploaded Documents (<span id="fileCount">0</span>)
-            </h3>
-            <div id="filesContainer"></div>
-
-            <button class="submit-btn" id="submitBtn" disabled onclick="submitDocuments()">
-                <i class="bi bi-check-circle"></i>
-                <span>Submit POPS Plan</span>
-            </button>
-        </div>
+        <form action="/upload-pops" class="dropzone" id="popsDropzone">
+            <div class="dz-message">Drag and drop POPS Plan documents here or click to browse.<br><small>PDF, DOC, DOCX (Max 10MB each)</small></div>
+        </form>
+        <button class="submit-btn mt-3" id="submitBtn" type="button">
+            <i class="bi bi-check-circle"></i>
+            <span>Submit POPS Plan</span>
+        </button>
     </div>
 </div>
 <?= $this->endSection() ?>
 
 <?= $this->section('pageScripts') ?>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.css" />
 <script>
-    let uploadedFiles = [];
+    Dropzone.autoDiscover = false;
+    const popsDropzone = new Dropzone('#popsDropzone', {
+        url: '/upload-pops',
+        autoProcessQueue: false,
+        acceptedFiles: '.pdf,.doc,.docx',
+        maxFilesize: 10,
+        addRemoveLinks: true,
+        dictDefaultMessage: 'Drag and drop POPS Plan documents here or click to browse.',
+        dictRemoveFile: 'Remove',
+        parallelUploads: 10
+    });
 
-    const uploadArea = document.getElementById('uploadArea');
-
-    uploadArea.addEventListener('dragover', (e) => {
+    document.getElementById('submitBtn').addEventListener('click', function(e) {
         e.preventDefault();
-        uploadArea.classList.add('dragover');
-    });
-
-    uploadArea.addEventListener('dragleave', () => {
-        uploadArea.classList.remove('dragover');
-    });
-
-    uploadArea.addEventListener('drop', (e) => {
-        e.preventDefault();
-        uploadArea.classList.remove('dragover');
-        handleFiles(e.dataTransfer.files);
-    });
-
-    function handleFiles(files) {
-        const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-        const maxSize = 10 * 1024 * 1024;
-
-        for (let file of files) {
-            if (!validTypes.includes(file.type)) {
-                alert(`${file.name} is not a supported file type. Please upload PDF, DOC, or DOCX files.`);
-                continue;
+        if (popsDropzone.files.length === 0) return;
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'Do you want to upload/submit the POPS Plan documents?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, submit',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                popsDropzone.processQueue();
             }
-
-            if (file.size > maxSize) {
-                alert(`${file.name} exceeds the 10MB size limit.`);
-                continue;
-            }
-
-            uploadedFiles.push({
-                name: file.name,
-                size: formatFileSize(file.size),
-                date: new Date().toLocaleDateString(),
-                file: file
-            });
-        }
-
-        renderFiles();
-    }
-
-    function formatFileSize(bytes) {
-        if (bytes < 1024) return bytes + ' B';
-        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
-        return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
-    }
-
-    function renderFiles() {
-        const container = document.getElementById('filesContainer');
-        const filesList = document.getElementById('filesList');
-        const fileCount = document.getElementById('fileCount');
-        const submitBtn = document.getElementById('submitBtn');
-
-        if (uploadedFiles.length > 0) {
-            filesList.style.display = 'block';
-            fileCount.textContent = uploadedFiles.length;
-            submitBtn.disabled = false;
-
-            container.innerHTML = uploadedFiles.map((file, index) => `
-                <div class="file-item">
-                    <div class="file-info">
-                        <div class="file-icon">
-                            <i class="bi bi-file-earmark-text"></i>
-                        </div>
-                        <div class="file-details">
-                            <div class="file-name">${file.name}</div>
-                            <div class="file-meta">${file.size} • Uploaded on ${file.date}</div>
-                        </div>
-                    </div>
-                    <div class="file-actions">
-                        <button class="action-btn btn-delete" onclick="deleteFile(${index})">
-                            <i class="bi bi-trash"></i> Delete
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        } else {
-            filesList.style.display = 'none';
-        }
-    }
-
-    function deleteFile(index) {
-        uploadedFiles.splice(index, 1);
-        renderFiles();
-    }
-
-    function submitDocuments() {
-        if (uploadedFiles.length > 0) {
-            alert('POPS Plan documents submitted successfully!');
-            window.location.href = '<?= base_url('/dashboard') ?>';
-        }
-    }
+        });
+    });
 </script>
 <?= $this->endSection() ?>

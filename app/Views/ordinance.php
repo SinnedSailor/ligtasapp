@@ -581,14 +581,28 @@
     const submitButton = document.getElementById('submitDocumentsButton');
 
     if (uploadForm && submitButton) {
-        uploadForm.addEventListener('submit', () => {
+        uploadForm.addEventListener('submit', function(e) {
+            e.preventDefault();
             if (submitButton.disabled) {
                 return;
             }
-
-            submitButton.disabled = true;
-            submitButton.textContent = 'Submitting...';
-            uploadForm.setAttribute('aria-busy', 'true');
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'Do you want to upload/submit the documents?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, submit',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    submitButton.disabled = true;
+                    submitButton.textContent = 'Submitting...';
+                    uploadForm.setAttribute('aria-busy', 'true');
+                    uploadForm.submit();
+                }
+            });
         });
     }
 

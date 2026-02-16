@@ -191,6 +191,16 @@
                 </div>
             </div>
         </div>
+
+        <!-- Incidents by Location Category (added) -->
+        <div class="card mt-4">
+            <div class="card-body">
+                <div class="section-title">Incidents by Location Category</div>
+                <div class="chart-container">
+                    <canvas id="locationChart"></canvas>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <?= $this->endSection() ?>
@@ -262,10 +272,18 @@
     new Chart(document.getElementById('ageChart'), {
         type: 'bar',
         data: {
-            labels: ['0-14 Years', '15-24 Years', '25-34 Years', '35-44 Years', '45+ Years'],
+            labels: [
+                'Preschool (0-4)',
+                'Gradeschool (5-12)',
+                'High School (13-17)',
+                'College (18-22)',
+                'Young Adult (23-35)',
+                'Middle Age (36-59)',
+                'Senior Citizen (60+)'
+            ],
             datasets: [{
                 label: 'Percentage (%)',
-                data: [38.2, 28.5, 18.3, 10.2, 4.8],
+                data: [8.2, 15.7, 12.3, 14.1, 18.4, 19.2, 12.1], // Example data, adjust as needed
                 backgroundColor: accentRed,
                 borderColor: accentRed,
                 borderWidth: 1
@@ -382,6 +400,26 @@
             indexAxis: 'y',
             plugins: { legend: { display: true } },
             scales: { x: { beginAtZero: true } }
+        }
+    });
+
+    // Incidents by Location Category
+    new Chart(document.getElementById('locationChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Resort', 'Tourist Spot', 'Beach', 'River', 'Lake', 'Pier/Port', 'Other'],
+            datasets: [{
+                label: 'Number of Incidents',
+                data: [124, 89, 312, 67, 42, 25, 48], // sample data — replace with real numbers from backend when available
+                backgroundColor: chartColors.slice(0, 7),
+                borderColor: '#fff',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom' } }
         }
     });
 </script>

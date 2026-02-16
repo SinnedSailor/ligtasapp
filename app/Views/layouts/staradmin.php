@@ -69,6 +69,17 @@
             padding-top: 0;
         }
 
+        /* Ensure the visible page header sits directly under the fixed navbar
+           - reduce extra top padding from the theme's .content-wrapper
+           - prevent awkward gaps on all pages that use .page-header */
+        .content-wrapper {
+            padding-top: 0.5rem !important;
+        }
+        .content-wrapper > .page-header,
+        .page-header {
+            margin-top: 0 !important;
+        }
+
         .main-panel.full-width {
             margin-left: 0 !important;
             width: 100%;
@@ -336,7 +347,17 @@
         $pageBodyClass = $hideNavbar ? 'page-body-wrapper no-navbar' : 'page-body-wrapper';
         $mainPanelClass = $hideSidebar ? 'main-panel full-width' : 'main-panel';
     ?>
-    <div class="container-scroller">
+                </div>
+                <?php if (!$hideFooter): ?>
+                    <?= view('components/footer') ?>
+                <?php endif; ?>
+            </div>
+        </div>
+        <script src="<?= base_url('assets/staradmin/vendors/js/vendor.bundle.base.js') ?>"></script>
+        </div>
+    </div>
+
+    <div class="container-scroller"> 
         <?php if (!$hideNavbar): ?>
             <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
                 <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
@@ -350,7 +371,7 @@
                         <span class="ti-layout-grid2"></span>
                     </button>
                     <!-- Logout Icon Button -->
-                    <a href="<?= base_url('/logout') ?>" title="Log out" class="ms-3" style="color: #fff; font-size: 1.5rem; display: flex; align-items: center;">
+                    <a href="#" id="logoutBtn" title="Log out" class="ms-3" style="color: #fff; font-size: 1.5rem; display: flex; align-items: center;">
                         <i class="ti-power-off"></i>
                     </a>
                 </div>
@@ -411,22 +432,51 @@
                 <div class="content-wrapper">
                     <?= $this->renderSection('content') ?>
                 </div>
-                <?php if (!$hideFooter): ?>
-                    <footer class="footer">
-                        <div class="d-sm-flex justify-content-center justify-content-sm-between">
-                            <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">LIGTAS 2026</span>
-                            <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Local Incident Gathering and Tracking for Aquatic Safety</span>
-                        </div>
-                    </footer>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
 
     <script src="<?= base_url('assets/staradmin/vendors/js/vendor.bundle.base.js') ?>"></script>
     <script src="<?= base_url('assets/staradmin/js/off-canvas.js') ?>"></script>
     <script src="<?= base_url('assets/staradmin/js/hoverable-collapse.js') ?>"></script>
     <script src="<?= base_url('assets/staradmin/js/template.js') ?>"></script>
     <?= $this->renderSection('pageScripts') ?>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Dropzone.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.css" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Logout confirmation
+            var logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Log out?',
+                        text: 'Are you sure you want to log out?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#0b45aa',
+                        cancelButtonColor: '#C9282D',
+                        confirmButtonText: 'Yes, log out',
+                        cancelButtonText: 'Cancel'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = "<?= base_url('/logout') ?>";
+                        }
+                    });
+                });
+            }
+
+            // Show login success alert 
+            <?php if (session()->getFlashdata('login_success')): ?>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Logged in successfully',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            <?php endif; ?>
+        });
+    </script>
 </body>
 </html>

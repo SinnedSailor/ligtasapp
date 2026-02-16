@@ -13,7 +13,7 @@
     .profile-picture-section {
         display: flex;
         justify-content: center;
-        margin-bottom: 20px;
+        margin-bottom: 48px; /* increased to prevent overlap with alert */
     }
 
     .profile-picture-upload {
@@ -57,7 +57,8 @@
     }
 
     .form-section {
-        margin-top: 20px;
+        margin-top: 24px;
+        margin-bottom: 16px;
     }
 
     .form-section h5 {
@@ -66,9 +67,14 @@
     }
 
     .form-row {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 15px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+    .form-row .form-group {
+        flex: 1 1 220px;
+        min-width: 220px;
+        margin-bottom: 0;
     }
 
     .forgot-password-link {
@@ -126,6 +132,19 @@
         color: #64748b;
         margin-bottom: 16px;
     }
+
+    /* profile info alert - centered and spaced properly */
+    .info-alert {
+        max-width: 560px;
+        margin: 8px auto 20px auto;
+        text-align: center;
+        box-shadow: none;
+    }
+
+    @media (max-width: 576px) {
+        .profile-picture-section { margin-bottom: 28px; }
+        .info-alert { margin: 12px; max-width: 100%; }
+    }
 </style>
 <?= $this->endSection() ?>
 
@@ -150,7 +169,7 @@
 <?php endif; ?>
 
 <div class="row">
-    <div class="col-lg-8 grid-margin">
+    <div class="col-lg-8 col-md-10 grid-margin mx-auto">
         <div class="profile-card">
             <div class="profile-picture-section">
                 <div class="profile-picture-upload">
@@ -161,11 +180,10 @@
                         <i class="ti-camera"></i> Change Photo
                     </div>
                     <input type="file" id="profilePicture" class="d-none" accept="image/*" onchange="previewImage(event)">
-                                    <button type="button" class="btn btn-outline-secondary btn-sm mt-2" onclick="document.getElementById('profilePicture').value = null">Clear</button>
                 </div>
             </div>
 
-            <div class="alert alert-info">
+            <div class="alert alert-info info-alert">
                 Keep your profile information up to date for better communication.
             </div>
 
@@ -233,7 +251,7 @@
                     </a>
                 </div>
 
-                <div class="mt-4 d-flex gap-2">
+                <div class="mt-4 d-flex flex-wrap gap-2">
                     <button type="submit" class="btn btn-primary">
                         <i class="ti-check"></i> Save Changes
                     </button>

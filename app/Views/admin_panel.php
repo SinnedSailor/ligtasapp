@@ -71,10 +71,6 @@
         color: #6c757d;
     }
 
-    .search-input {
-        min-width: 240px;
-    }
-
     .table thead th {
         color: #09637E;
         font-weight: 600;
@@ -203,44 +199,33 @@
 <?= $this->section('content') ?>
 <div class="page-header d-flex flex-wrap justify-content-between align-items-center mb-4">
     <div>
-        <h3 class="page-title mb-1"><i class="bi bi-shield-lock me-2"></i>Admin Panel</h3>
+        <h3 class="page-title mb-1"><i class="bi bi-shield-lock me-2"></i>User Management</h3>
         <div class="text-muted">Manage users, roles, and administrative access.</div>
     </div>
-</div>
-
-<div class="card admin-card mb-4">
-    <div class="card-body">
-        <h4 class="card-title"><i class="bi bi-bar-chart-fill me-2"></i>System Statistics</h4>
-        <div id="admin-stats" class="stats-grid" style="grid-template-columns: repeat(4, 1fr);">
-            <div class="stat-item">
-                <div class="stat-number">-</div>
-                <div class="stat-label">Total Users</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number">-</div>
-                <div class="stat-label">Admin Users</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number">-</div>
-                <div class="stat-label">Regular Users</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number">-</div>
-                <div class="stat-label">Unassigned</div>
-            </div>
-        </div>
-    </div>
-</div>
+</div>           
 
 <div id="user-management-section" class="card">
     <div class="card-body">
-        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-            <h4 class="card-title mb-0">User Management</h4>
-            <div class="d-flex flex-wrap align-items-center gap-2">
-                <input type="text" id="userSearch" class="form-control form-control-sm search-input" placeholder="Search by name, email, or username..." onkeyup="filterUsers()">
-                <button class="btn btn-primary btn-sm" onclick="loadUsers()">
-                    <i class="bi bi-arrow-clockwise"></i> Refresh
-                </button>
+        <h4 class="card-title mb-0">User Management</h4>
+
+        <div class="d-flex flex-wrap align-items-center gap-3 mb-3" style="margin-top: 10px;">
+            <div class="input-group" style="max-width: 320px;">
+                <span class="input-group-text bg-white border-end-0" style="border-radius: 999px 0 0 999px; border-color: #e5e7eb;">
+                    <i class="bi bi-search" style="color: #6c757d;"></i>
+                </span>
+                <input type="text" id="userSearch" class="form-control form-control-sm border-start-0" placeholder="Search" onkeyup="filterUsers()" style="border-radius: 0 999px 999px 0; border-color: #e5e7eb; background: #f9fafb;">
+            </div>
+            <div class="input-group" style="max-width: 180px;">
+                <span class="input-group-text bg-white border-end-0" style="border-radius: 999px 0 0 999px; border-color: #e5e7eb;">
+                    <i class="bi bi-person" style="color: #6c757d;"></i>
+                </span>
+                <select id="roleFilter" class="form-select form-select-sm border-start-0" style="border-radius: 0 999px 999px 0; border-color: #e5e7eb; background: #f9fafb;" onchange="filterUsers()">
+                    <option value="">Role</option>
+                    <option value="ADMIN">ADMIN</option>
+                    <option value="FOCAL">FOCAL</option>
+                    <option value="LGU">LGU</option>
+                    <option value="PROVINCE">PROVINCE</option>
+                </select>
             </div>
         </div>
 
@@ -360,29 +345,6 @@
         loadAdminStats();
     });
 
-    function filterUsers() {
-        const searchValue = document.getElementById('userSearch').value.toLowerCase();
-        const tbody = document.getElementById('user-tbody');
-        const rows = tbody.getElementsByTagName('tr');
-
-        for (let i = 0; i < rows.length; i++) {
-            const row = rows[i];
-            const cells = row.getElementsByTagName('td');
-
-            if (cells.length > 0) {
-                const name = cells[0].textContent.toLowerCase();
-                const email = cells[1].textContent.toLowerCase();
-                const username = cells[2].textContent.toLowerCase();
-
-                if (name.includes(searchValue) || email.includes(searchValue) || username.includes(searchValue)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            }
-        }
-    }
-
     function getRoleBadge(roleName) {
         if (!roleName) {
             return '<span class="text-muted small">No Role</span>';
@@ -408,13 +370,7 @@
                 if (data.users && data.users.length > 0) {
                     tbody.innerHTML = data.users.map(user => {
                         const roleBadge = getRoleBadge(user.role_name);
-                        const revokeAdminButton = user.id !== '<?= session()->get('user_id') ?>' && user.is_admin === 1
-                            ? `<button class="btn btn-sm btn-danger" onclick="revokeAdminConfirm(${user.id}, '${user.first_name} ${user.last_name}')">Revoke Admin</button>`
-                            : '';
-                        const clearRoleButton = user.role_id
-                            ? `<button class="btn btn-sm btn-warning" onclick="clearRoleConfirm(${user.id}, '${user.first_name} ${user.last_name}')">Clear Role</button>`
-                            : '';
-
+                        // Only show edit and disable icons for actions
                         return `
                             <tr>
                                 <td><strong>${user.first_name} ${user.last_name}</strong></td>
@@ -422,9 +378,12 @@
                                 <td>${user.username}</td>
                                 <td>${roleBadge}</td>
                                 <td class="d-flex flex-wrap gap-2">
-                                    <button class="btn btn-sm btn-primary" onclick="openRoleModal(${user.id}, '${user.first_name} ${user.last_name}')">Assign Role</button>
-                                    ${clearRoleButton}
-                                    ${revokeAdminButton}
+                                    <button class="btn btn-sm btn-outline-primary" title="Edit User" onclick="editUser(${user.id})">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary" title="Disable User" onclick="disableUser(${user.id})">
+                                        <i class="bi bi-person-x"></i>
+                                    </button>
                                 </td>
                             </tr>
                         `;
@@ -618,6 +577,26 @@
         }
     });
 
+    function filterUsers() {
+        const searchValue = document.getElementById('userSearch').value.toLowerCase();
+        const roleValue = document.getElementById('roleFilter').value;
+        const tbody = document.getElementById('user-tbody');
+        const rows = tbody.getElementsByTagName('tr');
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            const cells = row.getElementsByTagName('td');
+            if (cells.length > 0) {
+                const name = cells[0].textContent.toLowerCase();
+                const email = cells[1].textContent.toLowerCase();
+                const username = cells[2].textContent.toLowerCase();
+                const role = cells[3].textContent.trim().toUpperCase();
+                const matchesSearch = name.includes(searchValue) || email.includes(searchValue) || username.includes(searchValue);
+                const matchesRole = !roleValue || role === roleValue;
+                row.style.display = (matchesSearch && matchesRole) ? '' : 'none';
+            }
+        }
+    }
+
     function loadAdminStats() {
         fetch('<?= base_url('admin/getStats') ?>')
             .then(response => response.json())
@@ -645,6 +624,54 @@
                 }
             })
             .catch(error => console.error('Error loading stats:', error));
+    }
+
+    function editUser(userId) {
+        // Find the user row and get the name
+        const row = Array.from(document.getElementById('user-tbody').getElementsByTagName('tr')).find(tr => {
+            const editBtn = tr.querySelector('button[onclick^="editUser("]');
+            return editBtn && editBtn.getAttribute('onclick') === `editUser(${userId})`;
+        });
+        if (!row) return;
+        const name = row.querySelector('td').textContent.trim();
+        document.getElementById('modalUserName').textContent = name;
+        document.getElementById('roleSelect').value = '';
+        currentUserId = userId;
+        document.getElementById('assignRoleModal').classList.add('active');
+    }
+
+    function disableUser(userId) {
+        // Find the user row and get the role
+        const row = Array.from(document.getElementById('user-tbody').getElementsByTagName('tr')).find(tr => {
+            const disableBtn = tr.querySelector('button[onclick^="disableUser("]');
+            return disableBtn && disableBtn.getAttribute('onclick') === `disableUser(${userId})`;
+        });
+        if (!row) return;
+        const role = row.querySelectorAll('td')[3].textContent.trim().toUpperCase();
+        if (role === 'ADMIN') {
+            showSuccessModal('Cannot disable admin account!', 'Admin accounts cannot be disabled.');
+            return;
+        }
+        if (!confirm('Are you sure you want to disable this user account?')) return;
+        // Call backend to disable
+        const formData = new FormData();
+        formData.append('user_id', userId);
+        fetch('<?= base_url('admin/disableUser') ?>', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showSuccessModal('User disabled!', 'The user account has been disabled.');
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred');
+        });
     }
 </script>
 <?= $this->endSection() ?>

@@ -65,6 +65,7 @@ class Auth extends BaseController
             'logged_in' => true
         ]);
 
+        session()->setFlashdata('login_success', true);
         return redirect()->to('/dashboard');
     }
 
