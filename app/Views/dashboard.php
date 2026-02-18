@@ -56,122 +56,101 @@
     <div class="text-muted">Welcome, <?= esc(session()->get('username') ?? 'User') ?></div>
 </div>
 
-<div class="row">
-    <div class="col-md-3 grid-margin">
-        <div class="card stat-card">
-            <div class="card-body">
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+    <div>
+        <div class="stat-card bg-white rounded-md shadow p-4">
                 <h4>Total Incidents</h4>
                 <div class="stat-number">2,847</div>
-                <div class="text-muted">All Provinces (2020-2024)</div>
-            </div>
+                <div class="text-gray-500">All Provinces (2020-2024)</div>
         </div>
     </div>
-    <div class="col-md-3 grid-margin">
-        <div class="card stat-card">
-            <div class="card-body">
+    <div>
+        <div class="stat-card bg-white rounded-md shadow p-4">
                 <h4>Total Fatalities</h4>
                 <div class="stat-number">1,256</div>
-                <div class="text-muted">Death Rate: 44.1%</div>
-            </div>
+                <div class="text-gray-500">Death Rate: 44.1%</div>
         </div>
     </div>
-    <div class="col-md-3 grid-margin">
-        <div class="card stat-card">
-            <div class="card-body">
+    <div>
+        <div class="stat-card bg-white rounded-md shadow p-4">
                 <h4>Highest Risk Province</h4>
                 <div class="stat-number">Pangasinan</div>
-                <div class="text-muted">612 incidents (21.5%)</div>
-            </div>
+                <div class="text-gray-500">612 incidents (21.5%)</div>
         </div>
     </div>
-    <div class="col-md-3 grid-margin">
-        <div class="card stat-card">
-            <div class="card-body">
+    <div>
+        <div class="stat-card bg-white rounded-md shadow p-4">
                 <h4>Most Affected Age Group</h4>
                 <div class="stat-number">0-14 Years</div>
-                <div class="text-muted">38.2% of incidents</div>
-            </div>
+                <div class="text-gray-500">38.2% of incidents</div>
         </div>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-6 grid-margin">
-        <div class="card">
-            <div class="card-body">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+        <div class="bg-white rounded-md shadow p-4">
                 <div class="section-title">Incidents per Province</div>
                 <div class="chart-container">
                     <canvas id="provinceChart"></canvas>
                 </div>
-            </div>
         </div>
     </div>
-    <div class="col-md-6 grid-margin">
-        <div class="card">
-            <div class="card-body">
+    <div>
+        <div class="bg-white rounded-md shadow p-4">
                 <div class="section-title">Remarks Status</div>
                 <div class="chart-container">
                     <canvas id="remarksChart"></canvas>
                 </div>
-            </div>
         </div>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-6 grid-margin">
-        <div class="card">
-            <div class="card-body">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+        <div class="bg-white rounded-md shadow p-4">
                 <div class="section-title">Incidents by Sex</div>
                 <div class="chart-container">
                     <canvas id="sexChart"></canvas>
                 </div>
-            </div>
         </div>
     </div>
-    <div class="col-md-6 grid-margin">
-        <div class="card">
-            <div class="card-body">
+    <div>
+        <div class="bg-white rounded-md shadow p-4">
                 <div class="section-title">Incidents by Age Group</div>
                 <div class="chart-container">
                     <canvas id="ageChart"></canvas>
                 </div>
-            </div>
         </div>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-6 grid-margin">
-        <div class="card">
-            <div class="card-body">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+        <div class="bg-white rounded-md shadow p-4">
                 <div class="section-title">Incidents by Year</div>
                 <div class="chart-container">
                     <canvas id="yearChart"></canvas>
                 </div>
-            </div>
         </div>
     </div>
-    <div class="col-md-6 grid-margin">
-        <div class="card">
-            <div class="card-body">
+    <div>
+        <div class="bg-white rounded-md shadow p-4">
                 <div class="section-title">Incidents by Holiday</div>
                 <div class="chart-container">
                     <canvas id="occasionChart"></canvas>
                 </div>
-            </div>
         </div>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-6 grid-margin">
-        <div class="card">
-            <div class="card-body">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+        <div class="bg-white rounded-md shadow p-4">
                 <div class="section-title">Incidents by Residence</div>
-                <div class="d-flex align-items-center gap-2 mb-2">
-                    <label for="residenceFilter" class="text-muted mb-0">Filter by:</label>
-                    <select id="residenceFilter" onchange="updateResidenceChart()" class="form-control form-control-sm" style="max-width: 180px;">
+                <div class="flex items-center gap-2 mb-2">
+                    <label for="residenceFilter" class="text-gray-500 mb-0">Filter by:</label>
+                    <select id="residenceFilter" onchange="updateResidenceChart()" class="ml-2 rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300" style="max-width: 180px;">
                         <option value="province">Province</option>
                         <option value="municipality">Municipality</option>
                     </select>
@@ -179,27 +158,22 @@
                 <div class="chart-container">
                     <canvas id="residenceChart"></canvas>
                 </div>
-            </div>
         </div>
     </div>
-    <div class="col-md-6 grid-margin">
-        <div class="card">
-            <div class="card-body">
+    <div>
+        <div class="bg-white rounded-md shadow p-4">
                 <div class="section-title">Contributing Factors</div>
                 <div class="chart-container">
                     <canvas id="factorsChart"></canvas>
                 </div>
-            </div>
         </div>
 
         <!-- Incidents by Location Category (added) -->
-        <div class="card mt-4">
-            <div class="card-body">
+        <div class="bg-white rounded-md shadow p-4 mt-4">
                 <div class="section-title">Incidents by Location Category</div>
                 <div class="chart-container">
                     <canvas id="locationChart"></canvas>
                 </div>
-            </div>
         </div>
     </div>
 </div>

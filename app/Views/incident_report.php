@@ -750,14 +750,14 @@
             const reviewStatus = row.review_status || 'pending';
             const statusClass = reviewStatus === 'approved' ? 'status-approved' : (reviewStatus === 'rejected' ? 'status-rejected' : 'status-pending');
 
-            const viewButton = `<button class="btn btn-sm btn-outline-secondary mt-1" onclick="openAttachmentViewer(${row['N']})">View</button>`;
+            const viewButton = `<button class="inline-flex items-center gap-2 px-3 py-1 border rounded text-sm text-gray-700 bg-white hover:bg-gray-50 mt-1" onclick="openAttachmentViewer(${row['N']})">View</button>`;
 
             let reviewControls = '';
             if (canReviewIncidents) {
                 reviewControls = `
-                    <div class="d-flex gap-1 flex-wrap">
-                        <button class="btn btn-sm btn-success" onclick="reviewIncident(${row['N']}, 'approve')">Approve</button>
-                        <button class="btn btn-sm btn-danger" onclick="reviewIncident(${row['N']}, 'reject')">Reject</button>
+                    <div class="flex gap-1 flex-wrap">
+                        <button class="inline-flex items-center gap-2 px-3 py-1 bg-green-600 text-white rounded text-sm" onclick="reviewIncident(${row['N']}, 'approve')">Approve</button>
+                        <button class="inline-flex items-center gap-2 px-3 py-1 bg-red-600 text-white rounded text-sm" onclick="reviewIncident(${row['N']}, 'reject')">Reject</button>
                     </div>
                 `;
             }
@@ -771,8 +771,8 @@
                 ${reviewControls || '<span class="text-muted">-</span>'}
             </td>
             <td>
-                <button class="btn btn-inverse-primary btn-sm" onclick="openIncidentModal(${index})">Edit</button>
-                <button class="btn btn-inverse-danger btn-sm" onclick="deleteRow(${index})">Delete</button>
+                <button class="inline-flex items-center gap-2 px-3 py-1 bg-blue-800 text-white rounded text-sm" onclick="openIncidentModal(${index})">Edit</button>
+                <button class="inline-flex items-center gap-2 px-3 py-1 bg-red-600 text-white rounded text-sm" onclick="deleteRow(${index})">Delete</button>
             </td></tr>`;
         });
 

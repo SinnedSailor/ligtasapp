@@ -8,237 +8,86 @@ $hideFooter = true;
 
 <?= $this->section('pageStyles') ?>
 <style>
-    .auth-page {
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #f5f7fa;
-        padding: 0;
-    }
-
-    .perfect-fit-register-container {
-        background: #fff;
-        border-radius: 30px;
-        box-shadow: 0 10px 25px rgba(9, 99, 126, 0.15);
-        padding: 40px 32px;
-        width: 100%;
-        max-width: 700px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .perfect-fit-register-container form {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    .form-row {
-        display: flex;
-        gap: 1rem;
-        width: 100%;
-    }
-
-    .form-row .form-group {
-        flex: 1;
-        margin-bottom: 0;
-    }
-
-    .form-group {
-        width: 100%;
-    }
-
-    .form-group input, .form-group select {
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    .iwas-header {
-        text-align: center;
-        margin-bottom: 2rem;
-        padding-bottom: 1.5rem;
-        border-bottom: 2px solid #002C76;
-    }
-
-    .iwas-logo-circle {
-        width: 70px;
-        height: 70px;
-        margin: 0 auto 1rem;
-        background: linear-gradient(135deg, #002C76 0%, #0B4F63 100%);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 4px 15px rgba(9, 99, 126, 0.3);
-    }
-
-    .iwas-logo-circle i {
-        color: #fff;
-        font-size: 32px;
-    }
-
-    .iwas-header h3 {
-        color: #002C76;
-        font-weight: 700;
-        margin: 0.5rem 0;
-        font-size: 28px;
-    }
-
-    .iwas-header p {
-        color: #666;
-        font-size: 13px;
-        letter-spacing: 0.5px;
-        margin: 0;
-    }
-
-    .form-group input {
-        border: 1.5px solid #e8e8e8;
-        font-size: 14px;
-        padding: 0.75rem 1rem;
-        transition: all 0.3s ease;
-    }
-
-    .form-group input:focus {
-        border-color: #002C76;
-        box-shadow: 0 0 0 3px rgba(9, 99, 126, 0.1);
-        background-color: #f8fafb;
-    }
-
-    .form-group input::placeholder {
-        color: #999;
-    }
-
-    .auth-form-btn {
-        background: linear-gradient(135deg, #002C76 0%, #0B4F63 100%);
-        border: none;
-        color: #fff;
-        font-weight: 600;
-        padding: 0.75rem 1rem;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(9, 99, 126, 0.2);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        font-size: 13px;
-        width: 100%;
-        margin: 0 auto;
-    }
-
-    .auth-form-btn:hover {
-        background: linear-gradient(135deg, #0B4F63 0%, #002C76 100%);
-        box-shadow: 0 6px 20px rgba(9, 99, 126, 0.3);
-        color: #fff;
-        transform: translateY(-2px);
-    }
-
-    .text-center.mt-4 {
-        color: #666;
-        font-size: 13px;
-    }
-
-    .text-center.mt-4 a {
-        color: #002C76;
-        font-weight: 600;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        border-bottom: 2px solid transparent;
-    }
-
-    .text-center.mt-4 a:hover {
-        color: #0B4F63;
-        border-bottom-color: #0B4F63;
-    }
-
-    .alert-danger {
-        background-color: rgba(201, 74, 74, 0.1);
-        border: 1px solid #C94A4A;
-        color: #8B2D2D;
-        border-radius: 6px;
-    }
-
-    .welcome-text {
-        color: #002C76;
-        font-weight: 600;
-        margin-bottom: 0.25rem;
-    }
-
-    .subtitle-text {
-        color: #999;
-        font-size: 13px;
-        font-weight: 400;
-    }
+    .auth-bg { background: url('<?= base_url('assets/staradmin/images/water.jpg') ?>') no-repeat center center; background-size: cover; }
 </style>
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-<div class="auth-page">
-    <div class="perfect-fit-register-container">
-        <div class="iwas-header">
-            <div class="iwas-logo-circle">
+<div class="auth-page auth-bg min-h-screen flex items-center justify-center py-12 px-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-3xl p-8">
+        <div class="text-center border-b pb-6 mb-6">
+            <div class="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-blue-900 to-teal-700 flex items-center justify-center text-white text-2xl shadow mb-3">
                 <i class="ti-water"></i>
             </div>
-            <h3>LIGTAS</h3>
-            <p>Local Incident Gathering and Tracking for Aquatic Safety</p>
+            <h3 class="text-2xl font-extrabold text-blue-900">LIGTAS</h3>
+            <p class="text-sm text-gray-500 mt-1">Local Incident Gathering and Tracking for Aquatic Safety</p>
         </div>
-        <div class="mb-4">
-            <h4 class="welcome-text">Create your account</h4>
-            <p class="subtitle-text m-0">Fill in the details to register</p>
-        </div>
+
+        <h4 class="text-lg font-semibold text-gray-700 mb-4">Create your account</h4>
+        <p class="text-sm text-gray-500 mb-6">Fill in the details to register</p>
+
         <?php if (session()->has('error')): ?>
-            <div class="alert alert-danger mt-3">
+            <div class="mb-4 rounded-md bg-red-50 border border-red-200 text-red-700 px-4 py-3">
                 <i class="ti-alert mr-2"></i><?= session()->getFlashdata('error') ?>
             </div>
         <?php endif; ?>
-        <form class="pt-2" action="<?= base_url('/store-register') ?>" method="POST">
+
+        <form action="<?= base_url('/store-register') ?>" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <?= csrf_field() ?>
-            <div class="form-row">
-                <div class="form-group">
-                    <input type="text" class="form-control form-control-lg" name="first_name" placeholder="First Name" required>
-                </div>
-                <div class="form-group">
-                    <input type="text" class="form-control form-control-lg" name="last_name" placeholder="Last Name" required>
-                </div>
+
+            <div>
+                <label for="first_name" class="sr-only">First name</label>
+                <input id="first_name" name="first_name" type="text" required placeholder="First name" class="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300" />
             </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <input type="text" class="form-control form-control-lg" name="username" placeholder="Username" required>
-                </div>
-                <div class="form-group">
-                    <input type="email" class="form-control form-control-lg" name="email" placeholder="Email" required>
-                </div>
+
+            <div>
+                <label for="last_name" class="sr-only">Last name</label>
+                <input id="last_name" name="last_name" type="text" required placeholder="Last name" class="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300" />
             </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <select class="form-control form-control-md" id="province" name="province" required>
-                            <option value="">Select province</option>
-                            <?php foreach (($provinces ?? []) as $province): ?>
-                                <option value="<?= esc($province) ?>" <?= (old('province') === $province) ? 'selected' : '' ?>><?= esc($province) ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <select class="form-control form-control-md" id="municipality" name="municipality" required>
-                            <option value="">Select municipality</option>
-                        </select>
-                    </div>
-                </div>
+
+            <div>
+                <label for="username" class="sr-only">Username</label>
+                <input id="username" name="username" type="text" required placeholder="Username" class="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300" />
             </div>
-            <div class="form-group">
-                <input type="password" class="form-control form-control-lg" name="password" placeholder="Password" required>
+
+            <div>
+                <label for="email" class="sr-only">Email</label>
+                <input id="email" name="email" type="email" required placeholder="Email" class="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300" />
             </div>
-            <div class="form-group">
-                <input type="password" class="form-control form-control-lg" name="password_confirm" placeholder="Confirm Password" required>
+
+            <div>
+                <label for="province" class="sr-only">Province</label>
+                <select id="province" name="province" required class="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                    <option value="">Select province</option>
+                    <?php foreach (($provinces ?? []) as $province): ?>
+                        <option value="<?= esc($province) ?>" <?= (old('province') === $province) ? 'selected' : '' ?>><?= esc($province) ?></option>
+                    <?php endforeach; ?>
+                </select>
             </div>
-            <div class="mt-4">
-                <button type="submit" class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn">Create Account</button>
+
+            <div>
+                <label for="municipality" class="sr-only">Municipality</label>
+                <select id="municipality" name="municipality" required class="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                    <option value="">Select municipality</option>
+                </select>
             </div>
-            <div class="text-center mt-4">
-                Already have an account? <a href="<?= base_url('/login') ?>">Sign in</a>
+
+            <div class="md:col-span-2">
+                <label for="password" class="sr-only">Password</label>
+                <input id="password" name="password" type="password" required placeholder="Password" class="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300" />
+            </div>
+
+            <div class="md:col-span-2">
+                <label for="password_confirm" class="sr-only">Confirm Password</label>
+                <input id="password_confirm" name="password_confirm" type="password" required placeholder="Confirm Password" class="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300" />
+            </div>
+
+            <div class="md:col-span-2">
+                <button type="submit" class="w-full bg-blue-800 hover:bg-blue-900 text-white font-semibold py-3 rounded-lg shadow uppercase text-sm">Create Account</button>
+            </div>
+
+            <div class="md:col-span-2 text-center text-sm text-gray-500">
+                Already have an account? <a href="<?= base_url('/login') ?>" class="text-blue-700 font-medium hover:underline">Sign in</a>
             </div>
         </form>
     </div>

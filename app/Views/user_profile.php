@@ -163,13 +163,12 @@
 </div>
 
 <?php if (!empty($profileError)): ?>
-    <div class="alert alert-danger">
+    <div class="mb-4 rounded-md bg-red-50 border border-red-200 text-red-700 px-4 py-3">
         <?= esc($profileError) ?>
     </div>
 <?php endif; ?>
 
-<div class="row">
-    <div class="col-lg-8 col-md-10 grid-margin mx-auto">
+<div class="max-w-4xl mx-auto px-4">
         <div class="profile-card">
             <div class="profile-picture-section">
                 <div class="profile-picture-upload">
@@ -179,11 +178,11 @@
                     <div class="upload-overlay" onclick="document.getElementById('profilePicture').click()">
                         <i class="ti-camera"></i> Change Photo
                     </div>
-                    <input type="file" id="profilePicture" class="d-none" accept="image/*" onchange="previewImage(event)">
+                    <input type="file" id="profilePicture" class="hidden" accept="image/*" onchange="previewImage(event)">
                 </div>
             </div>
 
-            <div class="alert alert-info info-alert">
+            <div class="mb-4 rounded-md bg-blue-50 border border-blue-100 text-blue-700 px-4 py-3 text-center">
                 Keep your profile information up to date for better communication.
             </div>
 
@@ -193,27 +192,27 @@
                     <h5>Personal Information</h5>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="firstName">First Name *</label>
-                            <input type="text" class="form-control" id="firstName" name="first_name" value="<?= esc($profile['first_name'] ?? session()->get('first_name') ?? '') ?>" required oninput="this.value = this.value.toUpperCase()">
+                            <label for="firstName" class="block text-sm font-medium text-gray-700">First Name *</label>
+                            <input type="text" id="firstName" name="first_name" value="<?= esc($profile['first_name'] ?? session()->get('first_name') ?? '') ?>" required oninput="this.value = this.value.toUpperCase()" class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300" />
                         </div>
                         <div class="form-group">
-                            <label for="lastName">Last Name *</label>
-                            <input type="text" class="form-control" id="lastName" name="last_name" value="<?= esc($profile['last_name'] ?? session()->get('last_name') ?? '') ?>" required oninput="this.value = this.value.toUpperCase()">
+                            <label for="lastName" class="block text-sm font-medium text-gray-700">Last Name *</label>
+                            <input type="text" id="lastName" name="last_name" value="<?= esc($profile['last_name'] ?? session()->get('last_name') ?? '') ?>" required oninput="this.value = this.value.toUpperCase()" class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300" />
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="username">Username *</label>
-                            <input type="text" class="form-control" id="username" name="username" value="<?= esc($profile['username'] ?? session()->get('username') ?? '') ?>" required>
+                            <label for="username" class="block text-sm font-medium text-gray-700">Username *</label>
+                            <input type="text" id="username" name="username" value="<?= esc($profile['username'] ?? session()->get('username') ?? '') ?>" required class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300" />
                         </div>
                         <div class="form-group">
-                            <label for="contactNumber">Contact Number *</label>
-                            <input type="tel" class="form-control" id="contactNumber" name="contact_number" value="<?= esc($profile['contact_number'] ?? session()->get('contact_number') ?? '') ?>" placeholder="e.g., 09123456789" inputmode="numeric" maxlength="11" pattern="[0-9]{11}" title="Please enter 11-digit phone number (numbers only)" required oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                            <label for="contactNumber" class="block text-sm font-medium text-gray-700">Contact Number *</label>
+                            <input type="tel" id="contactNumber" name="contact_number" value="<?= esc($profile['contact_number'] ?? session()->get('contact_number') ?? '') ?>" placeholder="e.g., 09123456789" inputmode="numeric" maxlength="11" pattern="[0-9]{11}" title="Please enter 11-digit phone number (numbers only)" required oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300" />
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="email">Email Address *</label>
-                        <input type="email" class="form-control" id="email" value="<?= esc($profile['email'] ?? session()->get('email') ?? '') ?>" disabled>
+                        <label for="email" class="block text-sm font-medium text-gray-700">Email Address *</label>
+                        <input type="email" id="email" value="<?= esc($profile['email'] ?? session()->get('email') ?? '') ?>" disabled class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 bg-gray-50" />
                     </div>
                 </div>
 
@@ -221,8 +220,8 @@
                     <h5>Location Information</h5>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="province">Province *</label>
-                            <select class="form-control" id="province" name="province" required>
+                            <label for="province" class="block text-sm font-medium text-gray-700">Province *</label>
+                            <select id="province" name="province" required class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
                                 <option value="">Select province</option>
                                 <?php if (!$provinceSelectedInList && $selectedProvince !== ''): ?>
                                     <option value="<?= esc($selectedProvince) ?>" selected>
@@ -235,8 +234,8 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="municipality">Municipality *</label>
-                            <select class="form-control" id="municipality" name="municipality" required>
+                            <label for="municipality" class="block text-sm font-medium text-gray-700">Municipality *</label>
+                            <select id="municipality" name="municipality" required class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
                                 <option value="">Select municipality</option>
                             </select>
                         </div>
@@ -251,11 +250,11 @@
                     </a>
                 </div>
 
-                <div class="mt-4 d-flex flex-wrap gap-2">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="ti-check"></i> Save Changes
+                <div class="mt-4 flex flex-wrap gap-2">
+                    <button type="submit" class="bg-blue-800 hover:bg-blue-900 text-white py-2 px-4 rounded-md inline-flex items-center gap-2">
+                        <i class="ti-check"></i> <span>Save Changes</span>
                     </button>
-                    <button type="button" class="btn btn-secondary" onclick="window.location.href='<?= base_url('/dashboard') ?>'">
+                    <button type="button" class="bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded-md" onclick="window.location.href='<?= base_url('/dashboard') ?>'">
                         Cancel
                     </button>
                 </div>
@@ -271,7 +270,7 @@
         </div>
         <div class="success-message">Profile updated successfully!</div>
         <div class="success-subtext">Your changes have been saved.</div>
-        <button type="button" class="btn btn-primary" id="closeSuccessModal">OK</button>
+        <button type="button" class="bg-blue-800 hover:bg-blue-900 text-white py-2 px-4 rounded-md" id="closeSuccessModal">OK</button>
     </div>
 </div>
 <?= $this->endSection() ?>

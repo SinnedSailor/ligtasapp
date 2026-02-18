@@ -67,3 +67,26 @@ Additionally, make sure that the following extensions are enabled in your PHP:
 - json (enabled by default - don't turn it off)
 - [mysqlnd](http://php.net/manual/en/mysqlnd.install.php) if you plan to use MySQL
 - [libcurl](http://php.net/manual/en/curl.requirements.php) if you plan to use the HTTP\CURLRequest library
+
+## Tailwind CSS build (optional)
+This project now includes a Tailwind CSS toolchain for a gradual migration from Bootstrap.
+
+- Source: `src/tailwind.css`
+- Output (generated): `public/assets/css/tailwind.css`
+
+Commands (requires Node.js/npm):
+
+1. Install dev tools:
+
+   npm install
+
+2. One-time production build:
+
+   npm run build:css
+
+3. Development watch (rebuilds on file change):
+
+   npm run watch:css
+
+The compiled stylesheet is already included in `app/Views/layouts/staradmin.php`. Remove any CDN Tailwind usages in individual views once you switch them to the compiled CSS.
+
