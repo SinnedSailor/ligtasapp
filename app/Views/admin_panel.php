@@ -197,29 +197,26 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-<div class="page-header d-flex flex-wrap justify-content-between align-items-center mb-4">
+<div class="page-header flex flex-wrap justify-between items-center mb-4">
     <div>
-        <h3 class="page-title mb-1"><i class="bi bi-shield-lock me-2"></i>User Management</h3>
-        <div class="text-muted">Manage users, roles, and administrative access.</div>
+        <h3 class="page-title mb-1"><i class="bi bi-shield-lock mr-3 text-blue-900"></i><span class="text-xl font-semibold">User Management</span></h3>
+        <div class="text-gray-500">Manage users, roles, and administrative access.</div>
     </div>
-</div>           
+</div>
 
-<div id="user-management-section" class="card">
-    <div class="card-body">
-        <h4 class="card-title mb-0">User Management</h4>
+<div id="user-management-section" class="bg-white rounded-2xl shadow admin-card">
+    <div class="p-6">
+        <h4 class="text-lg font-semibold mb-4">User Management</h4>
 
-        <div class="d-flex flex-wrap align-items-center gap-3 mb-3" style="margin-top: 10px;">
-            <div class="input-group" style="max-width: 320px;">
-                <span class="input-group-text bg-white border-end-0" style="border-radius: 999px 0 0 999px; border-color: #e5e7eb;">
-                    <i class="bi bi-search" style="color: #6c757d;"></i>
-                </span>
-                <input type="text" id="userSearch" class="form-control form-control-sm border-start-0" placeholder="Search" onkeyup="filterUsers()" style="border-radius: 0 999px 999px 0; border-color: #e5e7eb; background: #f9fafb;">
+        <div class="flex flex-wrap items-center gap-3 mb-4 mt-2">
+            <div class="flex items-center rounded-full bg-gray-50 border border-gray-200 overflow-hidden" style="max-width:320px;">
+                <div class="px-3 text-gray-500"><i class="bi bi-search"></i></div>
+                <input type="text" id="userSearch" class="py-2 px-3 text-sm bg-transparent outline-none" placeholder="Search" onkeyup="filterUsers()" />
             </div>
-            <div class="input-group" style="max-width: 180px;">
-                <span class="input-group-text bg-white border-end-0" style="border-radius: 999px 0 0 999px; border-color: #e5e7eb;">
-                    <i class="bi bi-person" style="color: #6c757d;"></i>
-                </span>
-                <select id="roleFilter" class="form-select form-select-sm border-start-0" style="border-radius: 0 999px 999px 0; border-color: #e5e7eb; background: #f9fafb;" onchange="filterUsers()">
+
+            <div class="flex items-center rounded-full bg-gray-50 border border-gray-200 overflow-hidden" style="max-width:180px;">
+                <div class="px-3 text-gray-500"><i class="bi bi-person"></i></div>
+                <select id="roleFilter" class="py-2 pr-3 pl-1 text-sm bg-transparent outline-none" onchange="filterUsers()">
                     <option value="">Role</option>
                     <option value="ADMIN">ADMIN</option>
                     <option value="FOCAL">FOCAL</option>
@@ -229,19 +226,19 @@
             </div>
         </div>
 
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
                     <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Username</th>
-                        <th>Role</th>
-                        <th>Actions</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600">Name</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600">Email</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600">Username</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600">Role</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600">Actions</th>
                     </tr>
                 </thead>
-                <tbody id="user-tbody">
-                    <tr><td colspan="5" class="text-center text-muted">Loading users...</td></tr>
+                <tbody id="user-tbody" class="bg-white divide-y divide-gray-100">
+                    <tr><td colspan="5" class="px-4 py-4 text-center text-sm text-gray-400">Loading users...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -373,15 +370,15 @@
                         // Only show edit and disable icons for actions
                         return `
                             <tr>
-                                <td><strong>${user.first_name} ${user.last_name}</strong></td>
-                                <td>${user.email}</td>
-                                <td>${user.username}</td>
-                                <td>${roleBadge}</td>
-                                <td class="d-flex flex-wrap gap-2">
-                                    <button class="btn btn-sm btn-outline-primary" title="Edit User" onclick="editUser(${user.id})">
+                                <td class="px-4 py-4"><strong>${user.first_name} ${user.last_name}</strong></td>
+                                <td class="px-4 py-4">${user.email}</td>
+                                <td class="px-4 py-4">${user.username}</td>
+                                <td class="px-4 py-4">${roleBadge}</td>
+                                <td class="px-4 py-4 flex flex-wrap gap-2">
+                                    <button class="px-2.5 py-1.5 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-100" title="Edit User" onclick="editUser(${user.id})">
                                         <i class="bi bi-pencil"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-secondary" title="Disable User" onclick="disableUser(${user.id})">
+                                    <button class="px-2.5 py-1.5 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-100" title="Disable User" onclick="disableUser(${user.id})">
                                         <i class="bi bi-person-x"></i>
                                     </button>
                                 </td>
