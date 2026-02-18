@@ -151,74 +151,72 @@
     <h3 class="page-title">Incident Report</h3>
 </div>
 
-<div class="row">
-    <div class="col-12 grid-margin">
-        <div class="card">
-            <div class="card-body">
-                <h4 class="card-title">Data Management</h4>
-                <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
-                    <div class="file-input-wrapper">
-                        <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" class="d-none" />
-                        <button id="importButton" class="btn btn-primary btn-sm" onclick="document.getElementById('excelFile').click()" style="<?= $hasInitialRows ? 'display:none;' : '' ?>">
-                            <i class="ti-import"></i> Import Excel File
-                        </button>
-                    </div>
-                    <span class="file-name" id="fileName" style="<?= $hasInitialRows ? 'display:none;' : '' ?>">No file selected</span>
-                </div>
+<div class="px-0">
+    <div class="max-w-full bg-white rounded-2xl shadow p-6">
+        <h4 class="text-lg font-semibold">Data Management</h4>
+        <div class="flex flex-wrap items-center gap-3 mt-4 mb-4">
+            <div class="flex items-center gap-3">
+                <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" class="hidden" />
+                <button id="importButton" class="px-3 py-1.5 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700" onclick="document.getElementById('excelFile').click()" style="<?= $hasInitialRows ? 'display:none;' : '' ?>">
+                    <i class="ti-import mr-2"></i>Import Excel File
+                </button>
+                <span class="text-gray-500 text-sm file-name" id="fileName" style="<?= $hasInitialRows ? 'display:none;' : '' ?>">No file selected</span>
+            </div>
+        </div>
 
-                <?php if ($isLgu): ?>
-                    <div class="alert alert-info">
-                        Upload at least one photo or document per incident. Attachments are reviewed by Province users.
-                    </div>
-                <?php endif; ?>
+        <?php if ($isLgu): ?>
+            <div class="mb-4">
+                <div class="bg-blue-50 border border-blue-200 text-blue-800 rounded-md p-3 text-sm">Upload at least one photo or document per incident. Attachments are reviewed by Province users.</div>
+            </div>
+        <?php endif; ?>
 
-                <div class="d-flex flex-wrap gap-2 mb-3">
-                    <?php if ($isLgu || $isAdmin): ?>
-                        <button class="btn btn-primary btn-sm" onclick="openIncidentModal()">
-                            <i class="ti-plus"></i> Add Incident
-                        </button>
-                    <?php endif; ?>
-                    <button id="saveButton" class="btn btn-success btn-sm" onclick="openSaveModal()" style="<?= $hasInitialRows ? 'display:none;' : '' ?>">
-                        <i class="ti-save"></i> Save to Database
-                    </button>
-                    <button id="generateReportButton" class="btn btn-info btn-sm" onclick="downloadIncidentReport()">
-                        <i class="ti-bar-chart"></i> Generate Report
-                    </button>
-                </div>
+        <div class="flex flex-wrap gap-2 mb-4">
+            <?php if ($isLgu || $isAdmin): ?>
+                <button class="px-3 py-1.5 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700" onclick="openIncidentModal()">
+                    <i class="ti-plus mr-2"></i>Add Incident
+                </button>
+            <?php endif; ?>
+            <button id="saveButton" class="px-3 py-1.5 bg-green-600 text-white rounded-md text-sm hover:bg-green-700" onclick="openSaveModal()" style="<?= $hasInitialRows ? 'display:none;' : '' ?>">
+                <i class="ti-save mr-2"></i>Save to Database
+            </button>
+            <button id="generateReportButton" class="px-3 py-1.5 bg-sky-500 text-white rounded-md text-sm hover:bg-sky-600" onclick="downloadIncidentReport()">
+                <i class="ti-bar-chart mr-2"></i>Generate Report
+            </button>
+        </div>
 
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th>N</th>
-                                <th>Month of Incident</th>
-                                <th>Year of Incident</th>
-                                <th>Province</th>
-                                <th>Municipality/City where Incidence Occurred</th>
-                                <th class="col-primary">Name of Victim</th>
-                                <th class="col-secondary">Location Category</th>
-                                <th class="col-secondary">Age of the Person</th>
-                                <th class="col-secondary">Sex</th>
-                                <th class="col-secondary">Occasion</th>
-                                <th class="col-tertiary">Other Factors</th>
-                                <th class="col-tertiary">Person's Residence</th>
-                                <th class="col-tertiary">Occupation of the Victim</th>
-                                <th class="col-tertiary">Remarks</th>
-                                <th>Attachments</th>
-                                <th>Review</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tableBody">
-                            <tr>
-                                <td colspan="16" class="empty-message">No data yet. Upload an Excel file or click "Add Incident" to add data.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="pagination-controls" id="paginationControls" style="display:none;">
-                    <button class="btn btn-outline-secondary btn-sm" id="prevPage" type="button">Prev</button>
-                    <button class="btn btn-outline-secondary btn-sm" id="nextPage" type="button">Next</button>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-600">N</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-600">Month of Incident</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-600">Year of Incident</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-600">Province</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-600">Municipality/City where Incidence Occurred</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 col-primary">Name of Victim</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 col-secondary">Location Category</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 col-secondary">Age of the Person</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 col-secondary">Sex</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 col-secondary">Occasion</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 col-tertiary">Other Factors</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 col-tertiary">Person's Residence</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 col-tertiary">Occupation of the Victim</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 col-tertiary">Remarks</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-600">Attachments</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-600">Review</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-600">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody" class="bg-white divide-y divide-gray-100">
+                    <tr>
+                        <td colspan="16" class="px-4 py-6 text-center text-sm text-gray-400 empty-message">No data yet. Upload an Excel file or click "Add Incident" to add data.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="pagination-controls mt-4 hidden" id="paginationControls">
+            <button id="prevPage" type="button" class="px-3 py-1.5 border border-gray-300 rounded-md text-sm">Prev</button>
+                    <button id="nextPage" type="button" class="px-3 py-1.5 border border-gray-300 rounded-md text-sm">Next</button>
                     <span class="page-info" id="pageInfo"></span>
                     <div class="ms-auto d-flex align-items-center gap-2">
                         <label class="page-info" for="pageSize">Rows per page</label>
@@ -246,8 +244,8 @@
                 This will save the current imported rows into the database. Continue?
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-success" onclick="confirmSaveToDatabase()">Yes, Save</button>
+                <button type="button" class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="px-3 py-1.5 bg-green-600 text-white rounded-md" onclick="confirmSaveToDatabase()">Yes, Save</button>
             </div>
         </div>
     </div>
@@ -264,7 +262,7 @@
                 <div id="importSuccessMessage">Import completed.</div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                <button type="button" class="px-3 py-1.5 bg-blue-600 text-white rounded-md" data-bs-dismiss="modal">OK</button>
             </div>
         </div>
     </div>
@@ -281,7 +279,7 @@
                 <div id="saveResultMessage">Save completed.</div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                <button type="button" class="px-3 py-1.5 bg-blue-600 text-white rounded-md" data-bs-dismiss="modal">OK</button>
             </div>
         </div>
     </div>
@@ -298,7 +296,7 @@
                 <div id="attachmentModalMessage">Please upload at least one file.</div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                <button type="button" class="px-3 py-1.5 bg-blue-600 text-white rounded-md" data-bs-dismiss="modal">OK</button>
             </div>
         </div>
     </div>
@@ -315,8 +313,8 @@
                 <div id="reviewConfirmMessage">Are you sure you want to update this incident?</div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="reviewConfirmAction">Confirm</button>
+                <button type="button" class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="reviewConfirmAction" class="px-3 py-1.5 bg-blue-600 text-white rounded-md">Confirm</button>
             </div>
         </div>
     </div>
@@ -345,7 +343,7 @@
                         </div>
                         <div class="col-md-4">
                             <label class="form-label" for="incidentYear">Year of Incident</label>
-                            <input type="text" class="form-control form-control-sm" id="incidentYear" />
+                            <input type="text" id="incidentYear" class="block w-full rounded-md border-gray-200 py-2 px-3 text-sm shadow-sm focus:ring-2 focus:ring-blue-300" />
                         </div>
                         <div class="col-md-4">
                             <label class="form-label" for="incidentProvince">Province</label>
@@ -366,15 +364,15 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" for="incidentVictim">Name of Victim</label>
-                            <input type="text" class="form-control form-control-sm" id="incidentVictim" />
+                            <input type="text" id="incidentVictim" class="block w-full rounded-md border-gray-200 py-2 px-3 text-sm shadow-sm focus:ring-2 focus:ring-blue-300" />
                         </div>
                         <div class="col-md-4">
                             <label class="form-label" for="incidentLocation">Location Category</label>
-                            <input type="text" class="form-control form-control-sm" id="incidentLocation" />
+                            <input type="text" id="incidentLocation" class="block w-full rounded-md border-gray-200 py-2 px-3 text-sm shadow-sm focus:ring-2 focus:ring-blue-300" />
                         </div>
                         <div class="col-md-4">
                             <label class="form-label" for="incidentAge">Age of the Person</label>
-                            <input type="text" class="form-control form-control-sm" id="incidentAge" />
+                            <input type="text" id="incidentAge" class="block w-full rounded-md border-gray-200 py-2 px-3 text-sm shadow-sm focus:ring-2 focus:ring-blue-300" />
                         </div>
                         <div class="col-md-4">
                             <label class="form-label" for="incidentGender">Sex</label>
@@ -386,23 +384,23 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" for="incidentOccasion">Occasion</label>
-                            <input type="text" class="form-control form-control-sm" id="incidentOccasion" />
+                            <input type="text" id="incidentOccasion" class="block w-full rounded-md border-gray-200 py-2 px-3 text-sm shadow-sm focus:ring-2 focus:ring-blue-300" />
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" for="incidentFactors">Other Factors</label>
-                            <input type="text" class="form-control form-control-sm" id="incidentFactors" />
+                            <input type="text" id="incidentFactors" class="block w-full rounded-md border-gray-200 py-2 px-3 text-sm shadow-sm focus:ring-2 focus:ring-blue-300" />
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" for="incidentResidence">Person's Residence</label>
-                            <input type="text" class="form-control form-control-sm" id="incidentResidence" />
+                            <input type="text" id="incidentResidence" class="block w-full rounded-md border-gray-200 py-2 px-3 text-sm shadow-sm focus:ring-2 focus:ring-blue-300" />
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" for="incidentOccupation">Occupation of the Victim</label>
-                            <input type="text" class="form-control form-control-sm" id="incidentOccupation" />
+                            <input type="text" id="incidentOccupation" class="block w-full rounded-md border-gray-200 py-2 px-3 text-sm shadow-sm focus:ring-2 focus:ring-blue-300" />
                         </div>
                         <div class="col-12">
                             <label class="form-label" for="incidentRemarks">Remarks</label>
-                            <input type="text" class="form-control form-control-sm" id="incidentRemarks" />
+                            <input type="text" id="incidentRemarks" class="block w-full rounded-md border-gray-200 py-2 px-3 text-sm shadow-sm focus:ring-2 focus:ring-blue-300" />
                         </div>
                     </div>
 
@@ -414,16 +412,16 @@
                             </div>
                             <div class="text-muted" id="incidentAttachmentHint" style="font-size: 0.85rem;"></div>
                             <div class="d-flex flex-wrap gap-2 mt-2">
-                                <input type="file" id="incidentAttachments" class="form-control form-control-sm" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx" multiple />
-                                <button type="button" class="btn btn-outline-primary btn-sm" id="incidentUploadButton" onclick="uploadIncidentAttachments()">Upload Attachments</button>
+                                <input type="file" id="incidentAttachments" class="block w-full text-sm text-gray-700" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx" multiple />
+                                <button type="button" id="incidentUploadButton" class="px-3 py-1.5 border border-blue-600 text-blue-600 rounded-md text-sm hover:bg-blue-50" onclick="uploadIncidentAttachments()">Upload Attachments</button>
                             </div>
                         </div>
                     <?php endif; ?>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="incidentSaveButton" onclick="saveIncidentFromModal()">Save Incident</button>
+                <button type="button" class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="incidentSaveButton" class="px-3 py-1.5 bg-blue-600 text-white rounded-md" onclick="saveIncidentFromModal()">Save Incident</button>
             </div>
         </div>
     </div>
@@ -443,8 +441,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <a class="btn btn-outline-primary" id="attachmentDownload" href="#" target="_blank" rel="noopener">Download</a>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a id="attachmentDownload" href="#" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-3 py-1.5 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50">Download</a>
+                <button type="button" class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md" onclick="closeAttachmentViewer && closeAttachmentViewer()">Close</button>
             </div>
         </div>
     </div>
@@ -1382,7 +1380,7 @@
                             previewEl.innerHTML = `
                                 <div class="text-center p-4">
                                     <div class="text-muted mb-2">Preview not available for this file type.</div>
-                                    <a class="btn btn-outline-primary" href="${downloadUrl}" target="_blank" rel="noopener">Download ${item.original_name}</a>
+                                    <a class="inline-flex items-center gap-2 px-3 py-1.5 border border-blue-600 text-blue-600 rounded-md text-sm" href="${downloadUrl}" target="_blank" rel="noopener">Download ${item.original_name}</a>
                                 </div>
                             `;
                         }
