@@ -1352,14 +1352,7 @@
                 });
             }
 
-            if (typeof bootstrap === 'undefined') {
-                showModal('attachmentViewerModal');
-                return;
-            }
-
-            const modalElement = document.getElementById('attachmentViewerModal');
-            const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
-            modal.show();
+            showModal('attachmentViewerModal');
         } catch (error) {
             showAttachmentModal('Failed to load attachments: ' + error.message);
         }
@@ -1376,14 +1369,7 @@
 
         pendingReview = { incidentN, action };
 
-        if (typeof bootstrap === 'undefined') {
-            showModal('reviewConfirmModal');
-            return;
-        }
-
-        const modalElement = document.getElementById('reviewConfirmModal');
-        const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
-        modal.show();
+        showModal('reviewConfirmModal');
     }
 
     function submitReview() {
