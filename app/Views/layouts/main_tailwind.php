@@ -66,45 +66,55 @@
 
     <div class="container-fluid <?= $pageBodyClass ?>">
         <?php if (!$hideSidebar): ?>
-            <nav id="sidebar" class="w-64 h-screen flex flex-col bg-white/5 p-4">
-                <div class="space-y-6">
-                    <div class="sidebar-profile text-center">
-                        <div class="avatar mx-auto mb-3 w-12 h-12 rounded-full bg-slate-700 text-white flex items-center justify-center"> <?= esc($initials) ?>
-                            <a href="<?= base_url('/user-profile') ?>" class="ml-2 text-sm text-slate-400" title="Edit Profile"><?= svg_icon('pencil', 'w-4 h-4') ?></a>
-                        </div>
-                        <div class="name font-semibold text-sm">
-                            <?= esc(trim(($firstName ?? '') . ' ' . ($lastName ?? '')) ?: ($username ?? 'User')) ?>
-                        </div>
-                        <div class="role text-xs text-slate-400"><?= esc(session()->get('role_name') ?? 'User') ?></div>
-                    </div>
-                    <ul class="flex-1 space-y-2 mt-4">
-                        <li class="<?= $root === '' || $root === 'dashboard' ? 'bg-slate-100/10 rounded-md' : '' ?>">
-                            <a class="flex items-center gap-3 px-3 py-2 text-sm" href="<?= base_url('/dashboard') ?>">
-                                <?= svg_icon('home', 'w-4 h-4 text-indigo-600') ?>
+            <nav id="sidebar" class="w-72 lg:w-64 h-screen flex flex-col bg-white border-r border-slate-100 p-4">
+                <!-- Brand -->
+                <div class="flex items-center gap-3 px-2 py-3 mb-4">
+                    <div class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold">L</div>
+                    <a href="<?= base_url('/dashboard') ?>" class="text-lg font-semibold text-slate-900">LIGTAS</a>
+                    <button class="ml-auto inline-flex items-center justify-center p-2 rounded-md text-slate-400 hover:bg-slate-50" aria-label="Toggle sidebar"><?= svg_icon('menu', 'w-5 h-5') ?></button>
+                </div>
+
+                <!-- Navigation -->
+                <div class="flex-1 mt-2">
+                    <ul class="space-y-1">
+                        <li>
+                            <a href="<?= base_url('/dashboard') ?>" class="flex items-center gap-3 px-3 py-2 text-sm rounded-md <?= ($root === '' || $root === 'dashboard') ? 'bg-slate-100 text-indigo-600' : 'text-slate-600 hover:bg-slate-50' ?>">
+                                <?= svg_icon('home', 'w-5 h-5') ?>
                                 <span class="menu-title">Dashboard</span>
+                                <span class="ml-auto text-xs bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full">01</span>
                             </a>
                         </li>
-                        <li class="<?= $root === 'incident-report' ? 'bg-slate-100/10 rounded-md' : '' ?>">
-                            <a class="flex items-center gap-3 px-3 py-2 text-sm" href="<?= base_url('/incident-report') ?>">
-                                <?= svg_icon('files', 'w-4 h-4 text-indigo-600') ?>
+                        <li>
+                            <a href="<?= base_url('/incident-report') ?>" class="flex items-center gap-3 px-3 py-2 text-sm rounded-md <?= $root === 'incident-report' ? 'bg-slate-100 text-indigo-600' : 'text-slate-600 hover:bg-slate-50' ?>">
+                                <?= svg_icon('files', 'w-5 h-5') ?>
                                 <span class="menu-title">Incident Reports</span>
                             </a>
                         </li>
-                        <li class="<?= $root === 'ordinance' ? 'bg-slate-100/10 rounded-md' : '' ?>">
-                            <a class="flex items-center gap-3 px-3 py-2 text-sm" href="<?= base_url('/ordinance') ?>">
-                                <?= svg_icon('files', 'w-4 h-4 text-indigo-600') ?>
+                        <li>
+                            <a href="<?= base_url('/ordinance') ?>" class="flex items-center gap-3 px-3 py-2 text-sm rounded-md <?= $root === 'ordinance' ? 'bg-slate-100 text-indigo-600' : 'text-slate-600 hover:bg-slate-50' ?>">
+                                <?= svg_icon('files', 'w-5 h-5') ?>
                                 <span class="menu-title">Documents</span>
                             </a>
                         </li>
                         <?php if (session()->get('is_admin')): ?>
-                        <li class="<?= $root === 'admin-panel' ? 'bg-slate-100/10 rounded-md' : '' ?>">
-                            <a class="flex items-center gap-3 px-3 py-2 text-sm" href="<?= base_url('/admin-panel') ?>">
-                                <?= svg_icon('users', 'w-4 h-4 text-indigo-600') ?>
+                        <li>
+                            <a href="<?= base_url('/admin-panel') ?>" class="flex items-center gap-3 px-3 py-2 text-sm rounded-md <?= $root === 'admin-panel' ? 'bg-slate-100 text-indigo-600' : 'text-slate-600 hover:bg-slate-50' ?>">
+                                <?= svg_icon('users', 'w-5 h-5') ?>
                                 <span class="menu-title">Admin Panel</span>
                             </a>
                         </li>
                         <?php endif; ?>
                     </ul>
+                </div>
+
+                <!-- Footer / Profile -->
+                <div class="mt-4 pt-4 border-t border-slate-100 flex items-center gap-3 text-sm">
+                    <div class="w-9 h-9 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-semibold"><?= esc($initials) ?></div>
+                    <div>
+                        <div class="font-semibold text-sm text-slate-900"><?= esc(trim(($firstName ?? '') . ' ' . ($lastName ?? '')) ?: ($username ?? 'User')) ?></div>
+                        <div class="text-xs text-slate-400"><?= esc(session()->get('role_name') ?? 'User') ?></div>
+                    </div>
+                    <a href="<?= base_url('/user-profile') ?>" class="ml-auto text-slate-400 hover:text-slate-600" title="Edit Profile"><?= svg_icon('pencil', 'w-4 h-4') ?></a>
                 </div>
             </nav>
         <?php endif; ?>

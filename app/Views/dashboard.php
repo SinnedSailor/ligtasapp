@@ -5,15 +5,22 @@
 <?= $this->section('content') ?>
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 md:pt-28 pb-10">
   <!-- Header -->
-  <header class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
-    <div>
-      <h1 class="text-3xl font-bold text-slate-900">Dashboard</h1>
-      <p class="mt-2 text-sm text-slate-500">Overview — Local Incident Gathering and Tracking for Aquatic Safety</p>
+  <header class="flex items-center justify-between gap-6 mb-8">
+    <div class="flex items-center gap-4">
+      <button class="p-2 rounded-md text-slate-500 hover:bg-slate-50"><?= svg_icon('menu', 'w-5 h-5') ?></button>
+      <div>
+        <h1 class="text-2xl font-bold text-slate-900">Dashboard</h1>
+        <p class="text-sm text-slate-500">Overview — Local Incident Gathering and Tracking for Aquatic Safety</p>
+      </div>
     </div>
 
-    <div class="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 w-full sm:w-auto">
-      <button class="w-full sm:w-auto inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-full shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-300"><?= svg_icon('plus', 'w-4 h-4') ?> <span>New Incident</span></button>
-      <button class="w-full sm:w-auto inline-flex items-center gap-2 px-3 py-2 bg-white border border-slate-100 rounded-full text-slate-700 shadow-sm"><?= svg_icon('cloud-upload', 'w-4 h-4 text-slate-600') ?> Export</button>
+    <div class="flex items-center gap-3">
+      <div class="relative hidden md:block">
+        <div class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><?= svg_icon('search', 'w-4 h-4') ?></div>
+        <input class="pl-10 pr-3 py-2 w-64 rounded-full border border-slate-100 text-sm bg-white/80 focus:outline-none focus:ring-2 focus:ring-indigo-300" placeholder="Search incidents, provinces..." />
+      </div>
+      <button class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-full shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-300"><?= svg_icon('plus', 'w-4 h-4') ?> <span>New Incident</span></button>
+      <div class="w-9 h-9 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-semibold">AU</div>
     </div>
   </header>
 
@@ -21,37 +28,34 @@
   <section class="mb-8">
     <div class="overflow-x-auto sm:overflow-visible -mx-4 sm:mx-0 px-4 sm:px-0">
       <div class="flex gap-6 sm:grid sm:grid-cols-2 md:grid-cols-4">
-    <div class="w-56 shrink-0 sm:w-auto bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
-      <div class="flex items-start justify-between gap-4">
-        <div>
-          <div class="text-sm text-slate-500">Total Incidents</div>
-          <div class="mt-2 text-2xl font-semibold text-slate-900">2,847</div>
-          <div class="text-xs text-slate-400 mt-1">All Provinces (2020–2024)</div>
-        </div>
-        <div class="w-12 h-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-indigo-600"><?= svg_icon('chart', 'w-5 h-5 text-indigo-600') ?></div>
+    <div class="w-56 shrink-0 sm:w-auto bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm relative">
+      <div class="absolute top-4 right-4 w-10 h-10 bg-slate-50 border border-slate-100 rounded-md flex items-center justify-center"><?= svg_icon('chart', 'w-5 h-5 text-indigo-600') ?></div>
+      <div class="pt-4">
+        <div class="text-sm text-slate-500">Total Incidents</div>
+        <div class="mt-2 text-2xl font-semibold text-slate-900">2,847</div>
+        <div class="text-xs text-slate-400 mt-1">All Provinces (2020–2024)</div>
       </div>
+      <div class="mt-4 text-sm text-indigo-600 font-medium">View data →</div>
     </div>
 
-    <div class="w-56 shrink-0 sm:w-auto bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
-      <div class="flex items-start justify-between gap-4">
-        <div>
-          <div class="text-sm text-slate-500">Total Fatalities</div>
-          <div class="mt-2 text-2xl font-semibold text-slate-900">1,256</div>
-          <div class="text-xs text-slate-400 mt-1">Death Rate: 44.1%</div>
-        </div>
-        <div class="w-12 h-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-red-500"><?= svg_icon('alert', 'w-5 h-5 text-red-500') ?></div>
+    <div class="w-56 shrink-0 sm:w-auto bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm relative">
+      <div class="absolute top-4 right-4 w-10 h-10 bg-slate-50 border border-slate-100 rounded-md flex items-center justify-center"><?= svg_icon('alert', 'w-5 h-5 text-red-500') ?></div>
+      <div class="pt-4">
+        <div class="text-sm text-slate-500">Total Fatalities</div>
+        <div class="mt-2 text-2xl font-semibold text-slate-900">1,256</div>
+        <div class="text-xs text-slate-400 mt-1">Death Rate: 44.1%</div>
       </div>
+      <div class="mt-4 text-sm text-indigo-600 font-medium">View data →</div>
     </div>
 
-    <div class="w-56 shrink-0 sm:w-auto bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
-      <div class="flex items-start justify-between gap-4">
-        <div>
-          <div class="text-sm text-slate-500">Highest Risk Province</div>
-          <div class="mt-2 text-2xl font-semibold text-slate-900">Pangasinan</div>
-          <div class="text-xs text-slate-400 mt-1">612 incidents (21.5%)</div>
-        </div>
-        <div class="w-12 h-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-indigo-600"><?= svg_icon('map-pin', 'w-5 h-5 text-indigo-600') ?></div>
+    <div class="w-56 shrink-0 sm:w-auto bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm relative">
+      <div class="absolute top-4 right-4 w-10 h-10 bg-slate-50 border border-slate-100 rounded-md flex items-center justify-center"><?= svg_icon('map-pin', 'w-5 h-5 text-indigo-600') ?></div>
+      <div class="pt-4">
+        <div class="text-sm text-slate-500">Highest Risk Province</div>
+        <div class="mt-2 text-2xl font-semibold text-slate-900">Pangasinan</div>
+        <div class="text-xs text-slate-400 mt-1">612 incidents (21.5%)</div>
       </div>
+      <div class="mt-4 text-sm text-indigo-600 font-medium">View data →</div>
     </div>
 
     <div class="w-56 shrink-0 sm:w-auto bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
