@@ -15,7 +15,7 @@ $hideFooter = true;
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-<div class="auth-page auth-bg min-h-screen flex items-center justify-center py-12 px-4">
+<div class="auth-page auth-bg min-h-screen flex items-start justify-center pt-20 pb-8 px-4">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 overflow-hidden">
         <div class="hidden md:flex items-center justify-center bg-gray-100 p-8">
             <div class="w-full max-w-md rounded-lg bg-gradient-to-br from-blue-200 to-teal-100 h-48 flex items-center justify-center text-4xl">🌊</div>
