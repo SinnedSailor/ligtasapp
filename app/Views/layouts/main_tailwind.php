@@ -8,7 +8,18 @@
     <!-- Tailwind (compiled) only -->
     <link rel="stylesheet" href="<?= base_url('assets/css/tailwind.css') ?>">
 
+    <style>
+        /* shift fixed topbar to the right so it does not overlap the sidebar */
+        @media (min-width: 768px) {
+            .topbar-shift { left: 18rem !important; width: calc(100% - 18rem) !important; }
+        }
+        @media (min-width: 1024px) {
+            .topbar-shift { left: 16rem !important; width: calc(100% - 16rem) !important; }
+        }
+    </style>
+
     <?= $this->renderSection('pageStyles') ?>
+
 </head>
 <body class="antialiased bg-slate-50 text-slate-900 min-h-screen">
 <?php
@@ -37,7 +48,7 @@
 
 <div class="container-scroller">
     <?php if (!$hideNavbar): ?>
-        <nav class="w-full fixed top-4 left-0 z-40 px-4">
+        <nav class="w-full fixed top-4 left-0 z-40 px-4 topbar-shift">
             <div class="max-w-7xl mx-auto bg-white/80 backdrop-blur-md rounded-2xl px-4 py-3 shadow-md flex items-center justify-between gap-4">
                 <div class="flex items-center gap-4">
                     <a class="text-xl font-semibold text-slate-900 flex items-center gap-3" href="<?= base_url('/dashboard') ?>">
@@ -122,11 +133,9 @@
         <div class="<?= $mainPanelClass ?>">
             <div class="content-wrapper">
                 <?= $this->renderSection('content') ?>
-            </div>
 
-            <?php if (!$hideFooter): ?>
-                <?= view('components/footer') ?>
-            <?php endif; ?>
+
+            </div>
         </div>
     </div>
 </div>
