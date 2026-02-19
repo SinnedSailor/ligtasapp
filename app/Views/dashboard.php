@@ -70,7 +70,7 @@
 
   <!-- Charts grid -->
   <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    <div class="md:col-span-2 lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
+<div class="md:col-span-2 lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
       <div class="flex items-center justify-between mb-4">
         <h3 class="text-sm font-semibold text-slate-900">Incidents per Province</h3>
         <div class="text-xs text-slate-400">Last 12 months</div>
@@ -80,9 +80,34 @@
       </div>
     </div>
 
-<div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
-      <h3 class="text-sm font-semibold text-slate-900 mb-4">Remarks Status</h3>
-      <div class="h-56 sm:h-72"><canvas id="remarksChart"></canvas></div>
+    <!-- Right column: donut + revenue (matches inspo) -->
+    <div class="space-y-6">
+      <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-semibold text-slate-900">Stock</h3>
+          <div class="text-xs text-slate-400">Total sales made today</div>
+        </div>
+        <div class="relative h-44 flex items-center justify-center">
+          <canvas id="stockDonut" class="w-32 h-32"></canvas>
+          <div class="absolute text-center">
+            <div class="text-2xl font-bold text-indigo-600">45</div>
+            <div class="text-xs text-slate-400">in stock</div>
+          </div>
+        </div>
+        <div class="mt-4 grid grid-cols-2 gap-3 text-sm text-slate-500">
+          <div class="flex items-center gap-2"><span class="text-green-500">▲</span> Target <div class="ml-auto font-semibold text-slate-900">$7.8k</div></div>
+          <div class="flex items-center gap-2"><span class="text-red-500">▼</span> Last week <div class="ml-auto font-semibold text-slate-900">$1.4k</div></div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-semibold text-slate-900">Total Revenue</h3>
+          <div class="text-xs text-slate-400">Monthly</div>
+        </div>
+        <div class="h-28"><canvas id="revenueChart"></canvas></div>
+        <div class="mt-3 text-xs text-slate-500">$7841.12 <span class="text-slate-400">total revenue</span></div>
+      </div>
     </div>
 
     <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -102,20 +127,11 @@
       <div class="h-44 sm:h-56"><canvas id="yearChart"></canvas></div>
     </div>
 
-    <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
-      <div class="flex items-center justify-between">
-        <h3 class="text-sm font-semibold text-slate-900">Incidents by Residence</h3>
-        <div>
-          <select id="residenceFilter" onchange="updateResidenceChart()" class="rounded-md border border-slate-100 px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-300">
-            <option value="province">Province</option>
-            <option value="municipality">Municipality</option>
-          </select>
-        </div>
-      </div>
-      <div class="mt-4 h-48 sm:h-64"><canvas id="residenceChart"></canvas></div>
-    </div>
-
+    <!-- Reinsert Remarks pie (moved from top-right) -->
     <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
+      <h3 class="text-sm font-semibold text-slate-900 mb-4">Remarks Status</h3>
+      <div class="h-44 sm:h-56"><canvas id="remarksChart"></canvas></div>
+    </div>
       <h3 class="text-sm font-semibold text-slate-900 mb-4">Contributing Factors</h3>
       <div class="h-48 sm:h-64"><canvas id="factorsChart"></canvas></div>
     </div>
@@ -247,6 +263,47 @@
             maintainAspectRatio: false,
             plugins: { legend: { display: true } },
             scales: { y: { beginAtZero: true } }
+        }
+    });
+
+    // --- New: Stock donut (small) ---
+    new Chart(document.getElementById('stockDonut'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Stock','Remaining'],
+            datasets: [{
+                data: [45, 55],
+                backgroundColor: ['#a78bfa', '#eef2ff'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '80%',
+            plugins: { legend: { display: false } }
+        }
+    });
+
+    // --- New: Revenue small line chart ---
+    new Chart(document.getElementById('revenueChart'), {
+        type: 'line',
+        data: {
+            labels: ['2019','2020','2021','2022','2023'],
+            datasets: [{
+                label: 'Revenue',
+                data: [3200,4200,4800,5600,7841.12],
+                borderColor: '#a78bfa',
+                backgroundColor: 'rgba(167,139,250,0.12)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: false } }
         }
     });
 
