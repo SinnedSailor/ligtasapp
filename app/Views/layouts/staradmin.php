@@ -360,8 +360,8 @@
                         <span class="hidden md:inline text-slate-300">Local Incident Gathering and Tracking for Aquatic Safety</span>
                     </div>
                     <div class="flex items-center gap-4">
-                        <button class="lg:hidden p-2 rounded-md bg-slate-700 hover:bg-slate-600" type="button" aria-label="Open menu">☰</button>
-                        <a href="#" id="logoutBtn" title="Log out" class="ml-3 text-white text-xl" style="display:flex;align-items:center;">🔌</a>
+                        <button class="lg:hidden p-2 rounded-md bg-slate-700 hover:bg-slate-600" type="button" aria-label="Open menu"><?= view('components/icon', ['name' => 'menu', 'class' => 'w-5 h-5 text-white']) ?></button>
+                        <a href="#" id="logoutBtn" title="Log out" class="ml-3 text-white text-xl" style="display:flex;align-items:center;"><?= view('components/icon', ['name' => 'power', 'class' => 'w-5 h-5 text-white']) ?></a>
                     </div>
                 </div>
             </nav>
@@ -373,7 +373,7 @@
                     <div class="space-y-6">
                         <div class="sidebar-profile text-center">
                             <div class="avatar mx-auto mb-3 w-12 h-12 rounded-full bg-slate-700 text-white flex items-center justify-center"> <?= esc($initials) ?>
-                                <a href="<?= base_url('/user-profile') ?>" class="ml-2 text-sm text-slate-400" title="Edit Profile">✏️</a>
+                                <a href="<?= base_url('/user-profile') ?>" class="ml-2 text-sm text-slate-400" title="Edit Profile"><?= view('components/icon', ['name' => 'pencil', 'class' => 'w-4 h-4']) ?></a>
                             </div>
                             <div class="name font-semibold text-sm">
                                 <?= esc(trim(($firstName ?? '') . ' ' . ($lastName ?? '')) ?: ($username ?? 'User')) ?>
@@ -383,13 +383,15 @@
                         <ul class="flex-1 space-y-2 mt-4">
                         <li class="<?= $root === '' || $root === 'dashboard' ? 'bg-slate-100/10 rounded-md' : '' ?>">
                             <a class="flex items-center gap-3 px-3 py-2 text-sm" href="<?= base_url('/dashboard') ?>">
-                                <span>🏠</span>
+                                <?= view('components/icon', ['name' => 'home', 'class' => 'inline-block w-5 h-5']) ?>
                                 <span class="menu-title">Dashboard</span>
                             </a>
                         </li>
                         <li class="<?= $root === 'ordinance' ? 'bg-slate-100/10 rounded-md' : '' ?>">
                             <a class="flex items-center gap-3 px-3 py-2 text-sm" href="<?= base_url('/ordinance') ?>">
-                                <span class="menu-icon"><?= session()->get('role_name') === 'FOCAL' ? '👁️' : (session()->get('role_name') === 'PROVINCE' ? '☑️' : '⬆️') ?></span>
+                                <span class="menu-icon">
+                                    <?= session()->get('role_name') === 'FOCAL' ? view('components/icon', ['name' => 'eye', 'class' => 'inline-block w-4 h-4']) : (session()->get('role_name') === 'PROVINCE' ? view('components/icon', ['name' => 'check', 'class' => 'inline-block w-4 h-4']) : view('components/icon', ['name' => 'upload', 'class' => 'inline-block w-4 h-4'])) ?>
+                                </span>
                                 <span class="menu-title">
                                     <?= session()->get('role_name') === 'FOCAL' ? 'View Documents' : (session()->get('role_name') === 'PROVINCE' ? 'Review Documents' : 'Upload Documents') ?>
                                 </span>
@@ -397,14 +399,14 @@
                         </li>
                         <li class="<?= $root === 'incident-report' ? 'bg-slate-100/10 rounded-md' : '' ?>">
                             <a class="flex items-center gap-3 px-3 py-2 text-sm" href="<?= base_url('/incident-report') ?>">
-                                <span>⚠️</span>
+                                <?= view('components/icon', ['name' => 'alert', 'class' => 'inline-block w-5 h-5 text-yellow-500']) ?>
                                 <span class="menu-title">Incident Report</span>
                             </a>
                         </li>
                         <?php if (session()->get('is_admin')): ?>
                             <li class="<?= $root === 'admin-panel' ? 'bg-slate-100/10 rounded-md' : '' ?>">
                                 <a class="flex items-center gap-3 px-3 py-2 text-sm" href="<?= base_url('/admin-panel') ?>">
-                                    <span>🛡️</span>
+                                    <?= view('components/icon', ['name' => 'shield', 'class' => 'inline-block w-5 h-5']) ?>
                                     <span class="menu-title">Admin Panel</span>
                                 </a>
                             </li>

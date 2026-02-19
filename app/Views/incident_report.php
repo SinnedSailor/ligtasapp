@@ -850,14 +850,7 @@
 
         updateIncidentAttachmentSection(row);
 
-        if (typeof bootstrap === 'undefined') {
-            showModal('incidentModal');
-            return;
-        }
-
-        const modalElement = document.getElementById('incidentModal');
-        const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
-        modal.show();
+        showModal('incidentModal');
     }
 
     function updateIncidentAttachmentSection(row) {
@@ -969,11 +962,7 @@
 
         renderTable();
 
-        if (typeof bootstrap !== 'undefined') {
-            const modalElement = document.getElementById('incidentModal');
-            const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
-            modal.hide();
-        }
+        hideModal('incidentModal');
     }
 
     function ensureProvinceOption(value) {
@@ -1246,7 +1235,9 @@
         if (!el) return;
         el.classList.remove('hidden');
         el.setAttribute('aria-hidden', 'false');
+        // prevent background scrolling when modal is open
         document.body.classList.add('overflow-hidden');
+        try { setScrollLock(true); } catch (e) { /* noop */ }
     }
 
     function hideModal(id) {
@@ -1254,29 +1245,17 @@
         if (!el) return;
         el.classList.add('hidden');
         el.setAttribute('aria-hidden', 'true');
+        // restore scrolling
         document.body.classList.remove('overflow-hidden');
+        try { setScrollLock(false); } catch (e) { /* noop */ }
     }
 
     function openSaveModal() {
-        if (typeof bootstrap !== 'undefined') {
-            const modalElement = document.getElementById('saveConfirmModal');
-            const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
-            modal.show();
-            return;
-        }
-
         showModal('saveConfirmModal');
     }
 
     function confirmSaveToDatabase() {
-        if (typeof bootstrap !== 'undefined') {
-            const modalElement = document.getElementById('saveConfirmModal');
-            const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
-            modal.hide();
-        } else {
-            hideModal('saveConfirmModal');
-        }
-
+        hideModal('saveConfirmModal');
         saveToDatabase();
     }
 
@@ -1284,34 +1263,17 @@
         const messageEl = document.getElementById('importSuccessMessage');
         if (messageEl) messageEl.textContent = `Successfully imported ${count} rows.`;
 
-        if (typeof bootstrap === 'undefined') {
-            showModal('importSuccessModal');
-            return;
-        }
-
-        const modalElement = document.getElementById('importSuccessModal');
-        const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
-        modal.show();
+        showModal('importSuccessModal');
     }
 
     function showSaveResult(message) {
         const messageEl = document.getElementById('saveResultMessage');
         if (messageEl) messageEl.textContent = message;
 
-        if (typeof bootstrap === 'undefined') {
-            const modalId = 'saveResultModal';
-            showModal(modalId);
-            const el = document.getElementById(modalId);
-            el.addEventListener('click', () => window.location.reload(), { once: true });
-            return;
-        }
-
-        const modalElement = document.getElementById('saveResultModal');
-        const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
-        modalElement.addEventListener('hidden.bs.modal', () => {
-            window.location.reload();
-        }, { once: true });
-        modal.show();
+        showModal('saveResultModal');
+        const modalEl = document.getElementById('saveResultModal');
+        const okBtn = modalEl ? modalEl.querySelector('button') : null;
+        if (okBtn) okBtn.addEventListener('click', () => window.location.reload(), { once: true });
     }
 
     function showAttachmentModal(message) {
@@ -1320,14 +1282,7 @@
             messageEl.textContent = message;
         }
 
-        if (typeof bootstrap === 'undefined') {
-            showModal('attachmentModal');
-            return;
-        }
-
-        const modalElement = document.getElementById('attachmentModal');
-        const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
-        modal.show();
+        showModal('attachmentModal');
     }
 
     async function openAttachmentViewer(incidentN) {
@@ -1437,14 +1392,7 @@
             return;
         }
 
-        if (typeof bootstrap !== 'undefined') {
-            const modalElement = document.getElementById('reviewConfirmModal');
-            const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
-            modal.hide();
-        } else {
-            hideModal('reviewConfirmModal');
-        }
-
+        hideModal('reviewConfirmModal');
         performReview(incidentN, action);
     }
 

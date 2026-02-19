@@ -45,6 +45,27 @@ switch ($name) {
     case 'menu':
         echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 6h16M4 12h16M4 18h16'/></svg>";
         break;
+    case 'home':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M10.707 1.293a1 1 0 00-1.414 0L2 8.586V17a1 1 0 001 1h5v-5a1 1 0 011-1h2a1 1 0 011 1v5h5a1 1 0 001-1V8.586l-7.293-7.293z'/></svg>";
+        break;
+    case 'search':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path fill-rule='evenodd' d='M12.9 14.32a8 8 0 111.414-1.414l4.387 4.387a1 1 0 01-1.414 1.414l-4.387-4.387zM8 14a6 6 0 100-12 6 6 0 000 12z' clip-rule='evenodd'/></svg>";
+        break;
+    case 'cloud-upload':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' aria-hidden='true'><path d='M16.88 7.47A5 5 0 007 8.1a4 4 0 00-.5 7.97h10.38A3.62 3.62 0 0021 12.47 3.5 3.5 0 0016.88 7.47z'/><path d='M11 11V3h2v8h3l-4 4-4-4h3z'/></svg>";
+        break;
+    case 'files':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M4 3a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0013.586 6L10 2.414A2 2 0 008.586 2H4z'/></svg>";
+        break;
+    case 'file':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M8 2a2 2 0 00-2 2v12a2 2 0 002 2h6a2 2 0 002-2V7.414A2 2 0 0014.586 6L11 2.414A2 2 0 009.586 2H8z'/></svg>";
+        break;
+    case 'eye':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z'/><circle cx='12' cy='12' r='3'/></svg>";
+        break;
+    case 'trash':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path fill-rule='evenodd' d='M6 2a1 1 0 00-1 1v1H3a1 1 0 100 2h14a1 1 0 100-2h-2V3a1 1 0 00-1-1H6zm3 7a1 1 0 012 0v5a1 1 0 11-2 0V9zm-4 0a1 1 0 012 0v5a1 1 0 11-2 0V9zm8 0a1 1 0 012 0v5a1 1 0 11-2 0V9z' clip-rule='evenodd'/></svg>";
+        break;
     default:
         // fallback: empty spacer
         echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' aria-hidden='true'></svg>";
