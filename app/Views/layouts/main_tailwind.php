@@ -41,7 +41,7 @@
             <div class="max-w-7xl mx-auto bg-white/80 backdrop-blur-md rounded-2xl px-4 py-3 shadow-md flex items-center justify-between gap-4">
                 <div class="flex items-center gap-4">
                     <a class="text-xl font-semibold text-slate-900 flex items-center gap-3" href="<?= base_url('/dashboard') ?>">
-                        <?= view('components/icon', ['name' => 'home', 'class' => 'w-6 h-6 text-indigo-600']) ?>
+                        <?= svg_icon('home', 'w-6 h-6 text-indigo-600') ?>
                         <span>LIGTAS</span>
                     </a>
                     <p class="hidden md:block text-sm text-slate-500 mt-0.5">Local Incident Gathering &amp; Tracking</p>
@@ -49,7 +49,7 @@
 
                 <div class="flex items-center gap-3">
                     <div class="relative hidden md:block">
-                        <div class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><?= view('components/icon', ['name' => 'search', 'class' => 'w-4 h-4']) ?></div>
+                        <div class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><?= svg_icon('search', 'w-4 h-4') ?></div>
                         <input type="search" placeholder="Search incidents, provinces..." class="pl-10 pr-3 py-2 w-64 rounded-full border border-slate-200 text-sm bg-white/80 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
                     </div>
 
@@ -70,7 +70,7 @@
                 <div class="space-y-6">
                     <div class="sidebar-profile text-center">
                         <div class="avatar mx-auto mb-3 w-12 h-12 rounded-full bg-slate-700 text-white flex items-center justify-center"> <?= esc($initials) ?>
-                            <a href="<?= base_url('/user-profile') ?>" class="ml-2 text-sm text-slate-400" title="Edit Profile"><?= view('components/icon', ['name' => 'pencil', 'class' => 'w-4 h-4']) ?></a>
+                            <a href="<?= base_url('/user-profile') ?>" class="ml-2 text-sm text-slate-400" title="Edit Profile"><?= svg_icon('pencil', 'w-4 h-4') ?></a>
                         </div>
                         <div class="name font-semibold text-sm">
                             <?= esc(trim(($firstName ?? '') . ' ' . ($lastName ?? '')) ?: ($username ?? 'User')) ?>
@@ -80,26 +80,26 @@
                     <ul class="flex-1 space-y-2 mt-4">
                         <li class="<?= $root === '' || $root === 'dashboard' ? 'bg-slate-100/10 rounded-md' : '' ?>">
                             <a class="flex items-center gap-3 px-3 py-2 text-sm" href="<?= base_url('/dashboard') ?>">
-                                <?= view('components/icon', ['name' => 'home', 'class' => 'w-4 h-4 text-indigo-600']) ?>
+                                <?= svg_icon('home', 'w-4 h-4 text-indigo-600') ?>
                                 <span class="menu-title">Dashboard</span>
                             </a>
                         </li>
                         <li class="<?= $root === 'incident-report' ? 'bg-slate-100/10 rounded-md' : '' ?>">
                             <a class="flex items-center gap-3 px-3 py-2 text-sm" href="<?= base_url('/incident-report') ?>">
-                                <?= view('components/icon', ['name' => 'files', 'class' => 'w-4 h-4 text-indigo-600']) ?>
+                                <?= svg_icon('files', 'w-4 h-4 text-indigo-600') ?>
                                 <span class="menu-title">Incident Reports</span>
                             </a>
                         </li>
                         <li class="<?= $root === 'ordinance' ? 'bg-slate-100/10 rounded-md' : '' ?>">
                             <a class="flex items-center gap-3 px-3 py-2 text-sm" href="<?= base_url('/ordinance') ?>">
-                                <?= view('components/icon', ['name' => 'files', 'class' => 'w-4 h-4 text-indigo-600']) ?>
+                                <?= svg_icon('files', 'w-4 h-4 text-indigo-600') ?>
                                 <span class="menu-title">Documents</span>
                             </a>
                         </li>
                         <?php if (session()->get('is_admin')): ?>
                         <li class="<?= $root === 'admin-panel' ? 'bg-slate-100/10 rounded-md' : '' ?>">
                             <a class="flex items-center gap-3 px-3 py-2 text-sm" href="<?= base_url('/admin-panel') ?>">
-                                <?= view('components/icon', ['name' => 'users', 'class' => 'w-4 h-4 text-indigo-600']) ?>
+                                <?= svg_icon('users', 'w-4 h-4 text-indigo-600') ?>
                                 <span class="menu-title">Admin Panel</span>
                             </a>
                         </li>

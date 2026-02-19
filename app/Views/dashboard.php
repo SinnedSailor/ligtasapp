@@ -12,8 +12,8 @@
     </div>
 
     <div class="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 w-full sm:w-auto">
-      <button class="w-full sm:w-auto inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-full shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-300"><?php echo view('components/icon', ['name' => 'plus', 'class' => 'w-4 h-4']); ?> <span>New Incident</span></button>
-      <button class="w-full sm:w-auto inline-flex items-center gap-2 px-3 py-2 bg-white border border-slate-100 rounded-full text-slate-700 shadow-sm"><?php echo view('components/icon', ['name' => 'cloud-upload', 'class' => 'w-4 h-4 text-slate-600']); ?> Export</button>
+      <button class="w-full sm:w-auto inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-full shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-300"><?= svg_icon('plus', 'w-4 h-4') ?> <span>New Incident</span></button>
+      <button class="w-full sm:w-auto inline-flex items-center gap-2 px-3 py-2 bg-white border border-slate-100 rounded-full text-slate-700 shadow-sm"><?= svg_icon('cloud-upload', 'w-4 h-4 text-slate-600') ?> Export</button>
     </div>
   </header>
 
@@ -26,7 +26,7 @@
           <div class="mt-2 text-2xl font-semibold text-slate-900">2,847</div>
           <div class="text-xs text-slate-400 mt-1">All Provinces (2020–2024)</div>
         </div>
-        <div class="w-12 h-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-indigo-600"><?php echo view('components/icon', ['name' => 'chart', 'class' => 'w-5 h-5 text-indigo-600']); ?></div>
+        <div class="w-12 h-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-indigo-600"><?= svg_icon('chart', 'w-5 h-5 text-indigo-600') ?></div>
       </div>
     </div>
 
@@ -37,7 +37,7 @@
           <div class="mt-2 text-2xl font-semibold text-slate-900">1,256</div>
           <div class="text-xs text-slate-400 mt-1">Death Rate: 44.1%</div>
         </div>
-        <div class="w-12 h-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-red-500"><?php echo view('components/icon', ['name' => 'alert', 'class' => 'w-5 h-5 text-red-500']); ?></div>
+        <div class="w-12 h-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-red-500"><?= svg_icon('alert', 'w-5 h-5 text-red-500') ?></div>
       </div>
     </div>
 
@@ -48,7 +48,7 @@
           <div class="mt-2 text-2xl font-semibold text-slate-900">Pangasinan</div>
           <div class="text-xs text-slate-400 mt-1">612 incidents (21.5%)</div>
         </div>
-        <div class="w-12 h-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-indigo-600"><?php echo view('components/icon', ['name' => 'map-pin', 'class' => 'w-5 h-5 text-indigo-600']); ?></div>
+        <div class="w-12 h-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-indigo-600"><?= svg_icon('map-pin', 'w-5 h-5 text-indigo-600') ?></div>
       </div>
     </div>
 
@@ -59,7 +59,7 @@
           <div class="mt-2 text-2xl font-semibold text-slate-900">0–14 Years</div>
           <div class="text-xs text-slate-400 mt-1">38.2% of incidents</div>
         </div>
-        <div class="w-12 h-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-indigo-600"><?php echo view('components/icon', ['name' => 'users', 'class' => 'w-5 h-5 text-indigo-600']); ?></div>
+        <div class="w-12 h-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-indigo-600"><?= svg_icon('users', 'w-5 h-5 text-indigo-600') ?></div>
       </div>
     </div>
   </section>

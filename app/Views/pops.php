@@ -6,21 +6,21 @@
 <div class="container max-w-5xl mx-auto px-4 py-12">
     <div class="mb-6">
         <div class="flex items-center gap-4 mb-2">
-            <?= view('components/icon', ['name' => 'shield', 'class' => 'w-8 h-8 text-blue-900']) ?>
+            <?= svg_icon('shield', 'w-8 h-8 text-blue-900') ?>
             <h1 class="text-3xl font-extrabold text-blue-900">POPS Plan Upload</h1>
         </div>
         <p class="text-gray-500 text-sm">Peace and Order and Public Safety Plan - Upload required POPS documents</p>
     </div>
 
 <div class="flex items-center gap-2 rounded-lg border border-yellow-200 bg-yellow-50 text-yellow-800 mb-6 p-4">
-        <?= view('components/icon', ['name' => 'alert', 'class' => 'w-5 h-5 text-yellow-600']) ?>
+        <?= svg_icon('alert', 'w-5 h-5 text-yellow-600') ?>
         <span>Upload your POPS Plan documents (PDF, DOC, DOCX) to complete the submission.</span>
     </div>
 
     <div class="upload-card bg-white rounded-2xl shadow p-8 mb-6">
         <div class="upload-area border-2 border-dashed border-yellow-400 rounded-2xl p-10 text-center bg-gray-100 hover:bg-yellow-50 transition cursor-pointer mb-6" id="uploadArea" onclick="document.getElementById('fileInput').click()">
             <div class="upload-icon text-5xl text-blue-900 mb-4">
-                <?= view('components/icon', ['name' => 'cloud-upload', 'class' => 'w-12 h-12 text-blue-900']) ?>
+                <?= svg_icon('cloud-upload', 'w-12 h-12 text-blue-900') ?>
             </div>
             <div class="upload-text text-lg font-semibold text-gray-700 mb-2">Click to upload or drag and drop</div>
             <div class="upload-hint text-gray-500 text-sm mb-2">Supported formats: PDF, DOC, DOCX (Max 10MB each)</div>
@@ -30,7 +30,7 @@
 
         <div class="files-list mt-8" id="filesList" style="display: none;">
             <h3 class="flex items-center gap-2 text-lg font-semibold mb-4">
-                <?= view('components/icon', ['name' => 'files', 'class' => 'w-5 h-5 text-blue-900']) ?>
+                <?= svg_icon('files', 'w-5 h-5 text-blue-900') ?>
                 Uploaded Documents (<span id="fileCount">0</span>)
             </h3>
             <div id="filesContainer"></div>
@@ -101,7 +101,7 @@ function renderFiles() {
         container.innerHTML = uploadedFiles.map((file, index) => `
             <div class="file-item flex items-center justify-between bg-white border border-gray-200 rounded-md p-4 mb-2 shadow-sm hover:shadow transition">
                 <div class="file-info flex items-center gap-3 flex-1">
-                    <div class="file-icon text-2xl text-blue-900"><?= view('components/icon', ['name' => 'file', 'class' => 'w-6 h-6 text-blue-900']) ?></div>
+                    <div class="file-icon text-2xl text-blue-900"><?= svg_icon('file', 'w-6 h-6 text-blue-900') ?></div>
                     <div class="file-details flex-1">
                         <div class="file-name font-semibold text-gray-700 text-sm mb-1">${file.name}</div>
                         <div class="file-meta text-gray-400 text-xs">${file.size} • Uploaded on ${file.date}</div>
@@ -109,7 +109,7 @@ function renderFiles() {
                 </div>
                 <div class="file-actions flex gap-2">
                     <button class="action-btn btn-delete bg-red-700 text-white rounded px-4 py-2 hover:bg-red-800 transition" onclick="deleteFile(${index})">
-                        <?= view('components/icon', ['name' => 'trash', 'class' => 'inline-block mr-2 w-4 h-4 text-white']) ?> Delete
+                        <?= svg_icon('trash', 'inline-block mr-2 w-4 h-4 text-white') ?> Delete
                     </button>
                 </div>
             </div>

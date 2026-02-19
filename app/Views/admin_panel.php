@@ -198,7 +198,7 @@
 <?= $this->section('content') ?>
 <div class="page-header flex flex-wrap justify-between items-center mb-4">
     <div>
-        <h3 class="page-title mb-1"><?= view('components/icon', ['name' => 'shield', 'class' => 'w-5 h-5 mr-3 text-blue-900']) ?><span class="text-xl font-semibold">User Management</span></h3>
+        <h3 class="page-title mb-1"><?= svg_icon('shield', 'w-5 h-5 mr-3 text-blue-900') ?><span class="text-xl font-semibold">User Management</span></h3>
         <div class="text-gray-500">Manage users, roles, and administrative access.</div>
     </div>
 </div>
@@ -209,12 +209,12 @@
 
         <div class="flex flex-wrap items-center gap-3 mb-4 mt-2">
             <div class="flex items-center rounded-full bg-gray-50 border border-gray-200 overflow-hidden" style="max-width:320px;">
-                <div class="px-3 text-gray-500"><?= view('components/icon', ['name' => 'search', 'class' => 'w-4 h-4']) ?></div>
+                <div class="px-3 text-gray-500"><?= svg_icon('search', 'w-4 h-4') ?></div>
                 <input type="text" id="userSearch" class="py-2 px-3 text-sm bg-transparent outline-none" placeholder="Search" onkeyup="filterUsers()" />
             </div>
 
             <div class="flex items-center rounded-full bg-gray-50 border border-gray-200 overflow-hidden" style="max-width:180px;">
-                <div class="px-3 text-gray-500"><?= view('components/icon', ['name' => 'users', 'class' => 'w-4 h-4']) ?></div>
+                <div class="px-3 text-gray-500"><?= svg_icon('users', 'w-4 h-4') ?></div>
                 <select id="roleFilter" class="py-2 pr-3 pl-1 text-sm bg-transparent outline-none" onchange="filterUsers()">
                     <option value="">Role</option>
                     <option value="ADMIN">ADMIN</option>
@@ -247,7 +247,7 @@
 <div id="assignRoleModal" class="modal-overlay">
     <div class="modal-content">
         <div class="modal-header mb-3">
-            <h3><?= view('components/icon', ['name' => 'users', 'class' => 'w-5 h-5']) ?> Assign Role</h3>
+            <h3><?= svg_icon('users', 'w-5 h-5') ?> Assign Role</h3>
         </div>
         <div class="modal-body">
             <p>Assign a role to <strong id="modalUserName"></strong></p>
@@ -274,7 +274,7 @@
     <div class="modal-content">
         <div class="modal-body">
             <div class="success-icon">
-                <?= view('components/icon', ['name' => 'check', 'class' => 'w-4 h-4 text-white']) ?>
+                <?= svg_icon('check', 'w-4 h-4 text-white') ?>
             </div>
             <div class="success-message" id="successMessage">Role assigned successfully!</div>
             <div class="success-detail" id="successDetail"></div>
@@ -288,7 +288,7 @@
 <div id="revokeAdminModal" class="modal-overlay">
     <div class="modal-content">
         <div class="modal-header mb-3">
-            <h3><?= view('components/icon', ['name' => 'alert', 'class' => 'w-5 h-5 text-red-600']) ?> Confirm Action</h3>
+            <h3><?= svg_icon('alert', 'w-5 h-5 text-red-600') ?> Confirm Action</h3>
         </div>
         <div class="modal-body">
             <p>Are you sure you want to <strong style="color: #DC2626;">revoke admin privileges</strong> from <strong id="revokeUserName"></strong>?</p>
@@ -304,7 +304,7 @@
 <div id="grantAdminModal" class="modal-overlay">
     <div class="modal-content">
         <div class="modal-header mb-3">
-            <h3><?= view('components/icon', ['name' => 'shield', 'class' => 'w-5 h-5 text-green-500']) ?> Confirm Action</h3>
+            <h3><?= svg_icon('shield', 'w-5 h-5 text-green-500') ?> Confirm Action</h3>
         </div>
         <div class="modal-body">
             <p>Are you sure you want to <strong style="color: #10B981;">grant admin privileges</strong> to <strong id="grantUserName"></strong>?</p>
@@ -320,7 +320,7 @@
 <div id="clearRoleModal" class="modal-overlay">
     <div class="modal-content">
         <div class="modal-header mb-3">
-            <h3><?= view('components/icon', ['name' => 'alert', 'class' => 'w-5 h-5 text-yellow-500']) ?> Confirm Action</h3>
+            <h3><?= svg_icon('alert', 'w-5 h-5 text-yellow-500') ?> Confirm Action</h3>
         </div>
         <div class="modal-body">
             <p>Are you sure you want to <strong style="color: #F59E0B;">clear the role</strong> for <strong id="clearUserName"></strong>?</p>
@@ -375,10 +375,10 @@
                                 <td class="px-4 py-4">${roleBadge}</td>
                                 <td class="px-4 py-4 flex flex-wrap gap-2">
                                     <button class="px-2.5 py-1.5 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-100" title="Edit User" onclick="editUser(${user.id})">
-                                        <?= view('components/icon', ['name' => 'pencil', 'class' => 'w-4 h-4']) ?>
+                                        <?= svg_icon('pencil', 'w-4 h-4') ?>
                                     </button>
                                     <button class="px-2.5 py-1.5 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-100" title="Disable User" onclick="disableUser(${user.id})">
-                                        <?= view('components/icon', ['name' => 'users', 'class' => 'w-4 h-4']) ?>
+                                        <?= svg_icon('users', 'w-4 h-4') ?>
                                     </button>
                                 </td>
                             </tr>
