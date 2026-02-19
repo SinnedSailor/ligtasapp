@@ -90,4 +90,21 @@ class IncidentReportModel extends Model
         }
         return $row;
     }
+
+    /**
+     * Prepare incident data for save when callers provide plaintext `name_of_victim`.
+     * This runs the same encryption/hash logic used by callbacks and removes the
+     * plaintext key so the DB only receives `name_of_victim_enc`/`name_of_victim_hash`.
+     */
+    public function prepareForInsert(array $data): array
+    {
+        $wrapped = ['data' => $data];
+        $wrapped = $this->encryptVictimName($wrapped);
+        $data = $wrapped['data'] ?? [];
+
+        // Remove plaintext key so it is not sent to the database (column was dropped)
+        unset($data['name_of_victim']);
+
+        return $data;
+    }
 }

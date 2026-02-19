@@ -44,6 +44,8 @@ class IncidentReport extends BaseController
         unset($data['n']);
         unset($data['id']);
 
+        // Ensure any plaintext victim name is encrypted/hash-backed before saving
+        $data = $this->incidentReportModel->prepareForInsert($data);
         $this->incidentReportModel->update($incident['id'], $data);
 
         return $this->response->setJSON([
@@ -125,6 +127,9 @@ class IncidentReport extends BaseController
                 'incident' => $existing,
             ]);
         }
+
+        // Ensure any plaintext victim name is encrypted/hash-backed before saving
+        $mapped = $this->incidentReportModel->prepareForInsert($mapped);
 
         // Insert and return created row
         $insertId = $this->incidentReportModel->insert($mapped);
@@ -371,11 +376,13 @@ class IncidentReport extends BaseController
                 ->first();
 
             if ($existingRow) {
+                $mapped = $this->incidentReportModel->prepareForInsert($mapped);
                 $this->incidentReportModel->update($existingRow['id'], $mapped);
                 $updated++;
                 continue;
             }
 
+            $mapped = $this->incidentReportModel->prepareForInsert($mapped);
             $this->incidentReportModel->insert($mapped);
             $inserted++;
         }
