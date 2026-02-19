@@ -67,18 +67,13 @@
                 </div>
 
                 <div class="flex items-center gap-3">
-                    <div class="relative hidden md:block">
-                        <div class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><?= svg_icon('search', 'w-4 h-4') ?></div>
-                        <input type="search" placeholder="Search incidents, provinces..." class="pl-10 pr-3 py-2 w-64 rounded-full border border-slate-200 text-sm bg-white/80 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
-                    </div>
-
-                    <button class="px-3 py-2 bg-indigo-600 text-white rounded-full text-sm hover:bg-indigo-700">+ Incident</button>
-
-                    <div class="flex items-center gap-3">
-                        <div class="hidden sm:flex items-center gap-2 text-sm text-slate-600 pr-3 border-r border-slate-100"><?= esc(session()->get('role_name') ?? '') ?></div>
-                        <div class="w-9 h-9 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-semibold"><?= esc($initials) ?></div>
-                    </div>
+                    <a href="<?= base_url('/logout') ?>" title="Logout" class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-slate-50 hover:bg-slate-100 text-slate-600">
+                        <?= svg_icon('logout', 'w-5 h-5') ?>
+                        <span class="sr-only">Logout</span>
+                    </a>
                 </div>
+
+
             </div>
         </nav>
     <?php endif; ?>
