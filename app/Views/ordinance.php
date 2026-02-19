@@ -430,7 +430,7 @@
                                 <tr class="doc-filter-row" data-doc-type="<?= esc($doc['doc_type']) ?>" data-province="<?= esc($doc['province'] ?? '') ?>" data-municipality="<?= esc($doc['municipality'] ?? '') ?>">
                                     <td><?= esc($docLabels[$doc['doc_type']] ?? strtoupper($doc['doc_type'])) ?></td>
                                     <td><?= esc($doc['original_name']) ?></td>
-                                    <td><?= esc(trim($doc['first_name'] . ' ' . $doc['last_name'])) ?></td>
+                                    <td><?= esc(mb_convert_case(trim(($doc['first_name'] ?? '') . ' ' . ($doc['last_name'] ?? '')), MB_CASE_TITLE, 'UTF-8')) ?></td>
                                     <td><?= esc(trim(($doc['municipality'] ?? '') . ', ' . ($doc['province'] ?? ''), ' ,')) ?></td>
                                     <td><?= esc(date('M d, Y', strtotime($doc['created_at']))) ?></td>
                                     <td>
@@ -475,7 +475,7 @@
                                 <tr class="doc-filter-row" data-doc-type="<?= esc($doc['doc_type']) ?>" data-province="<?= esc($doc['province'] ?? '') ?>" data-municipality="<?= esc($doc['municipality'] ?? '') ?>">
                                     <td><?= esc($docLabels[$doc['doc_type']] ?? strtoupper($doc['doc_type'])) ?></td>
                                     <td><?= esc($doc['original_name']) ?></td>
-                                    <td><?= esc(trim($doc['first_name'] . ' ' . $doc['last_name'])) ?></td>
+                                    <td><?= esc(mb_convert_case(trim(($doc['first_name'] ?? '') . ' ' . ($doc['last_name'] ?? '')), MB_CASE_TITLE, 'UTF-8')) ?></td>
                                     <td><?= esc(trim(($doc['municipality'] ?? '') . ', ' . ($doc['province'] ?? ''), ' ,')) ?></td>
                                     <td><?= esc($doc['reviewed_at'] ? date('M d, Y', strtotime($doc['reviewed_at'])) : '-') ?></td>
                                     <td>
