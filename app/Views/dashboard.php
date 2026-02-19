@@ -4,103 +4,111 @@
 
 <?= $this->section('content') ?>
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 md:pt-28 pb-10">
-  <!-- Header -->
-  <header class="flex items-center justify-between gap-6 mb-8">
-    <div class="flex items-center gap-4">
-      <button class="p-2 rounded-md text-slate-500 hover:bg-slate-50"><?= svg_icon('menu', 'w-5 h-5') ?></button>
-      <div>
-        <h1 class="text-2xl font-bold text-slate-900">Dashboard</h1>
-        <p class="text-sm text-slate-500">Overview — Local Incident Gathering and Tracking for Aquatic Safety</p>
-      </div>
-    </div>
-
+  <!-- Header wrapper for system title -->
+  <div class="bg-white rounded-2xl border border-slate-100 p-4 mb-6 flex items-center justify-between">
     <div class="flex items-center gap-3">
-      <div class="relative hidden md:block">
-        <div class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><?= svg_icon('search', 'w-4 h-4') ?></div>
-        <input class="pl-10 pr-3 py-2 w-64 rounded-full border border-slate-100 text-sm bg-white/80 focus:outline-none focus:ring-2 focus:ring-indigo-300" placeholder="Search incidents, provinces..." />
+      <div class="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold">L</div>
+      <div>
+        <div class="text-sm text-slate-500">Welcome to</div>
+        <div class="text-lg font-semibold text-slate-900">LIGTAS Admin</div>
       </div>
-      <button class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-full shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-300"><?= svg_icon('plus', 'w-4 h-4') ?> <span>New Incident</span></button>
-      <div class="w-9 h-9 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-semibold">AU</div>
     </div>
-  </header>
+    <div class="text-sm text-slate-400">Last updated: <?= date('M d, Y') ?></div>
+  </div>
 
-  <!-- Stats (responsive: horizontal scroll on small screens, grid on md+) -->
-  <section class="mb-8">
-    <div class="overflow-x-auto sm:overflow-visible -mx-4 sm:mx-0 px-4 sm:px-0">
-      <div class="flex gap-6 sm:grid sm:grid-cols-2 md:grid-cols-4">
-    <div class="w-56 shrink-0 sm:w-auto bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm relative">
-      <div class="absolute top-4 right-4 w-10 h-10 bg-slate-50 border border-slate-100 rounded-md flex items-center justify-center"><?= svg_icon('chart', 'w-5 h-5 text-indigo-600') ?></div>
-      <div class="pt-4">
-        <div class="text-sm text-slate-500">Total Incidents</div>
-        <div class="mt-2 text-2xl font-semibold text-slate-900">2,847</div>
-        <div class="text-xs text-slate-400 mt-1">All Provinces (2020–2024)</div>
-      </div>
-      <div class="mt-4 text-sm text-indigo-600 font-medium">View data →</div>
-    </div>
-
-    <div class="w-56 shrink-0 sm:w-auto bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm relative">
-      <div class="absolute top-4 right-4 w-10 h-10 bg-slate-50 border border-slate-100 rounded-md flex items-center justify-center"><?= svg_icon('alert', 'w-5 h-5 text-red-500') ?></div>
-      <div class="pt-4">
-        <div class="text-sm text-slate-500">Total Fatalities</div>
-        <div class="mt-2 text-2xl font-semibold text-slate-900">1,256</div>
-        <div class="text-xs text-slate-400 mt-1">Death Rate: 44.1%</div>
-      </div>
-      <div class="mt-4 text-sm text-indigo-600 font-medium">View data →</div>
-    </div>
-
-    <div class="w-56 shrink-0 sm:w-auto bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm relative">
-      <div class="absolute top-4 right-4 w-10 h-10 bg-slate-50 border border-slate-100 rounded-md flex items-center justify-center"><?= svg_icon('map-pin', 'w-5 h-5 text-indigo-600') ?></div>
-      <div class="pt-4">
-        <div class="text-sm text-slate-500">Highest Risk Province</div>
-        <div class="mt-2 text-2xl font-semibold text-slate-900">Pangasinan</div>
-        <div class="text-xs text-slate-400 mt-1">612 incidents (21.5%)</div>
-      </div>
-      <div class="mt-4 text-sm text-indigo-600 font-medium">View data →</div>
-    </div>
-
-    <div class="w-56 shrink-0 sm:w-auto bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
-      <div class="flex items-start justify-between gap-4">
-        <div>
-          <div class="text-sm text-slate-500">Most Affected Age Group</div>
-          <div class="mt-2 text-2xl font-semibold text-slate-900">0–14 Years</div>
-          <div class="text-xs text-slate-400 mt-1">38.2% of incidents</div>
+  <!-- Top stat cards (TailAdmin style) -->
+  <div class="mb-8">
+    <div class="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+      <div class="flex gap-6 min-w-max sm:grid sm:grid-cols-4">
+        <div class="w-56 shrink-0 sm:w-auto bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm relative">
+          <div class="absolute top-4 right-4 w-10 h-10 bg-slate-50 border border-slate-100 rounded-md flex items-center justify-center"><?= svg_icon('home', 'w-5 h-5 text-indigo-600') ?></div>
+          <div class="pt-4">
+            <div class="text-sm text-slate-500">Total Visitors</div>
+            <div class="mt-2 text-2xl font-semibold text-slate-900">4,564</div>
+            <div class="text-xs text-slate-400 mt-1">Today</div>
+          </div>
+          <div class="mt-4 text-sm text-indigo-600 font-medium">View data →</div>
         </div>
-        <div class="w-12 h-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-indigo-600"><?= svg_icon('users', 'w-5 h-5 text-indigo-600') ?></div>
+
+        <div class="w-56 shrink-0 sm:w-auto bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm relative">
+          <div class="absolute top-4 right-4 w-10 h-10 bg-slate-50 border border-slate-100 rounded-md flex items-center justify-center"><?= svg_icon('cloud-upload', 'w-5 h-5 text-slate-600') ?></div>
+          <div class="pt-4">
+            <div class="text-sm text-slate-500">Revenue</div>
+            <div class="mt-2 text-2xl font-semibold text-slate-900">$7,564</div>
+            <div class="text-xs text-slate-400 mt-1">Monthly</div>
+          </div>
+          <div class="mt-4 text-sm text-indigo-600 font-medium">View data →</div>
+        </div>
+
+        <div class="w-56 shrink-0 sm:w-auto bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm relative">
+          <div class="absolute top-4 right-4 w-10 h-10 bg-slate-50 border border-slate-100 rounded-md flex items-center justify-center"><?= svg_icon('users', 'w-5 h-5 text-indigo-600') ?></div>
+          <div class="pt-4">
+            <div class="text-sm text-slate-500">Orders</div>
+            <div class="mt-2 text-2xl font-semibold text-slate-900">7,891+</div>
+            <div class="text-xs text-slate-400 mt-1">All time</div>
+          </div>
+          <div class="mt-4 text-sm text-indigo-600 font-medium">View data →</div>
+        </div>
+
+        <div class="w-56 shrink-0 sm:w-auto bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm relative">
+          <div class="absolute top-4 right-4 w-10 h-10 bg-slate-50 border border-slate-100 rounded-md flex items-center justify-center"><?= svg_icon('files', 'w-5 h-5 text-indigo-600') ?></div>
+          <div class="pt-4">
+            <div class="text-sm text-slate-500">Items</div>
+            <div class="mt-2 text-2xl font-semibold text-slate-900">486</div>
+            <div class="text-xs text-slate-400 mt-1">In inventory</div>
+          </div>
+          <div class="mt-4 text-sm text-indigo-600 font-medium">View data →</div>
+        </div>
       </div>
-    </div>
     </div>
   </div>
-  </section>
 
-  <!-- Charts grid -->
-  <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-<div class="md:col-span-2 lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
+  <!-- Main content (no graphs) -->
+  <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
       <div class="flex items-center justify-between mb-4">
-        <h3 class="text-sm font-semibold text-slate-900">Incidents per Province</h3>
-        <div class="text-xs text-slate-400">Last 12 months</div>
+        <h3 class="text-sm font-semibold text-slate-900">Statistics</h3>
+        <div class="text-xs text-slate-400">Overview</div>
       </div>
-      <div class="h-56 sm:h-72">
-        <canvas id="provinceChart"></canvas>
+
+      <div class="mt-6 grid grid-cols-3 gap-3 h-48 items-end">
+        <div class="h-32 bg-indigo-50 rounded-md flex items-end justify-center"><div class="w-8 h-3 bg-indigo-600 rounded-t"></div></div>
+        <div class="h-40 bg-indigo-50 rounded-md flex items-end justify-center"><div class="w-8 h-10 bg-indigo-600 rounded-t"></div></div>
+        <div class="h-28 bg-indigo-50 rounded-md flex items-end justify-center"><div class="w-8 h-6 bg-indigo-600 rounded-t"></div></div>
+      </div>
+
+      <div class="mt-6 grid grid-cols-3 gap-4 text-sm text-slate-600">
+        <div>
+          <div class="text-xs text-slate-400">Target</div>
+          <div class="font-semibold text-slate-900 mt-1">$7.8k</div>
+        </div>
+        <div>
+          <div class="text-xs text-slate-400">Last Week</div>
+          <div class="font-semibold text-slate-900 mt-1">$1.4k</div>
+        </div>
+        <div>
+          <div class="text-xs text-slate-400">Open Campaigns</div>
+          <div class="font-semibold text-slate-900 mt-1">17</div>
+        </div>
       </div>
     </div>
 
-    <!-- Right column: donut + revenue (matches inspo) -->
+    <!-- Right column — static widgets -->
     <div class="space-y-6">
       <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
         <div class="flex items-center justify-between mb-3">
           <h3 class="text-sm font-semibold text-slate-900">Stock</h3>
-          <div class="text-xs text-slate-400">Total sales made today</div>
+          <div class="text-xs text-slate-400">Today</div>
         </div>
-        <div class="relative h-44 flex items-center justify-center">
-          <canvas id="stockDonut" class="w-32 h-32"></canvas>
-          <div class="absolute text-center">
-            <div class="text-2xl font-bold text-indigo-600">45</div>
-            <div class="text-xs text-slate-400">in stock</div>
+        <div class="flex items-center gap-4">
+          <div class="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-50 to-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-xl">45</div>
+          <div class="flex-1">
+            <div class="text-sm text-slate-500">Total sales made today</div>
+            <div class="mt-3 grid grid-cols-2 gap-2 text-sm text-slate-600">
+              <div>Target <div class="font-semibold">$7.8k</div></div>
+              <div>Last week <div class="font-semibold">$1.4k</div></div>
+            </div>
           </div>
-        </div>
-        <div class="mt-4 grid grid-cols-2 gap-3 text-sm text-slate-500">
-          <div class="flex items-center gap-2"><span class="text-green-500">▲</span> Target <div class="ml-auto font-semibold text-slate-900">$7.8k</div></div>
-          <div class="flex items-center gap-2"><span class="text-red-500">▼</span> Last week <div class="ml-auto font-semibold text-slate-900">$1.4k</div></div>
         </div>
       </div>
 
@@ -109,310 +117,47 @@
           <h3 class="text-sm font-semibold text-slate-900">Total Revenue</h3>
           <div class="text-xs text-slate-400">Monthly</div>
         </div>
-        <div class="h-28"><canvas id="revenueChart"></canvas></div>
-        <div class="mt-3 text-xs text-slate-500">$7841.12 <span class="text-slate-400">total revenue</span></div>
+        <div class="text-2xl font-bold text-slate-900">$7,841.12</div>
+        <div class="mt-2 text-sm text-slate-500">17 Open Campaign</div>
       </div>
-    </div>
-
-    <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
-        <h3 class="text-sm font-semibold text-slate-900 mb-4">Incidents by Sex</h3>
-        <div class="h-44 sm:h-56"><canvas id="sexChart"></canvas></div>
-      </div>
-
-      <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
-        <h3 class="text-sm font-semibold text-slate-900 mb-4">Incidents by Age Group</h3>
-        <div class="h-44 sm:h-56"><canvas id="ageChart"></canvas></div>
-      </div>
-    </div>
-
-    <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
-      <h3 class="text-sm font-semibold text-slate-900 mb-4">Incidents by Year</h3>
-      <div class="h-44 sm:h-56"><canvas id="yearChart"></canvas></div>
-    </div>
-
-    <!-- Reinsert Remarks pie (moved from top-right) -->
-    <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
-      <h3 class="text-sm font-semibold text-slate-900 mb-4">Remarks Status</h3>
-      <div class="h-44 sm:h-56"><canvas id="remarksChart"></canvas></div>
-    </div>
-      <h3 class="text-sm font-semibold text-slate-900 mb-4">Contributing Factors</h3>
-      <div class="h-48 sm:h-64"><canvas id="factorsChart"></canvas></div>
-    </div>
-
-    <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
-      <h3 class="text-sm font-semibold text-slate-900 mb-4">Incidents by Location Category</h3>
-      <div class="h-48 sm:h-64"><canvas id="locationChart"></canvas></div>
     </div>
   </section>
+
+  <!-- Secondary info grid -->
+  <div class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
+      <h4 class="text-sm font-semibold text-slate-900">Incidents by Year</h4>
+      <div class="mt-4 grid grid-cols-2 gap-3 text-sm text-slate-700">
+        <div>2024 <div class="text-lg font-bold">410</div></div>
+        <div>2023 <div class="text-lg font-bold">702</div></div>
+        <div>2022 <div class="text-lg font-bold">625</div></div>
+        <div>2021 <div class="text-lg font-bold">598</div></div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
+      <h4 class="text-sm font-semibold text-slate-900">Contributing Factors</h4>
+      <ul class="mt-4 space-y-2 text-sm text-slate-600">
+        <li>Unable to Swim — 52.3%</li>
+        <li>Lack of Supervision — 31.2%</li>
+        <li>Intoxication — 18.5%</li>
+      </ul>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
+      <h4 class="text-sm font-semibold text-slate-900">Incidents by Location</h4>
+      <ul class="mt-4 space-y-2 text-sm text-slate-600">
+        <li>Beach — 312</li>
+        <li>Resort — 124</li>
+        <li>River — 67</li>
+      </ul>
+    </div>
+  </div>
 </div>
 <?= $this->endSection() ?>
 
 <?= $this->section('pageScripts') ?>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
-    const palette = {
-        bg: '#f8fafc',        // slate-50
-        cardBorder: '#eef2f7',
-        primary: '#4f46e5',   // indigo-600
-        muted: '#64748b',     // slate-500
-        accentRed: '#ef4444'
-    };
-
-    const chartColors = [palette.primary, palette.muted, '#cbd5e1', '#e6edf3', '#94a3b8', '#a78bfa'];
-    const accentRed = palette.accentRed;
-    const accentYellow = '#f59e0b';
-    const accentGreen = '#10b981';
-
-    new Chart(document.getElementById('provinceChart'), {
-        type: 'bar',
-        data: {
-            labels: ['Ilocos Norte', 'Ilocos Sur', 'La Union', 'Pangasinan'],
-            datasets: [{
-                label: 'Number of Incidents',
-                data: [456, 523, 378, 612],
-                backgroundColor: chartColors.slice(0, 4),
-                borderColor: chartColors.slice(0, 4),
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: true } },
-            scales: { y: { beginAtZero: true } }
-        }
-    });
-
-    new Chart(document.getElementById('remarksChart'), {
-        type: 'pie',
-        data: {
-            labels: ['Saved', 'Deceased', 'Missing'],
-            datasets: [{
-                data: [892, 1256, 118],
-                backgroundColor: [accentGreen, accentRed, accentYellow],
-                borderColor: '#fff',
-                borderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { position: 'bottom' } }
-        }
-    });
-
-    new Chart(document.getElementById('sexChart'), {
-        type: 'pie',
-        data: {
-            labels: ['Male', 'Female'],
-            datasets: [{
-                data: [72.5, 27.5],
-                backgroundColor: ['#09637E', accentRed],
-                borderColor: '#fff',
-                borderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { position: 'bottom' } }
-        }
-    });
-
-    new Chart(document.getElementById('ageChart'), {
-        type: 'bar',
-        data: {
-            labels: [
-                'Preschool (0-4)',
-                'Gradeschool (5-12)',
-                'High School (13-17)',
-                'College (18-22)',
-                'Young Adult (23-35)',
-                'Middle Age (36-59)',
-                'Senior Citizen (60+)'
-            ],
-            datasets: [{
-                label: 'Percentage (%)',
-                data: [8.2, 15.7, 12.3, 14.1, 18.4, 19.2, 12.1], // Example data, adjust as needed
-                backgroundColor: accentRed,
-                borderColor: accentRed,
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            indexAxis: 'y',
-            plugins: { legend: { display: true } },
-            scales: { x: { beginAtZero: true } }
-        }
-    });
-
-    new Chart(document.getElementById('yearChart'), {
-        type: 'line',
-        data: {
-            labels: ['2020', '2021', '2022', '2023', '2024'],
-            datasets: [{
-                label: 'Total Incidents',
-                data: [512, 598, 625, 702, 410],
-                borderColor: accentYellow,
-                backgroundColor: 'rgba(214, 180, 67, 0.15)',
-                tension: 0.4,
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: true } },
-            scales: { y: { beginAtZero: true } }
-        }
-    });
-
-    // --- New: Stock donut (small) ---
-    new Chart(document.getElementById('stockDonut'), {
-        type: 'doughnut',
-        data: {
-            labels: ['Stock','Remaining'],
-            datasets: [{
-                data: [45, 55],
-                backgroundColor: ['#a78bfa', '#eef2ff'],
-                borderWidth: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '80%',
-            plugins: { legend: { display: false } }
-        }
-    });
-
-    // --- New: Revenue small line chart ---
-    new Chart(document.getElementById('revenueChart'), {
-        type: 'line',
-        data: {
-            labels: ['2019','2020','2021','2022','2023'],
-            datasets: [{
-                label: 'Revenue',
-                data: [3200,4200,4800,5600,7841.12],
-                borderColor: '#a78bfa',
-                backgroundColor: 'rgba(167,139,250,0.12)',
-                tension: 0.4,
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: false } }
-        }
-    });
-
-    new Chart(document.getElementById('occasionChart'), {
-        type: 'bar',
-        data: {
-            labels: ['Christmas', 'New Year', 'Holy Week', 'All Saints Day', 'Independence Day', 'Halloween', 'Summer Break', 'Other Holidays'],
-            datasets: [{
-                label: 'Number of Incidents',
-                data: [523, 487, 412, 298, 234, 189, 645, 159],
-                backgroundColor: chartColors,
-                borderColor: chartColors,
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: true } },
-            scales: { y: { beginAtZero: true } }
-        }
-    });
-
-    let residenceChartInstance;
-
-    const residenceDataByProvince = {
-        labels: ['Ilocos Norte', 'Ilocos Sur', 'La Union', 'Pangasinan'],
-        data: [456, 523, 378, 612],
-        backgroundColor: chartColors.slice(0, 4)
-    };
-
-    const residenceDataByMunicipality = {
-        labels: ['San Fernando', 'Dagupan', 'Laoag', 'Vigan', 'Alaminos', 'Candon', 'Batac', 'San Juan'],
-        data: [234, 198, 167, 189, 145, 123, 156, 134],
-        backgroundColor: chartColors
-    };
-
-    function updateResidenceChart() {
-        const filterValue = document.getElementById('residenceFilter').value;
-        const data = filterValue === 'province' ? residenceDataByProvince : residenceDataByMunicipality;
-
-        if (residenceChartInstance) {
-            residenceChartInstance.destroy();
-        }
-
-        residenceChartInstance = new Chart(document.getElementById('residenceChart'), {
-            type: 'doughnut',
-            data: {
-                labels: data.labels,
-                datasets: [{
-                    data: data.data,
-                    backgroundColor: data.backgroundColor,
-                    borderColor: '#fff',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { position: 'bottom' } }
-            }
-        });
-    }
-
-    updateResidenceChart();
-
-    new Chart(document.getElementById('factorsChart'), {
-        type: 'bar',
-        data: {
-            labels: ['Unable to Swim', 'Lack of Supervision', 'Intoxication', 'Sudden Illness', 'Water Hazards', 'No Life Jacket'],
-            datasets: [{
-                label: 'Percentage (%)',
-                data: [52.3, 31.2, 18.5, 14.7, 22.1, 28.4],
-                backgroundColor: [accentRed, '#09637E', accentYellow, accentGreen, '#0E7EA0', '#0B4F63'],
-                borderColor: [accentRed, '#09637E', accentYellow, accentGreen, '#0E7EA0', '#0B4F63'],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            indexAxis: 'y',
-            plugins: { legend: { display: true } },
-            scales: { x: { beginAtZero: true } }
-        }
-    });
-
-    // Incidents by Location Category
-    new Chart(document.getElementById('locationChart'), {
-        type: 'doughnut',
-        data: {
-            labels: ['Resort', 'Tourist Spot', 'Beach', 'River', 'Lake', 'Pier/Port', 'Other'],
-            datasets: [{
-                label: 'Number of Incidents',
-                data: [124, 89, 312, 67, 42, 25, 48], // sample data — replace with real numbers from backend when available
-                backgroundColor: chartColors.slice(0, 7),
-                borderColor: '#fff',
-                borderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { position: 'bottom' } }
-        }
-    });
+  // Dashboard intentionally has no graphs — scripts removed.
 </script>
 <?= $this->endSection() ?>

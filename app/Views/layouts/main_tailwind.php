@@ -66,7 +66,7 @@
 
     <div class="container-fluid <?= $pageBodyClass ?>">
         <?php if (!$hideSidebar): ?>
-            <nav id="sidebar" class="w-72 lg:w-64 h-screen flex flex-col bg-white border-r border-slate-100 p-4">
+            <nav id="sidebar" class="w-72 lg:w-64 h-screen flex flex-col bg-white border-r border-slate-100 p-4 <?= $hideNavbar ? '' : 'pt-20' ?>">
                 <!-- Brand -->
                 <div class="flex items-center gap-3 px-2 py-3 mb-4">
                     <div class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold">L</div>
