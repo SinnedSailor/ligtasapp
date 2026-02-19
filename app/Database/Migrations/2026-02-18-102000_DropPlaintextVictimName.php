@@ -46,7 +46,9 @@ class DropPlaintextVictimName extends Migration
                 } else {
                     // Treat as plaintext: backfill `name_of_victim_enc` and `name_of_victim_hash` when not present
                     if (empty($r['name_of_victim_enc'])) {
-                        $update['name_of_victim_enc'] = base64_encode($encrypter->encrypt(mb_strtolower(trim($victim))));
+                        // Store display-friendly Title Case in encrypted column but keep hash deterministic (lowercase)
+                        $display = mb_convert_case(trim($victim), MB_CASE_TITLE, 'UTF-8');
+                        $update['name_of_victim_enc'] = base64_encode($encrypter->encrypt($display));
                     }
                     if (empty($r['name_of_victim_hash'])) {
                         $update['name_of_victim_hash'] = hash_hmac('sha256', mb_strtolower(trim($victim)), $key);

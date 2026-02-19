@@ -46,13 +46,19 @@ class IncidentReportModel extends Model
         $encrypter = \Config\Services::encrypter();
 
         if (!empty($data['data']['name_of_victim'])) {
-            $name = mb_strtolower(trim($data['data']['name_of_victim']));
-            // deterministic hash for dedup/search
+            $plain = trim($data['data']['name_of_victim']);
+            // deterministic lowercase value for hashing/searching
+            $normalized = mb_strtolower($plain);
             $key = env('encryption.key') ?: (getenv('encryption.key') ?: 'CHANGE_ME__SET_ENCRYPTION_KEY');
-            $h = hash_hmac('sha256', $name, $key);
+            $h = hash_hmac('sha256', $normalized, $key);
             $data['data']['name_of_victim_hash'] = $h;
-            // store encrypted ciphertext in the name_of_victim_enc column (base64)
-            $data['data']['name_of_victim_enc'] = base64_encode($encrypter->encrypt($name));
+
+            // Store display-friendly Title Case in the encrypted column (reversible)
+            $displayName = mb_convert_case($plain, MB_CASE_TITLE, 'UTF-8');
+            $data['data']['name_of_victim_enc'] = base64_encode($encrypter->encrypt($displayName));
+
+            // normalize plaintext key so callers see Title Case immediately
+            $data['data']['name_of_victim'] = $displayName;
         }
 
         return $data;
@@ -84,9 +90,11 @@ class IncidentReportModel extends Model
     public function decryptRow(array $row): array
     {
         if (isset($row['name_of_victim_enc']) && $row['name_of_victim_enc'] !== null) {
-            $row['name_of_victim'] = $this->decryptValue((string) $row['name_of_victim_enc']);
+            $plain = $this->decryptValue((string) $row['name_of_victim_enc']);
+            $row['name_of_victim'] = $plain === null || $plain === '' ? $plain : mb_convert_case($plain, MB_CASE_TITLE, 'UTF-8');
         } elseif (isset($row['name_of_victim'])) {
-            $row['name_of_victim'] = $this->decryptValue((string) $row['name_of_victim']);
+            $plain = $this->decryptValue((string) $row['name_of_victim']);
+            $row['name_of_victim'] = $plain === null || $plain === '' ? $plain : mb_convert_case($plain, MB_CASE_TITLE, 'UTF-8');
         }
         return $row;
     }
