@@ -62,6 +62,17 @@ class Admin extends BaseController
             ->join('roles', 'roles.id = users.role_id', 'left')
             ->findAll();
 
+        // Decrypt user fields for display. For admin UI/API show plaintext email
+        foreach ($users as &$u) {
+            $u = $this->userModel->decryptUserRow($u);
+            // If we have an encrypted email, decrypt it for display (admin-only)
+            $plainEmail = $this->userModel->decryptValue($u['email_enc'] ?? '');
+            if ($plainEmail) {
+                $u['email'] = $plainEmail;
+            }
+        }
+        unset($u);
+
         $roles = $this->roleModel->getAllRoles();
 
         $data = [
@@ -100,6 +111,14 @@ class Admin extends BaseController
                 'success' => false,
                 'message' => 'User not found'
             ])->setStatusCode(404);
+        }
+
+        // Prevent changing own role/admin status
+        if ($userId == session()->get('user_id')) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'You cannot change your own role or admin status'
+            ])->setStatusCode(400);
         }
 
         // Verify role exists
@@ -157,6 +176,14 @@ class Admin extends BaseController
                 'success' => false,
                 'message' => 'User not found'
             ])->setStatusCode(404);
+        }
+
+        // Prevent clearing own role/admin status
+        if ($userId == session()->get('user_id')) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'You cannot clear your own role or revoke your own admin status'
+            ])->setStatusCode(400);
         }
 
         // Clear role and admin status
@@ -238,6 +265,24 @@ class Admin extends BaseController
         if (!$this->isValidRegion1Location((string) $data['province'], (string) $data['municipality'])) {
             return redirect()->back()->with('error', 'Please select a valid Region 1 province and municipality')->withInput();
         }
+
+        // Ensure email uniqueness using deterministic hash lookup
+        if ($this->userModel->getUserByEmail($data['email'])) {
+            return redirect()->back()->with('error', 'This email is already registered.')->withInput();
+        }
+
+        // Validate plaintext fields using model rules before we remove them
+        if (! $this->userModel->validate($data)) {
+            $errors = $this->userModel->errors();
+            $errorMessage = is_array($errors) ? implode(', ', $errors) : 'Validation failed';
+            return redirect()->back()->with('error', $errorMessage)->withInput();
+        }
+
+        // Prepare encrypted PII and remove plaintext keys (DB stores encrypted PII only)
+        $data = $this->userModel->prepareForInsert($data);
+
+        // Skip validation here because we validated plaintext above
+        $this->userModel->skipValidation(true);
 
         // Save admin to database
         if (!$this->userModel->insert($data)) {
@@ -356,6 +401,16 @@ class Admin extends BaseController
             ->join('roles', 'roles.id = users.role_id', 'left')
             ->findAll();
 
+        // Decrypt before returning JSON and include plaintext email for admin consumers
+        foreach ($users as &$u) {
+            $u = $this->userModel->decryptUserRow($u);
+            $plainEmail = $this->userModel->decryptValue($u['email_enc'] ?? '');
+            if ($plainEmail) {
+                $u['email'] = $plainEmail;
+            }
+        }
+        unset($u);
+
         return $this->response->setJSON([
             'success' => true,
             'users' => $users
@@ -388,4 +443,76 @@ class Admin extends BaseController
             'unassignedRoles' => $unassignedRoles
         ]);
     }
+
+    // Debugging helper — show raw DB values and decrypted values for user id=1
+    public function debugDecryptUser(int $id = 1)
+    {
+        $user = $this->userModel->find($id);
+        if (! $user) {
+            return $this->response->setJSON(['found' => false])->setStatusCode(404);
+        }
+
+        $decrypted = $this->userModel->decryptUserRow($user);
+
+        // Additional raw decryption attempts for debugging
+        $encrypter = \Config\Services::encrypter();
+        $debug = [];
+        foreach (['first_name','last_name','email','contact_number'] as $f) {
+            $debug[$f] = ['raw' => $user[$f] ?? null, 'decrypted_attempt' => null, 'error' => null];
+            if (!empty($user[$f])) {
+                try {
+                    $decoded = base64_decode($user[$f], true);
+                    $plain = $encrypter->decrypt($decoded);
+                    $debug[$f]['decrypted_attempt'] = $plain === false ? null : $plain;
+                } catch (\Throwable $e) {
+                    $debug[$f]['error'] = $e->getMessage();
+                }
+            }
+        }
+
+        return $this->response->setJSON([
+            'found' => true,
+            'raw' => $user,
+            'decrypted' => $decrypted,
+            'debug_decrypt' => $debug,
+        ]);
+    }
+
+    // Repair encryption for a user by re-saving plaintext through the model callbacks.
+    // This will encrypt fields using the current application encryption key.
+    public function repairEncryption(int $id = 1)
+    {
+        $accessCheck = $this->checkAdminAccess();
+        if ($accessCheck) {
+            return $accessCheck;
+        }
+
+        $user = $this->userModel->find($id);
+        if (! $user) {
+            return $this->response->setJSON(['success' => false, 'message' => 'User not found'])->setStatusCode(404);
+        }
+
+        // Attempt to recover plausible plaintext from existing values if possible
+        // Prefer decrypting from the encrypted columns; do not rely on legacy `email`/`first_name` plaintext.
+        $email = $this->userModel->decryptValue($user['email_enc'] ?? ($user['email'] ?? ''));
+        $first = $this->userModel->decryptValue($user['first_name_enc'] ?? ($user['first_name'] ?? ''));
+        $last = $this->userModel->decryptValue($user['last_name_enc'] ?? ($user['last_name'] ?? ''));
+
+        // If name fields are still not decryptable, fall back to reasonable defaults
+        if (empty($first) || preg_match('/^[A-F0-9]{64}$/i', $first)) {
+            $first = 'Admin';
+        }
+        if (empty($last) || preg_match('/^[A-F0-9]{64}$/i', $last)) {
+            $last = 'User';
+        }
+
+        $this->userModel->update($id, [
+            'first_name' => $first,
+            'last_name' => $last,
+            'email' => $email ?: ($user['username'] . '@example.local'),
+        ]);
+
+        return $this->response->setJSON(['success' => true, 'message' => 'Re-encrypted user data']);
+    }
 }
+

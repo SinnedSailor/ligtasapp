@@ -390,7 +390,11 @@
                                 </a>
                             </div>
                             <div class="name">
-                                <?= esc(trim(($firstName ?? '') . ' ' . ($lastName ?? '')) ?: ($username ?? 'User')) ?>
+                                <?php
+                                    $displayNameRaw = trim(($firstName ?? '') . ' ' . ($lastName ?? ''));
+                                    $displayName = $displayNameRaw ? mb_convert_case($displayNameRaw, MB_CASE_TITLE, 'UTF-8') : ($username ?? 'User');
+                                ?>
+                                <?= esc($displayName) ?>
                             </div>
                             <div class="role"><?= esc(session()->get('role_name') ?? 'User') ?></div>
                         </div>

@@ -1,0 +1,20 @@
+{
+    "id": "1",
+    "first_name": "0uRwwtqGz\/Hy98LKBzQotch7gkIOepCX+e3r3puTYNSI1m\/vuzscuVGsVvWksK8mSXer2SKiHs4lGDXL0KG8CYJBJPOI7wGNoHmX",
+    "first_name_enc": "AUVZm7bNQ\/zWaQM7tX7oDdORmKZ+sDyWyarpVnQW7E69HNiNMSFJuQPJVQsbA+iRxD+fuyjw\/p7enYKWNwj9D32TwBzlVRiwUC+bjKby\/RyTdq1gKiqtoxYo6GTYHYWePQtblYAlH0nXHUaKIx0z4\/b\/jVagexWQfx4Vpxqq+j+F85m\/9gZ+4JUf5SItUNrgGebnbimIRT7ojD+Q0BxGRZBZnzV6rWltUR6Um5ryfqRe4N2p",
+    "last_name_enc": "NsaugtFpBKuIr5qfeLcIc5904bCMwXok42ZPNqamZJYhdxUZ3HFDFSpjw75lETIYdlqpiETD8QCROyPvvgdnMNYMZ6uW3dhQcNJLQDdfNIfMNN7uFCRGyOR+3PbmOmPmgsXh+b8vOO+wxyy4jxs6BFE1JZwNVPjP5xykViNQd2CuWkJPbrsxboj7uXRApli61ldsmSD\/ifepY9JUXgGiIRyO9foJch5k\/j5GkkhgoaInshvd",
+    "last_name": "p+97g9sH2cqLbw+rV6646l3Ry56PXe6FCmKdIKEXqjyuLDYxdMvoErqJ163yR6tu8lc9zIo2t36MAblxvDwuYJaOnxd8aAiYcT1b",
+    "username": "admin",
+    "email": "admin@iwas.local",
+    "email_hash": "3fcab072aa057503f13faf3102fed0c8e9c0b025ca90f5d1e87826dd6e282083",
+    "email_enc": "EwG9DrUGkytJHWBMhpASGYgasEvkKPJYIjsm3zyGHIoHmFHWcfL6Lk1A3Ay0B\/Jk2kNSoc4v6CXWsUzl4XLwBtwU5ioiCy490ZPRxV\/kkkzsZQ+YwkGwzUb4iCQEdttK",
+    "contact_number": null,
+    "contact_number_enc": null,
+    "password": "$2y$10$oxBh4kWymJDWJi.yllJNFORZYfcQ5g9kkVGAj5jX8mFSNflM8d8hy",
+    "province": "System",
+    "municipality": "System",
+    "role_id": null,
+    "is_admin": "1",
+    "created_at": "2026-02-18 01:01:58",
+    "updated_at": "2026-02-18 01:10:27"
+}

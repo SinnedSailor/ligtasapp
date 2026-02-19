@@ -79,7 +79,7 @@
                         <?php else: ?>
                             <?php foreach ($users as $user): ?>
                                 <tr>
-                                    <td><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?></td>
+                                    <td><?= htmlspecialchars(mb_convert_case(trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? '')), MB_CASE_TITLE, 'UTF-8')) ?></td>
                                     <td><?= htmlspecialchars($user['email']) ?></td>
                                     <td><?= htmlspecialchars($user['username']) ?></td>
                                     <td>
@@ -99,13 +99,15 @@
                                     <td><?= htmlspecialchars($user['province'] ?? '-') ?></td>
                                     <td><?= htmlspecialchars($user['municipality'] ?? '-') ?></td>
                                     <td>
-                                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#assignRoleModal" onclick="setUserData(<?= $user['id'] ?>, '<?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?>')">
-                                            Assign Role
-                                        </button>
                                         <?php if ($user['id'] != session()->get('user_id')): ?>
+                                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#assignRoleModal" onclick="setUserData(<?= $user['id'] ?>, '<?= htmlspecialchars(mb_convert_case(trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? '')), MB_CASE_TITLE, 'UTF-8')) ?>')">
+                                                Assign Role
+                                            </button>
                                             <button type="button" class="btn btn-sm btn-<?= $user['is_admin'] ? 'danger' : 'success' ?>" onclick="<?= $user['is_admin'] ? 'revokeAdmin' : 'grantAdmin' ?>(<?= $user['id'] ?>)">
                                                 <?= $user['is_admin'] ? 'Revoke Admin' : 'Make Admin' ?>
                                             </button>
+                                        <?php else: ?>
+                                            <a href="#" id="selfModifyInfo" class="text-muted small" onclick="showSelfModifyModal('You cannot change your own role or admin status'); return false;">You cannot change your own role or admin status</a>
                                         <?php endif; ?>
                                     </td>
                                 </tr>
@@ -146,6 +148,25 @@
         </div>
     </div>
 </div>
+
+<!-- Self-modify information modal -->
+<div class="modal fade" id="selfModifyModal" tabindex="-1" aria-labelledby="selfModifyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="selfModifyModalLabel">Action not allowed</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="selfModifyMessage" class="mb-0">You cannot change your own role or admin status.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <?= $this->endSection() ?>
 
 <?= $this->section('pageScripts') ?>
@@ -182,7 +203,12 @@
                 alert('Role assigned successfully');
                 location.reload();
             } else {
-                alert('Error: ' + data.message);
+                const msg = data.message || '';
+                if (msg.includes('cannot change your own') || msg.includes('cannot clear your own') || msg.includes('You cannot revoke your own') || msg.includes('You cannot change your own')) {
+                    showSelfModifyModal(msg);
+                } else {
+                    alert('Error: ' + msg);
+                }
             }
         })
         .catch(error => {
@@ -212,7 +238,12 @@
                 alert('Admin privileges granted');
                 location.reload();
             } else {
-                alert('Error: ' + data.message);
+                const msg = data.message || '';
+                if (msg.includes('cannot change your own') || msg.includes('cannot clear your own') || msg.includes('You cannot revoke your own') || msg.includes('You cannot change your own')) {
+                    showSelfModifyModal(msg);
+                } else {
+                    alert('Error: ' + msg);
+                }
             }
         })
         .catch(error => {
@@ -240,13 +271,25 @@
                 alert('Admin privileges revoked');
                 location.reload();
             } else {
-                alert('Error: ' + data.message);
+                const msg = data.message || '';
+                if (msg.includes('cannot change your own') || msg.includes('cannot clear your own') || msg.includes('You cannot revoke your own') || msg.includes('You cannot change your own')) {
+                    showSelfModifyModal(msg);
+                } else {
+                    alert('Error: ' + msg);
+                }
             }
         })
         .catch(error => {
             console.error('Error:', error);
             alert('An error occurred');
         });
+    }
+
+    function showSelfModifyModal(message) {
+        document.getElementById('selfModifyMessage').textContent = message || 'You cannot change your own role or admin status.';
+        const modalEl = document.getElementById('selfModifyModal');
+        const bsModal = new bootstrap.Modal(modalEl);
+        bsModal.show();
     }
 </script>
 <?= $this->endSection() ?>

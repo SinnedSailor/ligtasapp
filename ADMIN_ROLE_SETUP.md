@@ -70,7 +70,7 @@ The admin dashboard displays all users with their:
 1. Navigate to `/admin/users`
 2. Click "Make Admin" button to grant admin privileges to a regular user
 3. Click "Revoke Admin" button to revoke admin privileges
-4. Note: You cannot revoke your own admin privileges as a safety measure
+4. Note: You cannot revoke or change your own admin role/privileges — the UI and API prevent modifying your own role or admin status. The UI will show a modal explaining this restriction when attempted.
 
 ## Database Schema
 
@@ -128,9 +128,12 @@ When a user logs in, the following session variables are set:
 
 1. **Admin-Only Access**: All admin routes check for `is_admin` flag before allowing access
 2. **Password Protection**: Passwords are hashed using `PASSWORD_DEFAULT` (bcrypt)
-3. **Self-Protection**: Cannot revoke own admin privileges
-4. **First Admin Safeguard**: First admin creation is only allowed when no admin exists
-5. **Role Database**: Roles are managed from the database (ADMIN, FOCAL, LGU, PROVINCE)
+3. **PII Hashing (NEW)**: `name_of_victim` (incident_reports) and `first_name`, `last_name`, `email`, `contact_number` (users) are stored as deterministic HMAC-SHA256 hashes in the database. This is one-way (irreversible) — originals cannot be recovered.
+   - Email lookups and login are preserved by hashing the supplied email and comparing the hash.
+   - Existing rows are backfilled by a migration.
+4. **Self-Protection**: Cannot revoke own admin privileges
+5. **First Admin Safeguard**: First admin creation is only allowed when no admin exists
+6. **Role Database**: Roles are managed from the database (ADMIN, FOCAL, LGU, PROVINCE)
 
 ## File Changes
 
@@ -174,3 +177,8 @@ When a user logs in, the following session variables are set:
 3. Add role-based filters to user actions
 4. Create an audit log for admin actions
 5. Add email notifications for role assignments
+
+### Deployment notes
+- A new migration `2026-02-18-083500_HashPersonalData` was added and will backfill/hash existing PII. Run `php spark migrate` to apply.
+- The hashing uses `HMAC-SHA256` with the application's `encryption.key`. Set `encryption.key` in your `.env` to a stable secret before migrating so hashes are deterministic across environments.
+- Hashed PII is irreversible — keep a backup before running the migration if you need plaintext data preserved.

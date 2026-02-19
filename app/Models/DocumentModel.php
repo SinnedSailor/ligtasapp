@@ -34,20 +34,38 @@ class DocumentModel extends Model
 
     public function getDocumentsForUser(int $userId): array
     {
-        return $this->select('documents.*, users.first_name, users.last_name, users.province, users.municipality')
+        $rows = $this->select('documents.*, users.first_name_enc, users.last_name_enc, users.province, users.municipality')
             ->join('users', 'users.id = documents.user_id')
             ->where('documents.user_id', $userId)
             ->orderBy('documents.created_at', 'desc')
             ->findAll();
+
+        $userModel = new \App\Models\UserModel();
+        foreach ($rows as &$r) {
+            $r['first_name'] = $userModel->decryptValue($r['first_name_enc'] ?? '');
+            $r['last_name']  = $userModel->decryptValue($r['last_name_enc'] ?? '');
+        }
+        unset($r);
+
+        return $rows;
     }
 
     public function getDocumentsByStatus(string $status): array
     {
-        return $this->select('documents.*, users.first_name, users.last_name, users.province, users.municipality')
+        $rows = $this->select('documents.*, users.first_name_enc, users.last_name_enc, users.province, users.municipality')
             ->join('users', 'users.id = documents.user_id')
             ->where('documents.status', $status)
             ->orderBy('documents.created_at', 'desc')
             ->findAll();
+
+        $userModel = new \App\Models\UserModel();
+        foreach ($rows as &$r) {
+            $r['first_name'] = $userModel->decryptValue($r['first_name_enc'] ?? '');
+            $r['last_name']  = $userModel->decryptValue($r['last_name_enc'] ?? '');
+        }
+        unset($r);
+
+        return $rows;
     }
 
     public function getRecentDocumentsForUser(int $userId, string $docType, int $minutes): array

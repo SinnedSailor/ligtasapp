@@ -195,18 +195,18 @@ $hideFooter = true;
             <?= csrf_field() ?>
             <div class="form-row">
                 <div class="form-group">
-                    <input type="text" class="form-control form-control-lg" name="first_name" placeholder="First Name" required>
+                    <input type="text" class="form-control form-control-lg" name="first_name" placeholder="First Name" value="<?= old('first_name') ?>" required>
                 </div>
                 <div class="form-group">
-                    <input type="text" class="form-control form-control-lg" name="last_name" placeholder="Last Name" required>
+                    <input type="text" class="form-control form-control-lg" name="last_name" placeholder="Last Name" value="<?= old('last_name') ?>" required>
                 </div>
             </div>
             <div class="form-row">
                 <div class="form-group">
-                    <input type="text" class="form-control form-control-lg" name="username" placeholder="Username" required>
+                    <input type="text" class="form-control form-control-lg" name="username" placeholder="Username" value="<?= old('username') ?>" required>
                 </div>
                 <div class="form-group">
-                    <input type="email" class="form-control form-control-lg" name="email" placeholder="Email" required>
+                    <input type="email" class="form-control form-control-lg" name="email" placeholder="Email" value="<?= old('email') ?>" required>
                 </div>
             </div>
             <div class="row">

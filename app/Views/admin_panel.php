@@ -336,6 +336,22 @@
         </div>
     </div>
 </div>
+
+<!-- Self-modify information modal -->
+<div id="selfModifyModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header mb-3">
+            <h3><i class="bi bi-info-circle" style="color: #6B7280;"></i> Action not allowed</h3>
+        </div>
+        <div class="modal-body">
+            <p id="selfModifyMessage">You cannot change your own role or admin status.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-btn modal-btn-primary" onclick="closeSelfModifyModal()">OK</button>
+        </div>
+    </div>
+</div>
+
 <?= $this->endSection() ?>
 
 <?= $this->section('pageScripts') ?>
@@ -362,6 +378,12 @@
         return `<span class="${badgeClass}">${normalized}</span>`;
     }
 
+    // Helper: convert a string to Title Case for display
+    function titleCase(str) {
+        if (!str) return '';
+        return String(str).split(/\s+/).map(function(w){ return w ? (w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()) : ''; }).join(' ');
+    }
+
     function loadUsers() {
         fetch('<?= base_url('admin/getUsers') ?>')
             .then(response => response.json())
@@ -370,11 +392,12 @@
                 if (data.users && data.users.length > 0) {
                     tbody.innerHTML = data.users.map(user => {
                         const roleBadge = getRoleBadge(user.role_name);
+                        const fullName = (user.first_name || '').trim() + ' ' + (user.last_name || '').trim();
                         // Only show edit and disable icons for actions
                         return `
                             <tr>
-                                <td><strong>${user.first_name} ${user.last_name}</strong></td>
-                                <td>${user.email}</td>
+                                <td><strong>${titleCase(fullName)}</strong></td>
+                                <td>${user.email || ''}</td>
                                 <td>${user.username}</td>
                                 <td>${roleBadge}</td>
                                 <td class="d-flex flex-wrap gap-2">
@@ -452,6 +475,22 @@
         }
     });
 
+    /* Self-modify modal (show when user attempts to change their own admin/role) */
+    function showSelfModifyModal(message) {
+        document.getElementById('selfModifyMessage').textContent = message || 'You cannot change your own role or admin status.';
+        document.getElementById('selfModifyModal').classList.add('active');
+    }
+
+    function closeSelfModifyModal() {
+        document.getElementById('selfModifyModal').classList.remove('active');
+    }
+
+    document.getElementById('selfModifyModal').addEventListener('click', function(event) {
+        if (event.target === this) {
+            closeSelfModifyModal();
+        }
+    });
+
     function assignRole(userId, roleId) {
         const formData = new FormData();
         formData.append('user_id', userId);
@@ -467,7 +506,12 @@
                 const roleNames = {1: 'ADMIN', 2: 'FOCAL', 3: 'LGU', 4: 'PROVINCE'};
                 showSuccessModal('Role assigned successfully!', `User has been assigned the ${roleNames[roleId]} role.`);
             } else {
-                alert('Error: ' + data.message);
+                const msg = data.message || '';
+                if (msg.includes('cannot change your own') || msg.includes('cannot clear your own') || msg.includes('You cannot revoke your own') || msg.includes('You cannot change your own')) {
+                    showSelfModifyModal(msg);
+                } else {
+                    alert('Error: ' + msg);
+                }
             }
         })
         .catch(error => {
@@ -504,7 +548,12 @@
             if (data.success) {
                 showSuccessModal('Role cleared successfully!', "User's role has been removed.");
             } else {
-                alert('Error: ' + data.message);
+                const msg = data.message || '';
+                if (msg.includes('cannot change your own') || msg.includes('cannot clear your own') || msg.includes('You cannot revoke your own') || msg.includes('You cannot change your own')) {
+                    showSelfModifyModal(msg);
+                } else {
+                    alert('Error: ' + msg);
+                }
             }
         })
         .catch(error => {
@@ -556,7 +605,12 @@
             if (data.success) {
                 showSuccessModal('Admin status updated!', `Admin privileges have been ${actionText}.`);
             } else {
-                alert('Error: ' + data.message);
+                const msg = data.message || '';
+                if (msg.includes('cannot change your own') || msg.includes('cannot clear your own') || msg.includes('You cannot revoke your own') || msg.includes('You cannot change your own')) {
+                    showSelfModifyModal(msg);
+                } else {
+                    alert('Error: ' + msg);
+                }
             }
         })
         .catch(error => {

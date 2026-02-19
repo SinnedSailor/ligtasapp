@@ -331,6 +331,7 @@
             </div>
             <div class="modal-body">
                 <form id="incidentForm">
+                    <div id="incidentFormAlert" class="alert d-none" role="alert" style="display:none;"></div>
                     <div class="row g-3">
                         <div class="col-md-4">
                             <label class="form-label" for="incidentMonth">Month of Incident</label>
@@ -417,6 +418,17 @@
                                 <input type="file" id="incidentAttachments" class="form-control form-control-sm" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx" multiple />
                                 <button type="button" class="btn btn-outline-primary btn-sm" id="incidentUploadButton" onclick="uploadIncidentAttachments()">Upload Attachments</button>
                             </div>
+
+                            <!-- Per-file upload list -->
+                            <div id="incidentUploadFileList" class="mt-3"></div>
+
+                            <!-- Upload progress (hidden until used) -->
+                            <div id="incidentUploadProgressContainer" class="w-100 mt-2 d-none">
+                                <div class="progress" style="height:14px;">
+                                    <div id="incidentUploadProgressBar" class="progress-bar" role="progressbar" style="width:0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                                </div>
+                                <div id="incidentUploadProgressText" class="small text-muted mt-1"></div>
+                            </div>
                         </div>
                     <?php endif; ?>
                 </form>
@@ -458,6 +470,8 @@
     let tableData = [];
     const importUrl = "<?= base_url('/incident-report/import') ?>";
     const attachmentUploadUrl = "<?= base_url('/incident-report/attachments/upload') ?>";
+    const tempAttachmentUploadUrl = "<?= base_url('/incident-report/attachments/upload-temp') ?>";
+    const tempAttachmentRemoveUrl = "<?= base_url('/incident-report/attachments/remove-temp') ?>";
     const attachmentListUrl = "<?= base_url('/incident-report/attachments') ?>";
     const attachmentViewUrl = "<?= base_url('/incident-report/attachments/view') ?>";
     const attachmentDownloadUrl = "<?= base_url('/incident-report/attachments/download') ?>";
@@ -512,6 +526,11 @@
     let currentPage = 1;
     let pageSize = 10;
     let currentIncidentIndex = null;
+    // Per-file upload state for attachments modal
+    let currentUploadFiles = [];
+    // Session token for attachments uploaded before the incident is saved
+    let currentAttachmentSession = '';
+
 
     const incidentFieldMap = [
         { id: 'incidentMonth', column: 'Month of Incident' },
@@ -560,6 +579,15 @@
     }
 
     function preventScrollKeys(event) {
+        // Allow normal typing when the event target is editable (input/textarea/contenteditable)
+        // or when the target is inside an open modal — only block navigation/scroll keys
+        const target = event.target;
+        const tag = target && target.tagName ? target.tagName.toLowerCase() : '';
+        const isEditable = !!(target && (target.isContentEditable || tag === 'input' || tag === 'textarea' || (target.closest && target.closest('.modal.show'))));
+        if (isEditable) {
+            return;
+        }
+
         if (scrollLockKeys.includes(event.key)) {
             event.preventDefault();
         }
@@ -625,6 +653,324 @@
         }
     }
 
+    // Inline modal message helpers (for validation / server errors)
+    function showIncidentFormMessage(message, type = 'danger') {
+        const el = document.getElementById('incidentFormAlert');
+        if (!el) return;
+        const bsType = (type === 'error' ? 'danger' : type);
+        el.className = 'alert alert-' + bsType;
+        el.textContent = message;
+        el.classList.remove('d-none');
+        el.style.display = 'block';
+    }
+
+    function hideIncidentFormMessage() {
+        const el = document.getElementById('incidentFormAlert');
+        if (!el) return;
+        el.textContent = '';
+        el.classList.add('d-none');
+        el.style.display = 'none';
+    }
+
+    // Upload progress helpers (show/hide + update)
+    function showUploadProgress(percent) {
+        const container = document.getElementById('incidentUploadProgressContainer');
+        const bar = document.getElementById('incidentUploadProgressBar');
+        const text = document.getElementById('incidentUploadProgressText');
+        if (!container || !bar) return;
+        container.classList.remove('d-none');
+        const p = Math.max(0, Math.min(100, Math.round(percent)));
+        bar.style.width = p + '%';
+        bar.setAttribute('aria-valuenow', p);
+        bar.textContent = p + '%';
+        if (text) text.textContent = `Uploading ${p}%`;
+    }
+
+    function hideUploadProgress() {
+        const container = document.getElementById('incidentUploadProgressContainer');
+        const bar = document.getElementById('incidentUploadProgressBar');
+        const text = document.getElementById('incidentUploadProgressText');
+        if (!container || !bar) return;
+        container.classList.add('d-none');
+        bar.style.width = '0%';
+        bar.setAttribute('aria-valuenow', 0);
+        bar.textContent = '0%';
+        if (text) text.textContent = '';
+    }
+
+    // Render the per-file upload list UI
+    function renderUploadFileList() {
+        const container = document.getElementById('incidentUploadFileList');
+        if (!container) return;
+
+        if (!currentUploadFiles || currentUploadFiles.length === 0) {
+            container.innerHTML = '';
+            return;
+        }
+
+        const uploadingCount = currentUploadFiles.filter(f => f.status === 'uploading' || f.status === 'queued').length;
+        const header = `
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="small text-muted">${currentUploadFiles.length} file(s)</div>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-sm btn-outline-danger" id="incidentUploadCancelAllBtn" onclick="cancelAllUploads()" ${uploadingCount === 0 ? 'disabled' : ''}>Cancel all</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearUploadFileList()">Clear</button>
+                </div>
+            </div>
+        `;
+
+        const items = currentUploadFiles.map(f => {
+            const progress = Math.max(0, Math.min(100, Math.round(f.progress || 0)));
+            const statusLabel = (f.status === 'queued') ? 'Queued' : (f.status === 'uploading' ? 'Uploading' : (f.status === 'success' ? 'Uploaded' : (f.status === 'error' ? 'Error' : 'Cancelled')));
+            const showCancel = (f.status === 'uploading' || f.status === 'queued');
+            const showRetry = (f.status === 'error' || f.status === 'cancelled');
+
+            return `
+                <div class="upload-file-item d-flex align-items-center justify-content-between mb-2" data-file-id="${f.id}">
+                    <div style="flex:1; min-width:0;">
+                        <div class="fw-semibold small text-truncate">${escapeHtml(f.file.name)} <small class="text-muted">(${formatBytes(f.file.size)})</small></div>
+                        <div class="progress mt-1" style="height:8px;">
+                            <div class="progress-bar" role="progressbar" style="width:${progress}%" aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="100" data-file-progress-id="${f.id}">${progress}%</div>
+                        </div>
+                    </div>
+                    <div class="ms-3 text-end" style="min-width:140px;">
+                        <div class="small" data-file-status-id="${f.id}">${statusLabel}</div>
+                        <div class="btn-group btn-group-sm mt-1">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="cancelSingleUpload('${f.id}')" ${showCancel ? '' : 'style="display:none;"'}>Cancel</button>
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="retrySingleUpload('${f.id}')" ${showRetry ? '' : 'style="display:none;"'}>Retry</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        container.innerHTML = header + items;
+    }
+
+    function updateFileUploadUI(id) {
+        const entry = currentUploadFiles.find(x => x.id === id);
+        if (!entry) return;
+        const progressEl = document.querySelector(`[data-file-progress-id="${id}"]`);
+        const statusEl = document.querySelector(`[data-file-status-id="${id}"]`);
+        const container = document.querySelector(`[data-file-id="${id}"]`);
+        if (progressEl) {
+            const p = Math.max(0, Math.min(100, Math.round(entry.progress || 0)));
+            progressEl.style.width = p + '%';
+            progressEl.setAttribute('aria-valuenow', p);
+            progressEl.textContent = p + '%';
+        }
+        if (statusEl) {
+            const label = (entry.status === 'queued') ? 'Queued' : (entry.status === 'uploading' ? 'Uploading' : (entry.status === 'success' ? 'Uploaded' : (entry.status === 'error' ? 'Error' : 'Cancelled')));
+            statusEl.textContent = label;
+        }
+        if (container) {
+            const cancelBtn = container.querySelector('button[onclick^="cancelSingleUpload"]');
+            const retryBtn = container.querySelector('button[onclick^="retrySingleUpload"]');
+            if (cancelBtn) cancelBtn.style.display = (entry.status === 'uploading' || entry.status === 'queued') ? '' : 'none';
+            if (retryBtn) retryBtn.style.display = (entry.status === 'error' || entry.status === 'cancelled') ? '' : 'none';
+        }
+        // update overall progress bar
+        updateOverallProgress();
+    }
+
+    function startFileUploadEntry(entry, incidentN) {
+        return new Promise((resolve, reject) => {
+            const csrfToken = getCookie('csrf_cookie_name');
+            entry.status = 'uploading';
+            entry.progress = 0;
+            updateFileUploadUI(entry.id);
+
+            const formData = new FormData();
+            const isTemp = !incidentN;
+            if (isTemp) {
+                // include or create session token
+                entry.sessionToken = entry.sessionToken || currentAttachmentSession || String(Date.now()) + '-' + Math.floor(Math.random() * 10000);
+                currentAttachmentSession = entry.sessionToken;
+                formData.append('session_token', entry.sessionToken);
+            } else {
+                formData.append('incident_n', incidentN);
+            }
+            formData.append('attachments[]', entry.file);
+
+            const xhr = new XMLHttpRequest();
+            entry.xhr = xhr;
+
+            const url = (!incidentN) ? tempAttachmentUploadUrl : attachmentUploadUrl;
+            xhr.open('POST', url, true);
+            if (csrfToken) {
+                try { xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken); } catch (e) { /* ignore */ }
+            }
+
+            xhr.upload.onprogress = function (e) {
+                if (e.lengthComputable) {
+                    entry.progress = Math.round((e.loaded / e.total) * 100);
+                    updateFileUploadUI(entry.id);
+                }
+            };
+
+            xhr.onload = function () {
+                entry.xhr = null;
+                let body = null;
+                try { body = xhr.responseText ? JSON.parse(xhr.responseText) : {}; } catch (err) { body = { message: xhr.responseText }; }
+
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    entry.status = 'success';
+                    entry.progress = 100;
+
+                    // If server returned session info (temp upload), store it on the entry
+                    if (body && body.session_token) {
+                        entry.sessionToken = body.session_token;
+                        // if server returned file info, attach stored_name
+                        if (Array.isArray(body.files) && body.files.length > 0) {
+                            entry.storedName = body.files[0].stored_name || entry.storedName;
+                        }
+                    }
+
+                    updateFileUploadUI(entry.id);
+
+                    // update attachments count from server response (only when uploading to an existing incident)
+                    const attachmentsCount = body.attachments_count || null;
+                    if (attachmentsCount !== null && tableData[currentIncidentIndex]) {
+                        tableData[currentIncidentIndex].attachments_count = attachmentsCount;
+                        renderTable();
+                    }
+
+                    resolve(body);
+                } else {
+                    entry.status = 'error';
+                    updateFileUploadUI(entry.id);
+                    reject(body || { message: 'Upload failed' });
+                }
+            };
+
+            xhr.onerror = function () {
+                entry.xhr = null;
+                entry.status = 'error';
+                updateFileUploadUI(entry.id);
+                reject({ message: 'Network error' });
+            };
+
+            xhr.onabort = function () {
+                entry.xhr = null;
+                entry.status = 'cancelled';
+                updateFileUploadUI(entry.id);
+                reject({ message: 'Cancelled' });
+            };
+
+            try {
+                xhr.send(formData);
+            } catch (err) {
+                entry.xhr = null;
+                entry.status = 'error';
+                updateFileUploadUI(entry.id);
+                reject(err);
+            }
+        });
+    }
+
+    function cancelFileUpload(id) {
+        const entry = currentUploadFiles.find(x => x.id === id);
+        if (!entry) return;
+        // If it is currently uploading, abort XHR
+        if (entry.xhr && entry.status === 'uploading') {
+            try { entry.xhr.abort(); } catch (e) { /* ignore */ }
+            return;
+        }
+
+        // If this was a successful temp upload, request server to remove the temp file
+        if (entry.status === 'success' && entry.sessionToken && entry.storedName) {
+            const csrfToken = getCookie('csrf_cookie_name');
+            fetch(tempAttachmentRemoveUrl, {
+                method: 'POST',
+                headers: csrfToken ? { 'X-CSRF-TOKEN': csrfToken } : {},
+                body: new URLSearchParams({ session_token: entry.sessionToken, stored_name: entry.storedName })
+            }).then(r => r.json()).then(() => {
+                entry.status = 'cancelled';
+                updateFileUploadUI(entry.id);
+            }).catch(() => {
+                entry.status = 'error';
+                updateFileUploadUI(entry.id);
+            });
+            return;
+        }
+
+        if (entry.status === 'queued') {
+            entry.status = 'cancelled';
+            updateFileUploadUI(entry.id);
+            return;
+        }
+
+        // If already uploaded to final incident, user should delete via attachment viewer — do not allow here
+        if (entry.status === 'success' && !entry.sessionToken) {
+            showIncidentFormMessage('This file is already attached to the incident. Remove it from the attachment viewer instead.', 'warning');
+            return;
+        }
+    }
+
+    function retryFileUpload(id) {
+        const entry = currentUploadFiles.find(x => x.id === id);
+        if (!entry) return Promise.reject(new Error('Entry not found'));
+        if (entry.status === 'error' || entry.status === 'cancelled') {
+            entry.status = 'queued';
+            entry.progress = 0;
+            updateFileUploadUI(entry.id);
+            return startFileUploadEntry(entry, tableData[currentIncidentIndex] ? tableData[currentIncidentIndex].N : null);
+        }
+        return Promise.reject(new Error('Cannot retry in current state'));
+    }
+
+    function cancelSingleUpload(id) { cancelFileUpload(id); }
+    function retrySingleUpload(id) { retryFileUpload(id).catch(err => showIncidentFormMessage(err.message || 'Retry failed', 'danger')); }
+
+    function cancelAllUploads() {
+        currentUploadFiles.forEach(f => {
+            if (f.status === 'uploading' && f.xhr) {
+                try { f.xhr.abort(); } catch (e) { /* ignore */ }
+            } else if (f.status === 'queued') {
+                f.status = 'cancelled';
+            }
+        });
+        renderUploadFileList();
+        updateOverallProgress();
+    }
+
+    async function clearUploadFileList() {
+        // If we have temp-uploaded files on the server, try to remove them
+        const toRemove = currentUploadFiles.filter(f => f.status === 'success' && f.sessionToken && f.storedName);
+        const csrfToken = getCookie('csrf_cookie_name');
+        for (const f of toRemove) {
+            try {
+                await fetch(tempAttachmentRemoveUrl, {
+                    method: 'POST',
+                    headers: csrfToken ? { 'X-CSRF-TOKEN': csrfToken } : {},
+                    body: new URLSearchParams({ session_token: f.sessionToken, stored_name: f.storedName })
+                });
+            } catch (e) {
+                // ignore individual failures
+            }
+        }
+
+        currentUploadFiles = [];
+        currentAttachmentSession = '';
+        renderUploadFileList();
+        hideUploadProgress();
+    }
+
+    function updateOverallProgress() {
+        if (!currentUploadFiles || currentUploadFiles.length === 0) {
+            hideUploadProgress();
+            return;
+        }
+        const total = currentUploadFiles.length;
+        const sum = currentUploadFiles.reduce((acc, f) => acc + (f.progress || (f.status === 'success' ? 100 : 0)), 0);
+        const avg = Math.round(sum / total);
+        showUploadProgress(avg);
+    }
+
+    // small helpers
+    function escapeHtml(s) { return String(s).replace(/[&<>\"'`]/g, function (m) { return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;' })[m]; }); }
+    function formatBytes(bytes) { if (bytes === 0) return '0 B'; const sizes = ['B','KB','MB','GB','TB']; const i = Math.floor(Math.log(bytes)/Math.log(1024)); return (bytes/Math.pow(1024,i)).toFixed(1) + ' ' + sizes[i]; }
+
     document.addEventListener('DOMContentLoaded', function() {
         if (pageSizeSelect) {
             pageSize = parseInt(pageSizeSelect.value, 10) || pageSize;
@@ -653,6 +999,15 @@
                 }
             });
         }
+
+        // Clear inline incident-form messages when user edits fields inside the modal
+        incidentFieldMap.forEach(field => {
+            const el = document.getElementById(field.id);
+            if (el) {
+                el.addEventListener('input', hideIncidentFormMessage);
+                el.addEventListener('change', hideIncidentFormMessage);
+            }
+        });
 
         if (serverRows.length > 0) {
             tableData = serverRows.map(mapServerRow);
@@ -858,12 +1213,27 @@
             incidentModalLabel.textContent = isEdit ? `Edit Incident ${row && row['N'] ? '#' + row['N'] : ''}` : 'Add Incident';
         }
 
+        // clear any previous inline message
+        const incidentFormAlert = document.getElementById('incidentFormAlert');
+        if (incidentFormAlert) {
+            incidentFormAlert.textContent = '';
+            incidentFormAlert.classList.add('d-none');
+        }
+
         if (incidentSaveButton) {
             incidentSaveButton.textContent = isEdit ? 'Update Incident' : 'Add Incident';
         }
 
         if (incidentAttachmentsInput) {
             incidentAttachmentsInput.value = '';
+        }
+
+        // Reset any pre-save attachment session when opening the modal to add a new incident
+        if (!isEdit) {
+            currentAttachmentSession = '';
+            currentUploadFiles = [];
+            renderUploadFileList();
+            hideUploadProgress();
         }
 
         updateIncidentAttachmentSection(row);
@@ -891,9 +1261,15 @@
         const isLocal = !!(row && row._local);
         const canUpload = hasIncident && !isLocal;
 
-        incidentAttachmentHint.textContent = canUpload
-            ? 'Upload photos or documents for this incident.'
-            : 'Save the incident to the database before uploading attachments.';
+        // Show hint for saved incidents, or indicate pre-saved uploaded files when adding
+        if (canUpload) {
+            incidentAttachmentHint.textContent = 'Upload photos or documents for this incident.';
+        } else if (currentAttachmentSession && currentUploadFiles && currentUploadFiles.length > 0) {
+            const uploadedCount = currentUploadFiles.filter(f => f.status === 'success').length;
+            incidentAttachmentHint.textContent = `${uploadedCount} file(s) uploaded (will be attached when you save the incident).`;
+        } else {
+            incidentAttachmentHint.textContent = 'Save the incident to the database before uploading attachments.';
+        }
 
         if (incidentAttachmentStatus) {
             const count = row && row.attachments_count ? row.attachments_count : 0;
@@ -917,7 +1293,7 @@
             if (genderInput && genderInput.value) {
                 const gender = genderInput.value;
                 if (gender !== 'Male' && gender !== 'Female' && gender !== '') {
-                    alert('Sex must be "Male" or "Female" only!');
+                    showIncidentFormMessage('Sex must be "Male" or "Female" only!', 'danger');
                     return;
                 }
             }
@@ -934,26 +1310,41 @@
             row[field.column] = input.value;
         });
 
-        if (isEdit && row['N']) {
-            // Map frontend fields to backend/database fields
-            function mapIncidentFields(row) {
-                return {
-                    month_of_incident: row['Month of Incident'],
-                    year_of_incident: row['Year of Incident'],
-                    province: row['Province'],
-                    municipality: row['Municipality/City where Incidence Occurred'],
-                    name_of_victim: row['Name of Victim'],
-                    location_category: row['Location Category'],
-                    age: row['Age of the Person'],
-                    gender: row['Gender of the Person'],
-                    occasion: row['Occasion'],
-                    factors: row['Other Factors'],
-                    residence: row["Person's Residence"],
-                    occupation: row['Occupation of the Victim'],
-                    remarks: row['Remarks'],
-                    // add other fields as needed
-                };
+        // Map frontend fields to backend/database fields (used for both create and update)
+        function mapIncidentFields(row) {
+            return {
+                month_of_incident: row['Month of Incident'],
+                year_of_incident: row['Year of Incident'],
+                province: row['Province'],
+                municipality: row['Municipality/City where Incidence Occurred'],
+                name_of_victim: row['Name of Victim'],
+                location_category: row['Location Category'],
+                age: row['Age of the Person'],
+                gender: row['Gender of the Person'],
+                occasion: row['Occasion'],
+                factors: row['Other Factors'],
+                residence: row["Person's Residence"],
+                occupation: row['Occupation of the Victim'],
+                remarks: row['Remarks'],
+            };
+        }
+
+        // Client-side validation: ensure required fields are present before adding/saving
+        const requiredCols = ['Month of Incident', 'Year of Incident', 'Province', 'Municipality/City where Incidence Occurred'];
+        const missing = requiredCols.filter(c => !row[c] || String(row[c]).trim() === '');
+        if (missing.length) {
+            showIncidentFormMessage('Please fill Month, Year, Province and Municipality/City before saving the incident.', 'warning');
+            // focus first missing input (if present)
+            const firstMissing = missing[0];
+            const fieldMap = incidentFieldMap.find(f => f.column === firstMissing);
+            if (fieldMap) {
+                const el = document.getElementById(fieldMap.id);
+                if (el) el.focus();
             }
+            return;
+        }
+
+        if (isEdit && row['N']) {
             try {
                 // Get CSRF token from meta tag
                 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
@@ -968,18 +1359,84 @@
                 });
                 const result = await response.json();
                 if (!response.ok) {
-                    alert(result.message || 'Update failed.');
+                    showIncidentFormMessage(result.message || 'Update failed.', 'danger');
                     return;
                 }
             } catch (error) {
-                alert('Update failed: ' + error.message);
+                showIncidentFormMessage('Update failed: ' + error.message, 'danger');
                 return;
             }
         }
 
         if (!isEdit) {
-            tableData.push(row);
-            currentPage = getTotalPages();
+            // Persist new incident to server immediately (so it won't be lost on refresh)
+            try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                const mappedData = mapIncidentFields(row);
+                // include any pre-save attachment session so server can associate temp files
+                if (currentAttachmentSession) {
+                    mappedData.attachment_session = currentAttachmentSession;
+                }
+                const resp = await fetch('/incident-report/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify(mappedData)
+                });
+
+                const result = await resp.json();
+                if (!resp.ok) {
+                    showIncidentFormMessage(result.message || 'Failed to save incident to server.', 'danger');
+                    return;
+                }
+
+                const server = result.incident || {};
+
+                // Update local row with authoritative values from server
+                row['N'] = server.n || row['N'] || (tableData.length + 1);
+                row['Month of Incident'] = server.month_of_incident || row['Month of Incident'];
+                row['Year of Incident'] = server.year_of_incident || row['Year of Incident'];
+                row['Province'] = server.province || row['Province'];
+                row['Municipality/City where Incidence Occurred'] = server.municipality || row['Municipality/City where Incidence Occurred'];
+                // Prefer server-provided decrypted name when available; otherwise keep the user's input
+                if (server.name_of_victim !== undefined && server.name_of_victim !== null && String(server.name_of_victim).trim() !== '') {
+                    row['Name of Victim'] = server.name_of_victim;
+                }
+
+                row['Occupation of the Victim'] = server.occupation || row['Occupation of the Victim'];
+                row['review_status'] = server.review_status || 'pending';
+                row['attachments_count'] = server.attachments_count || 0;
+                row._local = false;
+
+                // Merge into existing local row if present (don't overwrite non-empty client values with empty server values)
+                const existingIndex = tableData.findIndex(r => String(r['N']) === String(row['N']));
+                if (existingIndex >= 0) {
+                    tableData[existingIndex] = Object.assign({}, tableData[existingIndex], row);
+                    currentIncidentIndex = existingIndex;
+                } else {
+                    tableData.push(row);
+                    currentIncidentIndex = tableData.findIndex(r => String(r['N']) === String(row['N']));
+                }
+                currentPage = getTotalPages();
+
+                // If there was a pre-save attachment session, server already associated those temp files with the new incident.
+                if (currentAttachmentSession) {
+                    // server moved temp files into the created incident; clear client-side temp state
+                    currentAttachmentSession = '';
+                    currentUploadFiles = [];
+                    renderUploadFileList();
+                }
+
+                // If the user selected files but didn't upload them pre-save, upload them now to the newly created incident
+                if (!currentAttachmentSession && incidentAttachmentsInput && incidentAttachmentsInput.files && incidentAttachmentsInput.files.length > 0) {
+                    await uploadIncidentAttachments();
+                }
+            } catch (err) {
+                showIncidentFormMessage('Save failed: ' + (err.message || err), 'danger');
+                return;
+            }
         } else {
             tableData[currentIncidentIndex] = row;
         }
@@ -1458,49 +1915,57 @@
     }
 
     async function uploadIncidentAttachments() {
-        if (currentIncidentIndex === null) {
-            showAttachmentModal('Please save the incident before uploading attachments.');
-            return;
-        }
+        // Allow uploading attachments while adding (pre-save) by uploading to a temporary session,
+        // or upload directly to an existing incident when present.
 
-        const row = tableData[currentIncidentIndex];
-        const incidentN = row ? row['N'] : null;
-        if (!incidentN || row._local) {
-            showAttachmentModal('Please save the incident to the database before uploading attachments.');
-            return;
-        }
+        const row = (currentIncidentIndex !== null) ? tableData[currentIncidentIndex] : null;
+        const incidentN = row && !row._local ? row['N'] : null;
+        const isPreSave = !incidentN; // true when adding a new incident or editing a local row
 
         if (!incidentAttachmentsInput || !incidentAttachmentsInput.files || incidentAttachmentsInput.files.length === 0) {
-            showAttachmentModal('Please select at least one file to upload.');
+            showIncidentFormMessage('Please select at least one file to upload.', 'warning');
             return;
         }
 
-        const formData = new FormData();
-        formData.append('incident_n', incidentN);
-        Array.from(incidentAttachmentsInput.files).forEach((file) => {
-            formData.append('attachments[]', file);
-        });
-
-        try {
-            const response = await fetch(attachmentUploadUrl, {
-                method: 'POST',
-                body: formData,
-            });
-            const result = await response.json();
-            if (!response.ok) {
-                showAttachmentModal(result.message || 'Upload failed.');
-                return;
-            }
-
-            row.attachments_count = result.attachments_count || row.attachments_count || 0;
-            row.review_status = 'pending';
-            incidentAttachmentsInput.value = '';
-            renderTable();
-            updateIncidentAttachmentSection(row);
-            showAttachmentModal('Attachments uploaded successfully.');
-        } catch (error) {
-            showAttachmentModal('Upload failed: ' + error.message);
+        // Prevent starting another upload while one is in progress
+        if (currentUploadFiles.some(f => f.status === 'uploading')) {
+            showIncidentFormMessage('An upload is already in progress. Please wait or cancel it first.', 'warning');
+            return;
         }
+
+        // Initialize per-file state and session token for pre-save uploads
+        const files = Array.from(incidentAttachmentsInput.files);
+        if (isPreSave) {
+            currentAttachmentSession = currentAttachmentSession || String(Date.now()) + '-' + Math.floor(Math.random() * 10000);
+        }
+
+        currentUploadFiles = files.map((file, idx) => ({ id: String(Date.now()) + '-' + idx, file: file, progress: 0, status: 'queued', xhr: null, sessionToken: (isPreSave ? currentAttachmentSession : null) }));
+        renderUploadFileList();
+        showUploadProgress(0);
+        setButtonLoading(incidentUploadButton, true, 'Uploading...');
+
+        // Start uploads in parallel (one XHR per file)
+        const uploadPromises = currentUploadFiles.map(entry => startFileUploadEntry(entry, incidentN).catch(err => err));
+
+        const results = await Promise.allSettled(uploadPromises);
+
+        // After uploads finish (success or failure), update UI and clear input
+        const anySuccess = results.some(r => r.status === 'fulfilled');
+        if (anySuccess) {
+            if (!isPreSave && row) {
+                row.review_status = 'pending';
+                renderTable();
+                updateIncidentAttachmentSection(row);
+            }
+            showAttachmentModal('Attachments uploaded.');
+            showIncidentFormMessage('Attachments uploaded.', 'success');
+            setTimeout(hideIncidentFormMessage, 2000);
+        }
+
+        // Keep file list visible so user can retry failed ones; clear file input
+        incidentAttachmentsInput.value = '';
+        updateOverallProgress();
+        setButtonLoading(incidentUploadButton, false);
     }
 
     async function performReview(incidentN, action) {

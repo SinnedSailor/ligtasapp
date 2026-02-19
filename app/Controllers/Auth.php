@@ -30,15 +30,27 @@ class Auth extends BaseController
             return redirect()->back()->with('error', 'Please provide email/username and password');
         }
 
-        // Check user in database by email or username
+        // Check user in database by email (hashed) or username
         $userModel = new UserModel();
-        $user = $userModel->select('users.*, roles.name as role_name')
-            ->join('roles', 'roles.id = users.role_id', 'left')
-            ->groupStart()
-                ->where('users.email', $emailOrUsername)
-                ->orWhere('users.username', $emailOrUsername)
-            ->groupEnd()
-            ->first();
+
+        // If input looks like an email, compute deterministic hash and compare to stored hashed email
+        if (strpos($emailOrUsername, '@') !== false) {
+            $key = env('encryption.key') ?: (getenv('encryption.key') ?: 'CHANGE_ME__SET_ENCRYPTION_KEY');
+            $emailHash = hash_hmac('sha256', mb_strtolower(trim($emailOrUsername)), $key);
+
+            $user = $userModel->select('users.*, roles.name as role_name')
+                ->join('roles', 'roles.id = users.role_id', 'left')
+                ->groupStart()
+                    ->where('users.email_hash', $emailHash)
+                    ->orWhere('users.username', $emailOrUsername)
+                ->groupEnd()
+                ->first();
+        } else {
+            $user = $userModel->select('users.*, roles.name as role_name')
+                ->join('roles', 'roles.id = users.role_id', 'left')
+                ->where('users.username', $emailOrUsername)
+                ->first();
+        }
 
         if (!$user) {
             return redirect()->back()->with('error', 'Invalid email/username or password');
@@ -49,10 +61,17 @@ class Auth extends BaseController
             return redirect()->back()->with('error', 'Invalid email/username or password');
         }
 
+        // Decrypt user fields for session display
+        $userModel = new \App\Models\UserModel();
+        $user = $userModel->decryptUserRow($user);
+
+        // Prefer decrypted plaintext email (from `email_enc`) for session storage if available
+        $emailPlain = $userModel->decryptValue($user['email_enc'] ?? '');
+
         // Store session data
         session()->set([
             'user_id' => $user['id'],
-            'email' => $user['email'],
+            'email' => $emailPlain ?: ($user['email'] ?? ''),
             'username' => $user['username'],
             'first_name' => $user['first_name'],
             'last_name' => $user['last_name'],
@@ -86,6 +105,9 @@ class Auth extends BaseController
 
     public function store_register()
     {
+        // Log incoming POST for debugging when validation fails in the UI
+        log_message('debug', '[Auth::store_register] POST keys: ' . json_encode(array_keys($this->request->getPost())));
+
         $data = [
             'first_name' => $this->request->getPost('first_name'),
             'last_name' => $this->request->getPost('last_name'),
@@ -119,12 +141,37 @@ class Auth extends BaseController
 
         // Save to database
         $userModel = new UserModel();
-        
-        if (!$userModel->insert($data)) {
+
+        // Validate incoming plaintext against the model's rules BEFORE we remove plaintext fields.
+        $valid = $userModel->validate($data);
+        log_message('debug', '[Auth::store_register] model->validate => ' . ($valid ? 'true' : 'false'));
+        if (! $valid) {
             $errors = $userModel->errors();
+            log_message('debug', '[Auth::store_register] validation errors: ' . json_encode($errors));
+            $errorMessage = is_array($errors) ? implode(', ', $errors) : 'Validation failed';
+            return redirect()->back()->with('error', $errorMessage)->withInput();
+        }
+
+        // Ensure email uniqueness using the deterministic hash lookup
+        if ($userModel->getUserByEmail($data['email'])) {
+            return redirect()->back()->with('error', 'This email is already registered.')->withInput();
+        }
+
+        // Prepare encrypted PII and remove plaintext keys (DB stores encrypted PII only)
+        $data = $userModel->prepareForInsert($data);
+
+        // We've already validated plaintext — skip validation for the insert since
+        // validation rules require plaintext fields that are intentionally removed.
+        $userModel->skipValidation(true);
+
+        $insertId = $userModel->insert($data);
+        if ($insertId === false) {
+            $errors = $userModel->errors();
+            log_message('debug', '[Auth::store_register] insert failed, errors: ' . json_encode($errors));
             $errorMessage = is_array($errors) ? implode(', ', $errors) : 'Registration failed';
             return redirect()->back()->with('error', $errorMessage)->withInput();
         }
+        log_message('debug', '[Auth::store_register] user inserted id=' . (int) $insertId);
 
         return redirect()->to('/login')->with('success', 'Registration successful! Please log in.');
     }
@@ -183,6 +230,13 @@ class Auth extends BaseController
             ->get()
             ->getResultArray();
 
+        // Decrypt victim names for display when possible
+        $incidentModel = new \App\Models\IncidentReportModel();
+        foreach ($rows as &$r) {
+            $r = $incidentModel->decryptRow($r);
+        }
+        unset($r);
+
         return view('incident_report', [
             'initialRows' => $rows,
             'roleName' => strtoupper(trim((string) session()->get('role_name'))),
@@ -210,6 +264,9 @@ class Auth extends BaseController
         $userModel = new UserModel();
         $userId = (int) session()->get('user_id');
         $profile = $userModel->find($userId) ?? [];
+        if (!empty($profile)) {
+            $profile = $userModel->decryptUserRow($profile);
+        }
 
         return view('user_profile', [
             'provinces' => $this->getRegion1Provinces(),
@@ -256,6 +313,9 @@ class Auth extends BaseController
             return redirect()->back()->with('error', 'This username is already taken.')->withInput();
         }
 
+        // Ensure encrypted PII columns are set when users update their profile.
+        $data = $userModel->prepareForInsert($data);
+
         $userModel->skipValidation(true);
         if (!$userModel->update($userId, $data)) {
             $errors = $userModel->errors();
@@ -263,13 +323,17 @@ class Auth extends BaseController
             return redirect()->back()->with('error', $errorMessage)->withInput();
         }
 
+        // Update session using decrypted values where available
+        $profile = $userModel->find($userId);
+        $profile = $userModel->decryptUserRow($profile);
+
         session()->set([
-            'first_name' => $data['first_name'],
-            'last_name' => $data['last_name'],
-            'username' => $data['username'],
-            'province' => $data['province'],
-            'municipality' => $data['municipality'],
-            'contact_number' => $data['contact_number'],
+            'first_name' => $profile['first_name'] ?? '',
+            'last_name' => $profile['last_name'] ?? '',
+            'username' => $profile['username'] ?? '',
+            'province' => $profile['province'] ?? '',
+            'municipality' => $profile['municipality'] ?? '',
+            'contact_number' => $profile['contact_number'] ?? '',
         ]);
 
         return redirect()->to('/user-profile')->with('profile_success', 'Profile updated successfully!');

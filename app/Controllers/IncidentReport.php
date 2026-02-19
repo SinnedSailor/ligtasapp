@@ -51,6 +51,172 @@ class IncidentReport extends BaseController
         ]);
     }
 
+    /**
+     * Create a single incident (used by UI Add Incident -> Save)
+     * Accepts JSON body with DB field names (month_of_incident, year_of_incident, province, municipality, name_of_victim, ...)
+     */
+    public function createIncident()
+    {
+        if (!session()->get('logged_in')) {
+            return $this->response->setStatusCode(401)->setJSON([
+                'message' => 'Unauthorized.'
+            ]);
+        }
+
+        $roleName = strtoupper(trim((string) session()->get('role_name')));
+        $isAdmin = (bool) session()->get('is_admin');
+        // Allow LGU users and administrators to create incidents (UI already shows Add Incident to admins)
+        if ($roleName !== 'LGU' && !$isAdmin) {
+            return $this->response->setStatusCode(403)->setJSON([
+                'message' => 'Only LGU users or administrators can create incidents.'
+            ]);
+        }
+
+        $data = $this->request->getJSON(true);
+        if (!is_array($data)) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'message' => 'Invalid payload.'
+            ]);
+        }
+
+        // Basic required fields
+        $required = ['month_of_incident', 'year_of_incident', 'province', 'municipality'];
+        foreach ($required as $f) {
+            if (!isset($data[$f]) || $data[$f] === '') {
+                return $this->response->setStatusCode(400)->setJSON([
+                    'message' => 'Missing required fields.'
+                ]);
+            }
+        }
+
+        $monthValue = $this->toInt($data['month_of_incident']);
+        if ($monthValue === null || $monthValue < 1 || $monthValue > 12) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'message' => 'Invalid month_of_incident (must be 1-12).'
+            ]);
+        }
+
+        // Normalize incoming payload similar to import/mapRow
+        $mapped = [];
+        // assign next available incident number (n) — required by DB
+        $mapped['n'] = $this->getNextIncidentNumber();
+        $mapped['month_of_incident'] = $this->toString($data['month_of_incident'] ?? '');
+        $mapped['year_of_incident'] = $this->toInt($data['year_of_incident'] ?? null);
+        $mapped['province'] = $this->toString($data['province'] ?? '');
+        $mapped['municipality'] = $this->toString($data['municipality'] ?? '');
+        $mapped['name_of_victim'] = $this->toString($data['name_of_victim'] ?? '');
+        $mapped['location_category'] = $this->toString($data['location_category'] ?? '');
+        $mapped['age'] = $this->toInt($data['age'] ?? null);
+        $mapped['gender'] = $this->normalizeGender($data['gender'] ?? '');
+        $mapped['occasion'] = $this->toString($data['occasion'] ?? '');
+        $mapped['factors'] = $this->toString($data['factors'] ?? '');
+        $mapped['residence'] = $this->toString($data['residence'] ?? '');
+        $mapped['occupation'] = $this->toString($data['occupation'] ?? '');
+        $mapped['remarks'] = $this->toString($data['remarks'] ?? '');
+
+        $mapped['row_hash'] = $this->hashRow($mapped);
+
+        // Avoid duplicates: if row with same hash exists, return it instead of inserting
+        $existing = $this->incidentReportModel->where('row_hash', $mapped['row_hash'])->first();
+        if ($existing) {
+            $existing = $this->incidentReportModel->decryptRow($existing);
+            return $this->response->setJSON([
+                'message' => 'Incident already exists.',
+                'incident' => $existing,
+            ]);
+        }
+
+        // Insert and return created row
+        $insertId = $this->incidentReportModel->insert($mapped);
+        if ($insertId === false) {
+            $errors = $this->incidentReportModel->errors();
+            return $this->response->setStatusCode(500)->setJSON([
+                'message' => 'Insert failed.',
+                'errors' => $errors,
+            ]);
+        }
+
+        $created = $this->incidentReportModel->find($insertId);
+        if ($created) {
+            $created = $this->incidentReportModel->decryptRow($created);
+
+            // If client provided an attachment session, move those temp files into the new incident
+            $sessionToken = isset($data['attachment_session']) ? trim((string) $data['attachment_session']) : '';
+            if ($sessionToken !== '') {
+                $tmpDir = WRITEPATH . 'uploads/incident_reports/tmp/' . $sessionToken;
+                if (is_dir($tmpDir)) {
+                    $files = array_values(array_filter(scandir($tmpDir), function ($f) use ($tmpDir) {
+                        return is_file($tmpDir . DIRECTORY_SEPARATOR . $f) && substr($f, -5) !== '.json';
+                    }));
+
+                    $attachmentModel = new \App\Models\IncidentReportAttachmentModel();
+                    $saved = 0;
+
+                    $destDir = WRITEPATH . 'uploads/incident_reports/' . $created['n'];
+                    if (!is_dir($destDir)) mkdir($destDir, 0775, true);
+
+                    foreach ($files as $fileName) {
+                        $metaPath = $tmpDir . DIRECTORY_SEPARATOR . $fileName . '.json';
+                        $meta = [];
+                        if (is_file($metaPath)) {
+                            $content = file_get_contents($metaPath);
+                            $meta = json_decode($content, true) ?: [];
+                        }
+
+                        $origName = $meta['original_name'] ?? $fileName;
+                        $mimeType = $meta['mime_type'] ?? mime_content_type($tmpDir . DIRECTORY_SEPARATOR . $fileName);
+                        $size = $meta['size_bytes'] ?? filesize($tmpDir . DIRECTORY_SEPARATOR . $fileName);
+
+                        $destName = $fileName;
+                        // move
+                        rename($tmpDir . DIRECTORY_SEPARATOR . $fileName, $destDir . DIRECTORY_SEPARATOR . $destName);
+
+                        $storedPath = 'incident_reports/' . $created['n'] . '/' . $destName;
+
+                        $fileKind = str_starts_with($mimeType, 'image/') ? 'photo' : 'document';
+
+                        $attachmentModel->insert([
+                            'incident_n' => $created['n'],
+                            'file_kind' => $fileKind,
+                            'original_name' => $origName,
+                            'stored_name' => $destName,
+                            'stored_path' => $storedPath,
+                            'mime_type' => $mimeType,
+                            'size_bytes' => (int) $size,
+                            'uploaded_by' => (int) session()->get('user_id'),
+                        ]);
+
+                        // remove meta file if exists
+                        if (is_file($metaPath)) @unlink($metaPath);
+                        $saved++;
+                    }
+
+                    // remove tmp dir if empty
+                    @rmdir($tmpDir);
+                }
+
+                // refresh attachments count
+                $attachmentModel = new \App\Models\IncidentReportAttachmentModel();
+                $count = $attachmentModel->where('incident_n', $created['n'])->countAllResults();
+                $created['attachments_count'] = $count;
+            } else {
+                // Count attachments (should be 0 for newly created)
+                $attachmentModel = new \App\Models\IncidentReportAttachmentModel();
+                $count = $attachmentModel->where('incident_n', $created['n'])->countAllResults();
+                $created['attachments_count'] = $count;
+            }
+        }
+
+        return $this->response->setJSON([
+            'message' => 'Incident created.',
+            'incident' => $created,
+        ]);
+    }
+
+    /**
+     * Generate incident report (excluding victim names)
+     * Returns JSON or downloadable file (CSV)
+     */
         /**
          * Generate incident report (excluding victim names)
          * Returns JSON or downloadable file (CSV)
@@ -328,6 +494,106 @@ class IncidentReport extends BaseController
             'message' => 'Attachments uploaded successfully.',
             'attachments_count' => $count,
         ]);
+    }
+
+    /**
+     * Upload attachments to a temporary session (used before an incident is created)
+     * POST fields: attachments[], session_token (optional)
+     * Returns: { session_token, files: [{ original_name, stored_name, mime_type, size_bytes }] }
+     */
+    public function uploadTempAttachment()
+    {
+        if (!session()->get('logged_in')) {
+            return $this->response->setStatusCode(401)->setJSON(['message' => 'Unauthorized.']);
+        }
+
+        $roleName = strtoupper(trim((string) session()->get('role_name')));
+        if ($roleName !== 'LGU') {
+            return $this->response->setStatusCode(403)->setJSON(['message' => 'Only LGU users can upload incident attachments.']);
+        }
+
+        $sessionToken = $this->request->getPost('session_token') ?: bin2hex(random_bytes(12));
+        $files = $this->request->getFileMultiple('attachments');
+        if (!$files) {
+            return $this->response->setStatusCode(400)->setJSON(['message' => 'Please upload at least one file.']);
+        }
+
+        $allowedTypes = [
+            'image/jpeg',
+            'image/png',
+            'application/pdf',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        ];
+
+        $tmpDir = WRITEPATH . 'uploads/incident_reports/tmp/' . $sessionToken;
+        if (!is_dir($tmpDir)) mkdir($tmpDir, 0775, true);
+
+        $uploaded = [];
+        foreach ($files as $file) {
+            if (!$file || !$file->isValid() || $file->hasMoved()) {
+                continue;
+            }
+            $mime = $file->getClientMimeType();
+            if (!in_array($mime, $allowedTypes, true)) {
+                continue;
+            }
+
+            $stored = $file->getRandomName();
+            $file->move($tmpDir, $stored);
+
+            $meta = [
+                'original_name' => $file->getClientName(),
+                'mime_type' => $mime,
+                'size_bytes' => $file->getSize(),
+                'uploaded_by' => (int) session()->get('user_id'),
+                'created_at' => date('Y-m-d H:i:s'),
+            ];
+            @file_put_contents($tmpDir . DIRECTORY_SEPARATOR . $stored . '.json', json_encode($meta));
+
+            $uploaded[] = [
+                'original_name' => $meta['original_name'],
+                'stored_name' => $stored,
+                'mime_type' => $meta['mime_type'],
+                'size_bytes' => $meta['size_bytes'],
+            ];
+        }
+
+        if (empty($uploaded)) {
+            return $this->response->setStatusCode(400)->setJSON(['message' => 'No valid files were uploaded.']);
+        }
+
+        return $this->response->setJSON(['session_token' => $sessionToken, 'files' => $uploaded]);
+    }
+
+    /**
+     * Remove a temporary attachment previously uploaded with a session token.
+     * POST: session_token, stored_name
+     */
+    public function removeTempAttachment()
+    {
+        if (!session()->get('logged_in')) {
+            return $this->response->setStatusCode(401)->setJSON(['message' => 'Unauthorized.']);
+        }
+
+        $roleName = strtoupper(trim((string) session()->get('role_name')));
+        if ($roleName !== 'LGU') {
+            return $this->response->setStatusCode(403)->setJSON(['message' => 'Only LGU users can remove attachments.']);
+        }
+
+        $sessionToken = $this->request->getPost('session_token') ?: '';
+        $storedName = $this->request->getPost('stored_name') ?: '';
+        if ($sessionToken === '' || $storedName === '') {
+            return $this->response->setStatusCode(400)->setJSON(['message' => 'Missing parameters.']);
+        }
+
+        $path = WRITEPATH . 'uploads/incident_reports/tmp/' . $sessionToken . DIRECTORY_SEPARATOR . $storedName;
+        $metaPath = $path . '.json';
+        $deleted = false;
+        if (is_file($path)) { @unlink($path); $deleted = true; }
+        if (is_file($metaPath)) { @unlink($metaPath); }
+
+        return $this->response->setJSON(['deleted' => $deleted]);
     }
 
     public function approve(int $incidentN)

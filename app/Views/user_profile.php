@@ -194,11 +194,11 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="firstName">First Name *</label>
-                            <input type="text" class="form-control" id="firstName" name="first_name" value="<?= esc($profile['first_name'] ?? session()->get('first_name') ?? '') ?>" required oninput="this.value = this.value.toUpperCase()">
+                            <input type="text" class="form-control" id="firstName" name="first_name" value="<?= esc($profile['first_name'] ?? session()->get('first_name') ?? '') ?>" required onblur="this.value = this.value.replace(/\s+/g, ' ').trim().split(' ').map(function(w){ return w ? (w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()) : ''; }).join(' ')">
                         </div>
                         <div class="form-group">
                             <label for="lastName">Last Name *</label>
-                            <input type="text" class="form-control" id="lastName" name="last_name" value="<?= esc($profile['last_name'] ?? session()->get('last_name') ?? '') ?>" required oninput="this.value = this.value.toUpperCase()">
+                            <input type="text" class="form-control" id="lastName" name="last_name" value="<?= esc($profile['last_name'] ?? session()->get('last_name') ?? '') ?>" required onblur="this.value = this.value.replace(/\s+/g, ' ').trim().split(' ').map(function(w){ return w ? (w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()) : ''; }).join(' ')">
                         </div>
                     </div>
                     <div class="form-row">
