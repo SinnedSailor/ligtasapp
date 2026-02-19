@@ -20,8 +20,8 @@
   <!-- Stats (responsive: horizontal scroll on small screens, grid on md+) -->
   <section class="mb-8">
     <div class="overflow-x-auto sm:overflow-visible -mx-4 sm:mx-0 px-4 sm:px-0">
-      <div class="grid grid-flow-col sm:grid-flow-row auto-cols-[minmax(220px,1fr)] sm:auto-cols-auto gap-6">
-    <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
+      <div class="flex gap-6 sm:grid sm:grid-cols-2 md:grid-cols-4">
+    <div class="w-56 shrink-0 sm:w-auto bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
       <div class="flex items-start justify-between gap-4">
         <div>
           <div class="text-sm text-slate-500">Total Incidents</div>
@@ -32,7 +32,7 @@
       </div>
     </div>
 
-    <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
+    <div class="w-56 shrink-0 sm:w-auto bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
       <div class="flex items-start justify-between gap-4">
         <div>
           <div class="text-sm text-slate-500">Total Fatalities</div>
@@ -43,7 +43,7 @@
       </div>
     </div>
 
-    <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
+    <div class="w-56 shrink-0 sm:w-auto bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
       <div class="flex items-start justify-between gap-4">
         <div>
           <div class="text-sm text-slate-500">Highest Risk Province</div>
@@ -54,7 +54,7 @@
       </div>
     </div>
 
-    <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
+    <div class="w-56 shrink-0 sm:w-auto bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
       <div class="flex items-start justify-between gap-4">
         <div>
           <div class="text-sm text-slate-500">Most Affected Age Group</div>
