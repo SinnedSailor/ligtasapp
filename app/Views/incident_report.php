@@ -151,8 +151,8 @@
     <h3 class="page-title">Incident Report</h3>
 </div>
 
-<div class="px-0">
-    <div class="max-w-full bg-white rounded-2xl shadow p-6">
+<div class="px-4">
+    <div class="max-w-6xl mx-auto bg-white rounded-2xl shadow p-6">
         <h4 class="text-lg font-semibold">Data Management</h4>
         <div class="flex flex-wrap items-center gap-3 mt-4 mb-4">
             <div class="flex items-center gap-3">
@@ -218,9 +218,9 @@
             <button id="prevPage" type="button" class="px-3 py-1.5 border border-gray-300 rounded-md text-sm">Prev</button>
                     <button id="nextPage" type="button" class="px-3 py-1.5 border border-gray-300 rounded-md text-sm">Next</button>
                     <span class="page-info" id="pageInfo"></span>
-                    <div class="ms-auto d-flex align-items-center gap-2">
+                    <div class="ml-auto flex items-center gap-2">
                         <label class="page-info" for="pageSize">Rows per page</label>
-                        <select id="pageSize" class="form-select form-select-sm" style="width:auto;">
+                        <select id="pageSize" class="border border-gray-300 rounded-md text-sm px-2 py-1 bg-white" style="width:auto;">
                             <option value="5">5</option>
                             <option value="10" selected>10</option>
                             <option value="20">20</option>
@@ -276,7 +276,7 @@
 
 <!-- Attachment notice modal (Tailwind) -->
 <div id="attachmentModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40" aria-hidden="true">
-  <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-4 mx-4">
+  <div class="bg-white rounded-2xl shadow-lg max-w-md w-full p-4 mx-4">
     <div class="flex items-center justify-between mb-3">
       <h5 class="text-lg font-semibold">Upload Notice</h5>
       <button type="button" class="text-slate-400 hover:text-slate-600" onclick="hideModal('attachmentModal')" aria-label="Close">&times;</button>
@@ -288,7 +288,7 @@
 
 <!-- Review confirm modal (Tailwind) -->
 <div id="reviewConfirmModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40" aria-hidden="true">
-  <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-4 mx-4">
+  <div class="bg-white rounded-2xl shadow-lg max-w-md w-full p-4 mx-4">
     <div class="flex items-center justify-between mb-3">
       <h5 class="text-lg font-semibold">Confirm Review</h5>
       <button type="button" class="text-slate-400 hover:text-slate-600" onclick="hideModal('reviewConfirmModal')" aria-label="Close">&times;</button>
@@ -396,9 +396,9 @@
         <div class="border-t pt-3 mt-3" id="incidentAttachmentSection">
           <div class="flex items-center justify-between mb-2">
             <h6 class="mb-0">Attachments</h6>
-            <span class="text-muted text-sm" id="incidentAttachmentStatus"></span>
+            <span class="text-gray-500 text-sm" id="incidentAttachmentStatus"></span>
           </div>
-          <div class="text-muted text-sm" id="incidentAttachmentHint"></div>
+          <div class="text-gray-500 text-sm" id="incidentAttachmentHint"></div>
           <div class="flex flex-wrap gap-2 mt-2">
             <input type="file" id="incidentAttachments" class="block w-full text-sm text-slate-700" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx" multiple />
             <button type="button" id="incidentUploadButton" class="px-3 py-1.5 border border-indigo-600 text-indigo-600 rounded-md text-sm hover:bg-indigo-50" onclick="uploadIncidentAttachments()">Upload Attachments</button>
@@ -412,15 +412,15 @@
 
 <!-- Attachment viewer modal (Tailwind) -->
 <div id="attachmentViewerModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40" aria-hidden="true">
-  <div class="bg-white rounded-lg shadow-lg max-w-4xl w-full p-4 mx-4">
+  <div class="bg-white rounded-2xl shadow-lg max-w-4xl w-full p-4 mx-4">
     <div class="flex items-center justify-between mb-3">
       <h5 class="text-lg font-semibold">Incident Attachments</h5>
       <button type="button" class="text-slate-400 hover:text-slate-600" onclick="hideModal('attachmentViewerModal')" aria-label="Close">&times;</button>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div id="attachmentList" class="space-y-2 md:col-span-1"></div>
-      <div id="attachmentPreview" class="md:col-span-2 border rounded p-4 flex items-center justify-center" style="min-height:320px; background: #f8fafc;">
-        <span class="text-muted">Select a file to preview.</span>
+      <div id="attachmentPreview" class="md:col-span-2 border rounded-2xl p-4 flex items-center justify-center" style="min-height:320px; background: #f8fafc;">
+        <span class="text-gray-500">Select a file to preview.</span>
       </div>
     </div>
     <div class="flex justify-between items-center gap-2 mt-4">
@@ -746,11 +746,11 @@
 
             html += `<td>
                 <div><span class="status-pill ${statusClass}">${reviewStatus || 'pending'}</span></div>
-                <div class="text-muted" style="font-size:12px;">${attachmentsCount} file(s)</div>
+                <div class="text-gray-500 text-sm">${attachmentsCount} file(s)</div>
                 ${viewButton}
             </td>
             <td>
-                ${reviewControls || '<span class="text-muted">-</span>'}
+                ${reviewControls || '<span class="text-gray-500">-</span>'}
             </td>
             <td>
                 <button class="inline-flex items-center gap-2 px-3 py-1 bg-blue-800 text-white rounded text-sm" onclick="openIncidentModal(${index})">Edit</button>
@@ -1305,17 +1305,17 @@
             const downloadEl = document.getElementById('attachmentDownload');
 
             listEl.innerHTML = '';
-            previewEl.innerHTML = '<span class="text-muted">Select a file to preview.</span>';
+            previewEl.innerHTML = '<span class="text-gray-500">Select a file to preview.</span>';
             downloadEl.href = '#';
 
             if (attachments.length === 0) {
-                listEl.innerHTML = '<div class="text-muted">No attachments uploaded yet.</div>';
+                listEl.innerHTML = '<div class="text-gray-500 text-sm">No attachments uploaded yet.</div>'; 
             } else {
                 attachments.forEach((item, index) => {
                     const button = document.createElement('button');
                     button.type = 'button';
-                    button.className = 'list-group-item list-group-item-action';
-                    button.textContent = `${item.original_name} (${item.file_kind})`;
+                    button.className = 'w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md';
+                    button.textContent = `${item.original_name} (${item.file_kind})`; 
                     button.addEventListener('click', () => {
                         const viewUrl = `${attachmentViewUrl}/${item.id}`;
                         const downloadUrl = `${attachmentDownloadUrl}/${item.id}`;
@@ -1334,13 +1334,13 @@
                         } else {
                             previewEl.innerHTML = `
                                 <div class="text-center p-4">
-                                    <div class="text-muted mb-2">Preview not available for this file type.</div>
+                                    <div class="text-gray-500 mb-2">Preview not available for this file type.</div>
                                     <a class="inline-flex items-center gap-2 px-3 py-1.5 border border-blue-600 text-blue-600 rounded-md text-sm" href="${downloadUrl}" target="_blank" rel="noopener">Download ${item.original_name}</a>
                                 </div>
                             `;
                         }
 
-                        listEl.querySelectorAll('.list-group-item').forEach(el => el.classList.remove('active'));
+                        listEl.querySelectorAll('button').forEach(el => el.classList.remove('active'));
                         button.classList.add('active');
                     });
 
