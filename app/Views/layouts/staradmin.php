@@ -19,22 +19,25 @@
         }
 
         .navbar {
-            background: #002C76 !important;
+            background: rgba(255,255,255,0.85) !important;
+            backdrop-filter: blur(6px);
             position: fixed;
             width: 100%;
             z-index: 1030;
             min-height: 70px;
+            border-bottom: 1px solid rgba(15, 23, 42, 0.04);
+            box-shadow: 0 6px 24px rgba(2,6,23,0.04);
         }
 
         .navbar .navbar-brand-wrapper {
-            background: #002C76 !important;
+            background: transparent !important;
             height: 70px;
             display: flex;
             align-items: center;
         }
 
         .navbar .navbar-menu-wrapper {
-            background: #002C76 !important;
+            background: transparent !important;
             height: 70px;
             display: flex;
             align-items: center;
@@ -43,17 +46,17 @@
         .navbar .navbar-menu-wrapper h6,
         .navbar .navbar-nav .nav-link,
         .navbar .navbar-nav .nav-link i {
-            color: #f2fbff !important;
+            color: #0f172a !important; /* slate-900 */
         }
 
         .navbar .navbar-nav .nav-link:hover,
         .navbar .navbar-nav .nav-link:focus {
-            color: #002C76 !important;
+            color: #0f172a !important;
         }
 
         .navbar .navbar-nav .nav-link.active,
         .navbar .navbar-nav .show > .nav-link {
-            color: #002C76 !important;
+            color: #4f46e5 !important; /* indigo-600 accent */
         }
 
         .page-body-wrapper {
@@ -316,7 +319,7 @@
             font-size: 14px;
         }
         .container-scroller {
-            background: #D4F6FF !important;
+            background: linear-gradient(180deg,#fbfdff 0%, #f8fafc 100%) !important;
         }
     </style>
     <?= $this->renderSection('pageStyles') ?>
@@ -353,15 +356,28 @@
 
     <div class="container-scroller"> 
         <?php if (!$hideNavbar): ?>
-            <nav class="w-full fixed top-0 left-0 bg-slate-800 text-white px-4 py-3 shadow-sm z-40">
-                <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <nav class="w-full fixed top-4 left-0 z-40 px-4">
+                <div class="max-w-7xl mx-auto bg-white/80 backdrop-blur-md rounded-2xl px-4 py-3 shadow-md flex items-center justify-between gap-4">
                     <div class="flex items-center gap-4">
-                        <a class="text-lg font-bold tracking-wide" href="<?= base_url('/dashboard') ?>">LIGTAS</a>
-                        <span class="hidden md:inline text-slate-300">Local Incident Gathering and Tracking for Aquatic Safety</span>
+                        <a class="text-xl font-semibold text-slate-900 flex items-center gap-3" href="<?= base_url('/dashboard') ?>">
+                            <?= view('components/icon', ['name' => 'home', 'class' => 'w-6 h-6 text-indigo-600']) ?>
+                            <span>LIGTAS</span>
+                        </a>
+                        <p class="hidden md:block text-sm text-slate-500 mt-0.5">Local Incident Gathering &amp; Tracking</p>
                     </div>
-                    <div class="flex items-center gap-4">
-                        <button class="lg:hidden p-2 rounded-md bg-slate-700 hover:bg-slate-600" type="button" aria-label="Open menu"><?= view('components/icon', ['name' => 'menu', 'class' => 'w-5 h-5 text-white']) ?></button>
-                        <a href="#" id="logoutBtn" title="Log out" class="ml-3 text-white text-xl" style="display:flex;align-items:center;"><?= view('components/icon', ['name' => 'power', 'class' => 'w-5 h-5 text-white']) ?></a>
+
+                    <div class="flex items-center gap-3">
+                        <div class="relative hidden md:block">
+                            <div class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><?php echo view('components/icon', ['name' => 'search', 'class' => 'w-4 h-4']); ?></div>
+                            <input type="search" placeholder="Search incidents, provinces..." class="pl-10 pr-3 py-2 w-64 rounded-full border border-slate-200 text-sm bg-white/80 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+                        </div>
+
+                        <button class="px-3 py-2 bg-indigo-600 text-white rounded-full text-sm hover:bg-indigo-700">+ Incident</button>
+
+                        <div class="flex items-center gap-3">
+                            <div class="hidden sm:flex items-center gap-2 text-sm text-slate-600 pr-3 border-r border-slate-100"><?php echo esc(session()->get('role_name') ?? '') ?></div>
+                            <div class="w-9 h-9 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-semibold"><?= esc($initials) ?></div>
+                        </div>
                     </div>
                 </div>
             </nav>
