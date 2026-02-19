@@ -25,8 +25,6 @@ if (!function_exists('svg_icon')) {
             'trash'        => 'trash',
             'shield'       => 'shield-check',
             'check'        => 'check',
-            // logout icon (Heroicons)
-            'logout'       => 'arrow-right-on-rectangle',
         ];
 
         $heroName = $heroMap[$name] ?? null;

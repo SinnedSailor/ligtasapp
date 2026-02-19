@@ -8,16 +8,6 @@
     <!-- Tailwind (compiled) only -->
     <link rel="stylesheet" href="<?= base_url('assets/css/tailwind.css') ?>">
 
-    <style>
-        /* ensure topbar sits to the right of the sidebar on larger screens */
-        @media (min-width: 768px) {
-            .topbar-shift { left: 18rem !important; width: calc(100% - 18rem) !important; }
-        }
-        @media (min-width: 1024px) {
-            .topbar-shift { left: 16rem !important; width: calc(100% - 16rem) !important; }
-        }
-    </style>
-
     <?= $this->renderSection('pageStyles') ?>
 </head>
 <body class="antialiased bg-slate-50 text-slate-900 min-h-screen">
@@ -47,19 +37,36 @@
 
 <div class="container-scroller">
     <?php if (!$hideNavbar): ?>
-        <nav class="w-full fixed top-4 left-0 z-40 px-4 topbar-shift">
-            <div class="max-w-7xl mx-auto md:ml-72 lg:ml-64 bg-white/80 backdrop-blur-md rounded-2xl px-4 py-3 shadow-md flex items-center justify-end gap-4">
-                <a href="<?= base_url('/logout') ?>" class="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900">
-                    <?= svg_icon('logout', 'w-5 h-5') ?>
-                    <span class="sr-only">Logout</span>
-                </a>
+        <nav class="w-full fixed top-4 left-0 z-40 px-4">
+            <div class="max-w-7xl mx-auto bg-white/80 backdrop-blur-md rounded-2xl px-4 py-3 shadow-md flex items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <a class="text-xl font-semibold text-slate-900 flex items-center gap-3" href="<?= base_url('/dashboard') ?>">
+                        <?= svg_icon('home', 'w-6 h-6 text-indigo-600') ?>
+                        <span>LIGTAS</span>
+                    </a>
+                    <p class="hidden md:block text-sm text-slate-500 mt-0.5">Local Incident Gathering &amp; Tracking</p>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <div class="relative hidden md:block">
+                        <div class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><?= svg_icon('search', 'w-4 h-4') ?></div>
+                        <input type="search" placeholder="Search incidents, provinces..." class="pl-10 pr-3 py-2 w-64 rounded-full border border-slate-200 text-sm bg-white/80 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+                    </div>
+
+                    <button class="px-3 py-2 bg-indigo-600 text-white rounded-full text-sm hover:bg-indigo-700">+ Incident</button>
+
+                    <div class="flex items-center gap-3">
+                        <div class="hidden sm:flex items-center gap-2 text-sm text-slate-600 pr-3 border-r border-slate-100"><?= esc(session()->get('role_name') ?? '') ?></div>
+                        <div class="w-9 h-9 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-semibold"><?= esc($initials) ?></div>
+                    </div>
+                </div>
             </div>
         </nav>
     <?php endif; ?>
 
     <div class="container-fluid <?= $pageBodyClass ?>">
         <?php if (!$hideSidebar): ?>
-            <nav id="sidebar" class="w-72 lg:w-64 h-screen flex flex-col bg-white border-r border-slate-100 p-4">
+            <nav id="sidebar" class="w-72 lg:w-64 h-screen flex flex-col bg-white border-r border-slate-100 p-4 <?= $hideNavbar ? '' : 'pt-20' ?>">
                 <!-- Brand -->
                 <div class="flex items-center gap-3 px-2 py-3 mb-4">
                     <div class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold">L</div>
