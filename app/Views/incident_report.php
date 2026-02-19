@@ -511,21 +511,31 @@
         { id: 'incidentRemarks', column: 'Remarks' },
     ];
 
-    if (typeof bootstrap !== 'undefined') {
-        document.addEventListener('show.bs.modal', function(event) {
-            const modal = event.target;
-            const openModals = document.querySelectorAll('.modal.show').length;
-            const zIndex = 1050 + (openModals * 20);
-            modal.style.zIndex = zIndex;
-            setTimeout(() => {
-                const backdrops = document.querySelectorAll('.modal-backdrop.show');
-                const backdrop = backdrops[backdrops.length - 1];
-                if (backdrop) {
-                    backdrop.style.zIndex = zIndex - 10;
-                }
-            }, 0);
-        });
-    }
+    // Modal stacking & scroll-lock for the app's custom modals (replaces legacy Bootstrap modal events)
+    (function() {
+        function refreshModalStack() {
+            const modals = Array.from(document.querySelectorAll('.modal-overlay.active, .modal.show'));
+            modals.forEach((modal, idx) => {
+                const z = 1050 + idx * 20;
+                modal.style.zIndex = z;
+                // try to find a backdrop element if present and adjust it
+                const backdrop = modal.querySelector('.modal-backdrop') || document.querySelector('.modal-backdrop.show');
+                if (backdrop) backdrop.style.zIndex = z - 10;
+            });
+            // enable/disable scroll lock depending on open modals
+            setScrollLock(modals.length > 0);
+        }
+
+        // Observe class changes on modal containers so stacking updates when modals are toggled
+        const containers = Array.from(document.querySelectorAll('.modal-overlay, .modal'));
+        if (containers.length > 0) {
+            const mo = new MutationObserver(() => refreshModalStack());
+            containers.forEach(el => mo.observe(el, { attributes: true, attributeFilter: ['class'] }));
+        }
+
+        // ensure correct stacking on initial load
+        document.addEventListener('DOMContentLoaded', refreshModalStack);
+    })();
 
     const scrollLockKeys = ['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '];
     let scrollLocked = false;
@@ -561,16 +571,7 @@
         }
     }
 
-    if (typeof bootstrap !== 'undefined') {
-        document.addEventListener('shown.bs.modal', function() {
-            setScrollLock(true);
-        });
-        document.addEventListener('hidden.bs.modal', function() {
-            if (document.querySelectorAll('.modal.show').length === 0) {
-                setScrollLock(false);
-            }
-        });
-    }
+
 
     function setImportSaveState(hasData) {
         const showButtons = !hasData;
