@@ -17,8 +17,10 @@
     </div>
   </header>
 
-  <!-- Stats -->
-  <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+  <!-- Stats (responsive: horizontal scroll on small screens, grid on md+) -->
+  <section class="mb-8">
+    <div class="overflow-x-auto sm:overflow-visible -mx-4 sm:mx-0 px-4 sm:px-0">
+      <div class="grid grid-flow-col sm:grid-flow-row auto-cols-[minmax(220px,1fr)] sm:auto-cols-auto gap-6">
     <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
       <div class="flex items-start justify-between gap-4">
         <div>
@@ -62,11 +64,13 @@
         <div class="w-12 h-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-indigo-600"><?= svg_icon('users', 'w-5 h-5 text-indigo-600') ?></div>
       </div>
     </div>
+    </div>
+  </div>
   </section>
 
   <!-- Charts grid -->
-  <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
+  <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="md:col-span-2 lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
       <div class="flex items-center justify-between mb-4">
         <h3 class="text-sm font-semibold text-slate-900">Incidents per Province</h3>
         <div class="text-xs text-slate-400">Last 12 months</div>
