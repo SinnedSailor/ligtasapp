@@ -347,15 +347,6 @@
         $pageBodyClass = $hideNavbar ? 'page-body-wrapper no-navbar' : 'page-body-wrapper';
         $mainPanelClass = $hideSidebar ? 'main-panel full-width' : 'main-panel';
     ?>
-                </div>
-                <?php if (!$hideFooter): ?>
-                    <?= view('components/footer') ?>
-                <?php endif; ?>
-            </div>
-        </div>
-        <script src="<?= base_url('assets/staradmin/vendors/js/vendor.bundle.base.js') ?>"></script>
-        </div>
-    </div>
 
     <div class="container-scroller"> 
         <?php if (!$hideNavbar): ?>
@@ -436,6 +427,13 @@
                 <div class="content-wrapper">
                     <?= $this->renderSection('content') ?>
                 </div>
+
+                <?php if (!$hideFooter): ?>
+                    <?= view('components/footer') ?>
+                <?php endif; ?>
+            </div> <!-- main-panel -->
+        </div> <!-- page-body-wrapper / container-fluid -->
+    </div> <!-- container-scroller -->
 
     <script src="<?= base_url('assets/staradmin/vendors/js/vendor.bundle.base.js') ?>"></script>
     <script src="<?= base_url('assets/staradmin/js/off-canvas.js') ?>"></script>

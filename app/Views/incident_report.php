@@ -375,7 +375,17 @@
                         </div>
                         <div class="col-md-4">
                             <label class="form-label" for="incidentYear">Year of Incident</label>
-                            <input type="text" class="form-control form-control-sm" id="incidentYear" />
+                                                        <select class="form-select form-select-sm" id="incidentYear" style="background-color: #fff; color: #222; font-weight: 500;">
+                                <option value="" disabled selected style="color: #888; font-weight: 400;">Select year</option>
+                                <?php
+                                    $currentYear = (int) date('Y');
+                                    $startYear = $currentYear; // show up to current year
+                                    $minYear = 2000; // start at year 2000
+                                    for ($y = $startYear; $y >= $minYear; $y--):
+                                ?>
+                                    <option value="<?= $y ?>" style="color: #222; font-weight: 500;"><?= $y ?></option>
+                                <?php endfor; ?>
+                            </select>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label" for="incidentProvince">Province</label>
@@ -404,7 +414,7 @@
                         </div>
                         <div class="col-md-4">
                             <label class="form-label" for="incidentAge">Age of the Person</label>
-                            <input type="text" class="form-control form-control-sm" id="incidentAge" />
+                            <input type="number" class="form-control form-control-sm" id="incidentAge" min="0" max="120" step="1" inputmode="numeric" pattern="\d*" />
                         </div>
                         <div class="col-md-4">
                             <label class="form-label" for="incidentGender">Sex</label>
@@ -529,7 +539,67 @@
     const tempAttachmentRemoveUrl = "<?= base_url('/incident-report/attachments/remove-temp') ?>";
     const attachmentListUrl = "<?= base_url('/incident-report/attachments') ?>";
     const attachmentViewUrl = "<?= base_url('/incident-report/attachments/view') ?>";
+    const attachmentPreviewDataUrl = "<?= base_url('/incident-report/attachments/preview') ?>";
     const attachmentDownloadUrl = "<?= base_url('/incident-report/attachments/download') ?>";
+
+    /* Helper: fetch attachment as image blob (credentials: same-origin) and validate content-type.
+       This avoids broken <img> placeholders when the direct image request fails (ensures cookies/credentials are sent
+       and lets us show a friendly fallback). */
+    async function fetchAttachmentImageBlob(url) {
+        const res = await fetch(url, { credentials: 'same-origin' });
+        console.debug('[fetchAttachmentImageBlob] response', url, 'status=', res.status, 'content-type=', res.headers.get('content-type'));
+        if (!res.ok) throw new Error('Fetch failed: ' + res.status);
+        const ct = res.headers.get('content-type') || '';
+        if (!ct.startsWith('image/')) throw new Error('Not an image (content-type=' + ct + ')');
+        const blob = await res.blob();
+        console.debug('[fetchAttachmentImageBlob] blob size:', blob.size, 'for', url);
+        return blob;
+    }
+
+    async function fetchAttachmentPreviewJson(attachmentId) {
+        const res = await fetch(`${attachmentPreviewDataUrl}/${attachmentId}`, { credentials: 'same-origin' });
+        // 202 means conversion queued - surface that to the caller so it can poll/notify
+        if (res.status === 202) {
+            const j = await res.json().catch(() => null) || { converting: true };
+            return j;
+        }
+
+        if (!res.ok) {
+            const txt = await res.text().catch(() => null);
+            throw new Error('Preview API failed: ' + res.status + (txt ? ' - ' + txt.slice(0, 300) : ''));
+        }
+
+        const json = await res.json();
+        return json;
+    }
+
+    // Polling helper: repeatedly call preview API until content is ready or attempts exhausted
+    async function pollPreview(attachmentId, onReady, onPending, attemptsLeft = 6, delayMs = 2500) {
+        try {
+            const json = await fetchAttachmentPreviewJson(attachmentId);
+            if (json && json.converting) {
+                if (typeof onPending === 'function') onPending(json);
+                if (attemptsLeft > 0) {
+                    setTimeout(() => pollPreview(attachmentId, onReady, onPending, attemptsLeft - 1, delayMs), delayMs);
+                }
+                return;
+            }
+
+            if (json && json.data) {
+                if (typeof onReady === 'function') onReady(json);
+                return;
+            }
+
+            throw new Error('Preview API returned unexpected payload.');
+        } catch (err) {
+            if (attemptsLeft > 0) {
+                // transient error — retry
+                setTimeout(() => pollPreview(attachmentId, onReady, onPending, attemptsLeft - 1, delayMs), delayMs);
+                return;
+            }
+            if (typeof onPending === 'function') onPending({ error: err });
+        }
+    }
     const approveUrl = "<?= base_url('/incident-report/approve') ?>";
     const rejectUrl = "<?= base_url('/incident-report/reject') ?>";
     const canUploadAttachments = <?= $isLgu ? 'true' : 'false' ?>;
@@ -579,6 +649,34 @@
     const incidentPicturesInput = document.getElementById('incidentPicturesInput');
     const incidentDocumentsInput = document.getElementById('incidentDocumentsInput');
     const incidentUploadButton = document.getElementById('incidentUploadButton');
+    const incidentAgeInput = document.getElementById('incidentAge');
+    if (incidentAgeInput) {
+        // Prevent non-digit keystrokes, sanitize input and block non-numeric pastes
+        incidentAgeInput.addEventListener('keydown', (e) => {
+            // allow control/meta keys and navigation
+            const controlKeys = ['Backspace','Tab','ArrowLeft','ArrowRight','Delete','Home','End'];
+            if (e.ctrlKey || e.metaKey || controlKeys.includes(e.key)) return;
+            // allow digits only
+            if (!/^\d$/.test(e.key)) e.preventDefault();
+        });
+        incidentAgeInput.addEventListener('input', (e) => {
+            const el = e.target;
+            // strip non-digits
+            let v = String(el.value || '').replace(/\D+/g, '');
+            if (v === '') { el.value = ''; return; }
+            // clamp to 0-120
+            let n = parseInt(v, 10);
+            if (n > 120) n = 120;
+            el.value = String(n);
+        });
+        incidentAgeInput.addEventListener('paste', (e) => {
+            const pasted = (e.clipboardData || window.clipboardData).getData('text') || '';
+            if (!/^\d+$/.test(pasted)) {
+                e.preventDefault();
+            }
+        });
+    }
+
     let currentPage = 1;
     let pageSize = 10;
     let currentIncidentIndex = null;
@@ -1303,6 +1401,12 @@
             input.value = row ? (row[field.column] || '') : '';
         });
 
+        // Ensure the currently stored year (if any) exists as an option in the select
+        const yearValue = row ? (row['Year of Incident'] || '') : '';
+        if (yearValue) {
+            ensureYearOption(yearValue);
+        }
+
         const provinceInput = document.getElementById('incidentProvince');
         const municipalityInput = document.getElementById('incidentMunicipality');
         const provinceValue = row ? (row['Province'] || '') : '';
@@ -1449,6 +1553,24 @@
             return;
         }
 
+        // Validate age (if provided) — only whole numbers between 0 and 120 allowed
+        const ageValStr = (row['Age of the Person'] || '').toString().trim();
+        if (ageValStr !== '') {
+            if (!/^\d+$/.test(ageValStr)) {
+                showIncidentFormMessage('Age must be a whole number (0–120).', 'danger');
+                const ageEl = document.getElementById('incidentAge'); if (ageEl) ageEl.focus();
+                return;
+            }
+            const ageNum = parseInt(ageValStr, 10);
+            if (ageNum < 0 || ageNum > 120) {
+                showIncidentFormMessage('Age must be between 0 and 120.', 'danger');
+                const ageEl = document.getElementById('incidentAge'); if (ageEl) ageEl.focus();
+                return;
+            }
+            // normalize value
+            row['Age of the Person'] = String(ageNum);
+        }
+
         if (isEdit && row['N']) {
             try {
                 // Get CSRF token from meta tag
@@ -1567,6 +1689,22 @@
             option.value = value;
             option.textContent = value;
             provinceInput.appendChild(option);
+        }
+    }
+
+    function ensureYearOption(value) {
+        const yearInput = document.getElementById('incidentYear');
+        if (!yearInput || !value) {
+            return;
+        }
+
+        const options = Array.from(yearInput.options).map(option => option.value);
+        if (!options.includes(String(value))) {
+            const option = document.createElement('option');
+            option.value = String(value);
+            option.textContent = String(value);
+            // append so it becomes selectable; we keep existing order as-is
+            yearInput.appendChild(option);
         }
     }
 
@@ -1938,7 +2076,7 @@
                     const isImage = mimeType.startsWith('image/');
 
                     const thumbHtml = isImage
-                        ? `<img src="${viewUrl}" alt="${escapeHtml(item.original_name)}" style="width:64px;height:48px;object-fit:cover;border-radius:4px;margin-right:12px;display:inline-block;" />`
+                        ? `<img data-src="${viewUrl}" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='48'></svg>" alt="${escapeHtml(item.original_name)}" style="width:64px;height:48px;object-fit:cover;border-radius:4px;margin-right:12px;display:inline-block;background:#f1f3f5;" />`
                         : `<div style="width:64px;height:48px;display:inline-flex;align-items:center;justify-content:center;background:#f1f3f5;border-radius:4px;margin-right:12px;"><i class="mdi mdi-file-document-outline" style="font-size:20px;color:#6c757d;"></i></div>`;
 
                     const meta = `<div style="flex:1;min-width:0;text-align:left;">
@@ -1948,7 +2086,49 @@
 
                     button.innerHTML = thumbHtml + meta;
 
-                    button.addEventListener('click', () => {
+                    // If this is an image thumbnail, load it via fetch->blob first. This
+                    // avoids the browser-level <img> failure we're seeing where the
+                    // direct img request sometimes errors even though the server returns 200.
+                    (function loadThumbnail() {
+                        const t = button.querySelector('img[data-src]');
+                        if (!t) return;
+
+                        // show a neutral background while fetching
+                        t.style.background = '#f1f3f5';
+
+                        // Use the preview JSON API (guarantees we get a decodable data URI)
+                        pollPreview(item.id,
+                            (json) => {
+                                t.src = `data:${json.mime_type};base64,${json.data}`;
+                                t.addEventListener('error', () => console.warn('Thumbnail data URL failed to render:' , item.id), { once: true });
+                            },
+                            (info) => {
+                                // show converting indicator or keep placeholder
+                                if (info && info.converting) {
+                                    t.style.opacity = '0.6';
+                                }
+                            }
+                        );
+                    })();
+
+                    // Log thumbnail load failures and probe the server response so we can debug
+                    // why images sometimes show the broken-image icon in the UI.
+                    const thumbImg = button.querySelector('img');
+                    if (thumbImg) {
+                        thumbImg.addEventListener('error', async () => {
+                            console.warn('Attachment thumbnail failed to load:', viewUrl);
+                            try {
+                                const probe = await fetch(viewUrl, { credentials: 'same-origin' });
+                                console.warn('Probe response for', viewUrl, 'status=', probe.status, 'content-type=', probe.headers.get('content-type'));
+                                const sample = await probe.text().catch(() => null);
+                                if (sample) console.debug('Probe body (first 300 chars):', sample.substring(0, 300));
+                            } catch (probeErr) {
+                                console.error('Probe fetch error for thumbnail:', probeErr);
+                            }
+                        }, { once: true });
+                    }
+
+                    button.addEventListener('click', async () => {
                         const downloadUrl = `${attachmentDownloadUrl}/${item.id}`;
                         downloadEl.href = downloadUrl;
 
@@ -1956,9 +2136,45 @@
                         const isOffice = mimeType === 'application/msword' || mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
                         if (isImage) {
-                            previewEl.innerHTML = `<img src="${viewUrl}" alt="${escapeHtml(item.original_name)}" style="max-width:100%; max-height:520px;" />`;
-                        } else if (isPdf || isOffice) {
+                            // Image: use preview API (base64) so browser decodes reliably
+                            previewEl.innerHTML = `<div class="text-center p-4 text-muted">Loading preview…</div>`;
+
+                            await pollPreview(item.id,
+                                (json) => {
+                                    const dataUrl = `data:${json.mime_type};base64,${json.data}`;
+                                    previewEl.innerHTML = `<img src="${dataUrl}" alt="${escapeHtml(item.original_name)}" style="max-width:100%; max-height:520px;" />`;
+                                },
+                                (info) => {
+                                    if (info && info.converting) {
+                                        previewEl.innerHTML = `<div class="text-center p-4 text-muted">Converting preview…</div>`;
+                                    } else if (info && info.error) {
+                                        previewEl.innerHTML = `<div class="text-center p-4 text-muted">Preview not available.</div>`;
+                                    }
+                                }
+                            );
+
+                        } else if (isPdf) {
+                            // PDFs: render directly
                             previewEl.innerHTML = `<iframe src="${viewUrl}" style="width:100%; height:520px; border:0;" title="${escapeHtml(item.original_name)}"></iframe>`;
+
+                        } else if (isOffice) {
+                            // Office documents: server converts to PDF; poll preview API for the PDF and show it in an iframe
+                            previewEl.innerHTML = `<div class="text-center p-4 text-muted">Preparing preview…</div>`;
+
+                            await pollPreview(item.id,
+                                (json) => {
+                                    const dataUrl = `data:${json.mime_type};base64,${json.data}`;
+                                    previewEl.innerHTML = `<iframe src="${dataUrl}" style="width:100%; height:520px; border:0;" title="${escapeHtml(item.original_name)}"></iframe>`;
+                                },
+                                (info) => {
+                                    if (info && info.converting) {
+                                        previewEl.innerHTML = `<div class="text-center p-4 text-muted">Converting preview…</div>`;
+                                    } else {
+                                        previewEl.innerHTML = `<div class="text-center p-4 text-muted">Preview not available.</div>`;
+                                    }
+                                }
+                            );
+
                         } else {
                             previewEl.innerHTML = `
                                 <div class="text-center p-4">

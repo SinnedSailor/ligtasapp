@@ -27,6 +27,7 @@ $routes->post('/incident-report/attachments/upload-temp', 'IncidentReport::uploa
 $routes->post('/incident-report/attachments/remove-temp', 'IncidentReport::removeTempAttachment');
 $routes->get('/incident-report/attachments/(:num)', 'IncidentReport::listAttachments/$1');
 $routes->get('/incident-report/attachments/view/(:num)', 'IncidentReport::viewAttachment/$1');
+$routes->get('/incident-report/attachments/preview/(:num)', 'IncidentReport::previewAttachment/$1');
 $routes->get('/incident-report/attachments/download/(:num)', 'IncidentReport::downloadAttachment/$1');
 $routes->post('/incident-report/approve/(:num)', 'IncidentReport::approve/$1');
 $routes->post('/incident-report/reject/(:num)', 'IncidentReport::reject/$1');

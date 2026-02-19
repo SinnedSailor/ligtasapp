@@ -40,6 +40,27 @@ class IncidentReport extends BaseController
             ]);
         }
 
+        // Reject invalid year values early (prevent bypassing client-side UI)
+        if (isset($data['year_of_incident'])) {
+            $yearValue = $this->toInt($data['year_of_incident']);
+            $currentYear = (int) date('Y');
+            if ($yearValue === null || $yearValue < 2000 || $yearValue > $currentYear) {
+                return $this->response->setStatusCode(400)->setJSON([
+                    'message' => 'Invalid year_of_incident.'
+                ]);
+            }
+        }
+
+        // Validate age (if provided) — must be integer 0..120
+        if (isset($data['age'])) {
+            $ageValue = $this->toInt($data['age']);
+            if (!is_null($data['age']) && ($ageValue === null || $ageValue < 0 || $ageValue > 120)) {
+                return $this->response->setStatusCode(400)->setJSON([
+                    'message' => 'Invalid age.'
+                ]);
+            }
+        }
+
         // Remove fields that should not be updated
         unset($data['n']);
         unset($data['id']);
@@ -96,6 +117,25 @@ class IncidentReport extends BaseController
             return $this->response->setStatusCode(400)->setJSON([
                 'message' => 'Invalid month_of_incident (must be 1-12).'
             ]);
+        }
+
+        // Validate year_of_incident to prevent arbitrary values (server-side enforcement)
+        $yearValue = $this->toInt($data['year_of_incident'] ?? null);
+        $currentYear = (int) date('Y');
+        if ($yearValue === null || $yearValue < 2000 || $yearValue > $currentYear) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'message' => 'Invalid year_of_incident.'
+            ]);
+        }
+
+        // Validate age if present (must be integer 0..120)
+        if (isset($data['age']) && $data['age'] !== '') {
+            $ageValue = $this->toInt($data['age']);
+            if ($ageValue === null || $ageValue < 0 || $ageValue > 120) {
+                return $this->response->setStatusCode(400)->setJSON([
+                    'message' => 'Invalid age.'
+                ]);
+            }
         }
 
         // Normalize incoming payload similar to import/mapRow
@@ -737,12 +777,74 @@ class IncidentReport extends BaseController
             ]);
         }
 
-        $contents = file_get_contents($filePath);
+        // STREAM the file directly with Content-Length to avoid browser decoding issues
+        $filesize = filesize($filePath);
+        $stream = fopen($filePath, 'rb');
+        if ($stream === false) {
+            return $this->response->setStatusCode(500)->setJSON(['message' => 'Unable to read file.']);
+        }
+
+        $body = stream_get_contents($stream);
+        fclose($stream);
 
         return $this->response
             ->setHeader('Content-Type', $mimeType)
+            ->setHeader('Content-Length', (string) $filesize)
             ->setHeader('Content-Disposition', 'inline; filename="' . addslashes($attachment['original_name']) . '"')
-            ->setBody($contents);
+            ->setBody($body);
+    }
+
+    /**
+     * Return attachment preview data (base64) for robust in-page previews.
+     * Client JS uses this to render images reliably inside the modal.
+     */
+    public function previewAttachment(int $attachmentId)
+    {
+        if (!session()->get('logged_in')) {
+            return $this->response->setStatusCode(401)->setJSON(['message' => 'Unauthorized.']);
+        }
+
+        $attachmentModel = new \App\Models\IncidentReportAttachmentModel();
+        $attachment = $attachmentModel->find($attachmentId);
+        if (!$attachment) {
+            return $this->response->setStatusCode(404)->setJSON(['message' => 'Attachment not found.']);
+        }
+
+        // Prefer preview_path when available (converted PDF for office docs)
+        $previewPath = $attachment['preview_path'] ?? null;
+        if ($previewPath) {
+            $filePath = WRITEPATH . 'uploads/' . $previewPath;
+            if (!is_file($filePath)) {
+                $filePath = WRITEPATH . 'uploads/' . ($attachment['stored_path'] ?? '');
+            }
+        } else {
+            $filePath = WRITEPATH . 'uploads/' . ($attachment['stored_path'] ?? '');
+        }
+
+        if (!is_file($filePath)) {
+            return $this->response->setStatusCode(404)->setJSON(['message' => 'File not found on server.']);
+        }
+
+        // If the original is an office document and no preview exists yet, queue conversion
+        if ($this->isOfficeDocument($attachment) && empty($attachment['preview_path'])) {
+            $this->queueAttachmentPreviewConversion($attachmentId);
+            return $this->response->setStatusCode(202)->setJSON(['converting' => true, 'message' => 'Preview conversion queued.']);
+        }
+
+        $mimeType = $attachment['preview_mime'] ?? $attachment['mime_type'] ?? mime_content_type($filePath) ?? 'application/octet-stream';
+
+        // Read and base64-encode. Small/medium images/PDFs are acceptable to inline.
+        $contents = file_get_contents($filePath);
+        if ($contents === false) {
+            return $this->response->setStatusCode(500)->setJSON(['message' => 'Failed to read file.']);
+        }
+
+        $data = base64_encode($contents);
+
+        return $this->response->setJSON([
+            'mime_type' => $mimeType,
+            'data' => $data,
+        ]);
     }
 
     public function downloadAttachment(int $attachmentId)
