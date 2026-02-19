@@ -413,16 +413,39 @@
                                 <h6 class="mb-0">Attachments</h6>
                                 <span class="text-muted" id="incidentAttachmentStatus" style="font-size: 0.85rem;"></span>
                             </div>
-                            <div class="text-muted" id="incidentAttachmentHint" style="font-size: 0.85rem;"></div>
-                            <div class="d-flex flex-wrap gap-2 mt-2">
-                                <input type="file" id="incidentAttachments" class="form-control form-control-sm" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx" multiple />
-                                <button type="button" class="btn btn-outline-primary btn-sm" id="incidentUploadButton" onclick="uploadIncidentAttachments()">Upload Attachments</button>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="small fw-semibold mb-1">Pictures</div>
+                                    <div class="text-muted mb-2" style="font-size:0.85rem;">JPEG / PNG only. You can queue multiple photos.</div>
+                                    <div class="d-flex gap-2">
+                                        <input type="file" id="incidentPicturesInput" class="form-control form-control-sm" accept=".jpg,.jpeg,.png" multiple />
+                                        <!-- kept the main upload button as the primary action -->
+                                    </div>
+                                    <div id="incidentUploadFileListPictures" class="mt-3"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="small fw-semibold mb-1">Documents</div>
+                                    <div class="text-muted mb-2" style="font-size:0.85rem;">PDF / DOC / DOCX only. You can queue multiple documents.</div>
+                                    <div class="d-flex gap-2">
+                                        <input type="file" id="incidentDocumentsInput" class="form-control form-control-sm" accept=".pdf,.doc,.docx" multiple />
+                                    </div>
+                                    <div id="incidentUploadFileListDocuments" class="mt-3"></div>
+                                </div>
                             </div>
 
-                            <!-- Per-file upload list -->
-                            <div id="incidentUploadFileList" class="mt-3"></div>
+                            <div class="d-flex align-items-center justify-content-between mt-3 mb-1">
+                                <div class="small text-muted" id="incidentAttachmentHint" style="font-size: 0.85rem;"></div>
+                                <div class="d-flex gap-2">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearUploadFileList()">Clear</button>
+                                    <button type="button" class="btn btn-outline-primary btn-sm" id="incidentUploadButton" onclick="uploadIncidentAttachments()">Upload Attachments</button>
+                                </div>
+                            </div>
 
-                            <!-- Upload progress (hidden until used) -->
+                            <!-- Combined per-file upload list (renders pictures/documents grouped) -->
+                            <div id="incidentUploadFileList" class="mt-2"></div>
+
+                            <!-- Upload progress (reflects combined progress of both types) -->
                             <div id="incidentUploadProgressContainer" class="w-100 mt-2 d-none">
                                 <div class="progress" style="height:14px;">
                                     <div id="incidentUploadProgressBar" class="progress-bar" role="progressbar" style="width:0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
@@ -521,7 +544,8 @@
     const incidentSaveButton = document.getElementById('incidentSaveButton');
     const incidentAttachmentHint = document.getElementById('incidentAttachmentHint');
     const incidentAttachmentStatus = document.getElementById('incidentAttachmentStatus');
-    const incidentAttachmentsInput = document.getElementById('incidentAttachments');
+    const incidentPicturesInput = document.getElementById('incidentPicturesInput');
+    const incidentDocumentsInput = document.getElementById('incidentDocumentsInput');
     const incidentUploadButton = document.getElementById('incidentUploadButton');
     let currentPage = 1;
     let pageSize = 10;
@@ -698,20 +722,24 @@
         if (text) text.textContent = '';
     }
 
-    // Render the per-file upload list UI
+    // Render the per-file upload list UI grouped by type (pictures / documents)
     function renderUploadFileList() {
         const container = document.getElementById('incidentUploadFileList');
-        if (!container) return;
+        const picsContainer = document.getElementById('incidentUploadFileListPictures');
+        const docsContainer = document.getElementById('incidentUploadFileListDocuments');
+        if (!container || !picsContainer || !docsContainer) return;
 
         if (!currentUploadFiles || currentUploadFiles.length === 0) {
             container.innerHTML = '';
+            picsContainer.innerHTML = '';
+            docsContainer.innerHTML = '';
             return;
         }
 
         const uploadingCount = currentUploadFiles.filter(f => f.status === 'uploading' || f.status === 'queued').length;
-        const header = `
+        const globalHeader = `
             <div class="d-flex justify-content-between align-items-center mb-2">
-                <div class="small text-muted">${currentUploadFiles.length} file(s)</div>
+                <div class="small text-muted">${currentUploadFiles.length} file(s) queued</div>
                 <div class="d-flex gap-2">
                     <button type="button" class="btn btn-sm btn-outline-danger" id="incidentUploadCancelAllBtn" onclick="cancelAllUploads()" ${uploadingCount === 0 ? 'disabled' : ''}>Cancel all</button>
                     <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearUploadFileList()">Clear</button>
@@ -719,32 +747,39 @@
             </div>
         `;
 
-        const items = currentUploadFiles.map(f => {
-            const progress = Math.max(0, Math.min(100, Math.round(f.progress || 0)));
-            const statusLabel = (f.status === 'queued') ? 'Queued' : (f.status === 'uploading' ? 'Uploading' : (f.status === 'success' ? 'Uploaded' : (f.status === 'error' ? 'Error' : 'Cancelled')));
-            const showCancel = (f.status === 'uploading' || f.status === 'queued');
-            const showRetry = (f.status === 'error' || f.status === 'cancelled');
+        function renderListFor(filterFn) {
+            const list = currentUploadFiles.filter(filterFn);
+            if (!list.length) return '<div class="empty-message">No files</div>';
 
-            return `
-                <div class="upload-file-item d-flex align-items-center justify-content-between mb-2" data-file-id="${f.id}">
-                    <div style="flex:1; min-width:0;">
-                        <div class="fw-semibold small text-truncate">${escapeHtml(f.file.name)} <small class="text-muted">(${formatBytes(f.file.size)})</small></div>
-                        <div class="progress mt-1" style="height:8px;">
-                            <div class="progress-bar" role="progressbar" style="width:${progress}%" aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="100" data-file-progress-id="${f.id}">${progress}%</div>
+            return list.map(f => {
+                const progress = Math.max(0, Math.min(100, Math.round(f.progress || 0)));
+                const statusLabel = (f.status === 'queued') ? 'Queued' : (f.status === 'uploading' ? 'Uploading' : (f.status === 'success' ? 'Uploaded' : (f.status === 'error' ? 'Error' : 'Cancelled')));
+                const showCancel = (f.status === 'uploading' || f.status === 'queued');
+                const showRetry = (f.status === 'error' || f.status === 'cancelled');
+
+                return `
+                    <div class="upload-file-item d-flex align-items-center justify-content-between mb-2" data-file-id="${f.id}">
+                        <div style="flex:1; min-width:0;">
+                            <div class="fw-semibold small text-truncate">${escapeHtml(f.file.name)} <small class="text-muted">(${formatBytes(f.file.size)})</small></div>
+                            <div class="progress mt-1" style="height:8px;">
+                                <div class="progress-bar" role="progressbar" style="width:${progress}%" aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="100" data-file-progress-id="${f.id}">${progress}%</div>
+                            </div>
+                        </div>
+                        <div class="ms-3 text-end" style="min-width:140px;">
+                            <div class="small" data-file-status-id="${f.id}">${statusLabel}</div>
+                            <div class="btn-group btn-group-sm mt-1">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="cancelSingleUpload('${f.id}')" ${showCancel ? '' : 'style="display:none;"'}>Cancel</button>
+                                <button type="button" class="btn btn-outline-primary btn-sm" onclick="retrySingleUpload('${f.id}')" ${showRetry ? '' : 'style="display:none;"'}>Retry</button>
+                            </div>
                         </div>
                     </div>
-                    <div class="ms-3 text-end" style="min-width:140px;">
-                        <div class="small" data-file-status-id="${f.id}">${statusLabel}</div>
-                        <div class="btn-group btn-group-sm mt-1">
-                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="cancelSingleUpload('${f.id}')" ${showCancel ? '' : 'style="display:none;"'}>Cancel</button>
-                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="retrySingleUpload('${f.id}')" ${showRetry ? '' : 'style="display:none;"'}>Retry</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }).join('');
+                `;
+            }).join('');
+        }
 
-        container.innerHTML = header + items;
+        picsContainer.innerHTML = renderListFor(f => f.type === 'photo');
+        docsContainer.innerHTML = renderListFor(f => f.type === 'document');
+        container.innerHTML = globalHeader + '<div class="row"><div class="col-md-6">' + (picsContainer.innerHTML) + '</div><div class="col-md-6">' + (docsContainer.innerHTML) + '</div></div>';
     }
 
     function updateFileUploadUI(id) {
@@ -952,8 +987,30 @@
 
         currentUploadFiles = [];
         currentAttachmentSession = '';
+        // clear native inputs as well
+        if (incidentPicturesInput) incidentPicturesInput.value = '';
+        if (incidentDocumentsInput) incidentDocumentsInput.value = '';
         renderUploadFileList();
         hideUploadProgress();
+    }
+
+    // Add selected files (from inputs) to the client-side upload queue. type is 'photo' or 'document'
+    function addFilesToQueue(files, type) {
+        if (!files || !files.length) return;
+        const now = Date.now();
+        const startIndex = currentUploadFiles.length;
+        const entries = files.map((file, i) => ({
+            id: `${now}-${startIndex + i}`,
+            file: file,
+            progress: 0,
+            status: 'queued',
+            xhr: null,
+            sessionToken: currentAttachmentSession || null,
+            type: type === 'document' ? 'document' : 'photo'
+        }));
+        currentUploadFiles = currentUploadFiles.concat(entries);
+        renderUploadFileList();
+        updateOverallProgress();
     }
 
     function updateOverallProgress() {
@@ -1008,6 +1065,23 @@
                 el.addEventListener('change', hideIncidentFormMessage);
             }
         });
+
+        // wire picture/document inputs to queue selected files
+        if (incidentPicturesInput) {
+            incidentPicturesInput.addEventListener('change', function(e) {
+                const files = Array.from(e.target.files || []);
+                if (files.length) addFilesToQueue(files, 'photo');
+                // clear native input so same file can be re-selected later
+                incidentPicturesInput.value = '';
+            });
+        }
+        if (incidentDocumentsInput) {
+            incidentDocumentsInput.addEventListener('change', function(e) {
+                const files = Array.from(e.target.files || []);
+                if (files.length) addFilesToQueue(files, 'document');
+                incidentDocumentsInput.value = '';
+            });
+        }
 
         if (serverRows.length > 0) {
             tableData = serverRows.map(mapServerRow);
@@ -1224,9 +1298,8 @@
             incidentSaveButton.textContent = isEdit ? 'Update Incident' : 'Add Incident';
         }
 
-        if (incidentAttachmentsInput) {
-            incidentAttachmentsInput.value = '';
-        }
+        if (incidentPicturesInput) incidentPicturesInput.value = '';
+        if (incidentDocumentsInput) incidentDocumentsInput.value = '';
 
         // Reset any pre-save attachment session when opening the modal to add a new incident
         if (!isEdit) {
@@ -1265,8 +1338,9 @@
         if (canUpload) {
             incidentAttachmentHint.textContent = 'Upload photos or documents for this incident.';
         } else if (currentAttachmentSession && currentUploadFiles && currentUploadFiles.length > 0) {
-            const uploadedCount = currentUploadFiles.filter(f => f.status === 'success').length;
-            incidentAttachmentHint.textContent = `${uploadedCount} file(s) uploaded (will be attached when you save the incident).`;
+            const uploadedPhotos = currentUploadFiles.filter(f => f.type === 'photo' && f.status === 'success').length;
+            const uploadedDocs = currentUploadFiles.filter(f => f.type === 'document' && f.status === 'success').length;
+            incidentAttachmentHint.textContent = `${uploadedPhotos} photo(s), ${uploadedDocs} document(s) uploaded (will be attached when you save the incident).`;
         } else {
             incidentAttachmentHint.textContent = 'Save the incident to the database before uploading attachments.';
         }
@@ -1277,9 +1351,8 @@
             incidentAttachmentStatus.textContent = hasIncident ? `${count} file(s), status: ${status}` : '';
         }
 
-        if (incidentAttachmentsInput) {
-            incidentAttachmentsInput.disabled = false;
-        }
+        if (incidentPicturesInput) incidentPicturesInput.disabled = false;
+        if (incidentDocumentsInput) incidentDocumentsInput.disabled = false;
 
         if (incidentUploadButton) {
             incidentUploadButton.disabled = false;
@@ -1429,8 +1502,8 @@
                     renderUploadFileList();
                 }
 
-                // If the user selected files but didn't upload them pre-save, upload them now to the newly created incident
-                if (!currentAttachmentSession && incidentAttachmentsInput && incidentAttachmentsInput.files && incidentAttachmentsInput.files.length > 0) {
+                // If the user queued/selected files but didn't upload them pre-save, upload them now to the newly created incident
+                if (currentUploadFiles && currentUploadFiles.length > 0) {
                     await uploadIncidentAttachments();
                 }
             } catch (err) {
@@ -1915,14 +1988,24 @@
     }
 
     async function uploadIncidentAttachments() {
-        // Allow uploading attachments while adding (pre-save) by uploading to a temporary session,
-        // or upload directly to an existing incident when present.
+        // Upload entries from the client-side queue (currentUploadFiles).
+        // If queue is empty, try to pick up files from the native inputs.
 
         const row = (currentIncidentIndex !== null) ? tableData[currentIncidentIndex] : null;
         const incidentN = row && !row._local ? row['N'] : null;
         const isPreSave = !incidentN; // true when adding a new incident or editing a local row
 
-        if (!incidentAttachmentsInput || !incidentAttachmentsInput.files || incidentAttachmentsInput.files.length === 0) {
+        // If user selected files in native inputs but didn't 'queue' them yet, add them now
+        if (!currentUploadFiles || currentUploadFiles.length === 0) {
+            if (incidentPicturesInput && incidentPicturesInput.files && incidentPicturesInput.files.length > 0) {
+                addFilesToQueue(Array.from(incidentPicturesInput.files), 'photo');
+            }
+            if (incidentDocumentsInput && incidentDocumentsInput.files && incidentDocumentsInput.files.length > 0) {
+                addFilesToQueue(Array.from(incidentDocumentsInput.files), 'document');
+            }
+        }
+
+        if (!currentUploadFiles || currentUploadFiles.length === 0) {
             showIncidentFormMessage('Please select at least one file to upload.', 'warning');
             return;
         }
@@ -1933,23 +2016,27 @@
             return;
         }
 
-        // Initialize per-file state and session token for pre-save uploads
-        const files = Array.from(incidentAttachmentsInput.files);
+        // Prepare session token for pre-save uploads (only if at least one queued file has no sessionToken)
         if (isPreSave) {
             currentAttachmentSession = currentAttachmentSession || String(Date.now()) + '-' + Math.floor(Math.random() * 10000);
+            currentUploadFiles.forEach(f => { if (!f.sessionToken) f.sessionToken = currentAttachmentSession; });
         }
 
-        currentUploadFiles = files.map((file, idx) => ({ id: String(Date.now()) + '-' + idx, file: file, progress: 0, status: 'queued', xhr: null, sessionToken: (isPreSave ? currentAttachmentSession : null) }));
         renderUploadFileList();
         showUploadProgress(0);
         setButtonLoading(incidentUploadButton, true, 'Uploading...');
 
-        // Start uploads in parallel (one XHR per file)
-        const uploadPromises = currentUploadFiles.map(entry => startFileUploadEntry(entry, incidentN).catch(err => err));
+        // Start uploads for queued files only
+        const queued = currentUploadFiles.filter(e => e.status === 'queued' || e.status === 'error' || e.status === 'cancelled');
+        const uploadPromises = queued.map(entry => {
+            entry.status = 'queued';
+            entry.progress = 0;
+            updateFileUploadUI(entry.id);
+            return startFileUploadEntry(entry, incidentN).catch(err => err);
+        });
 
         const results = await Promise.allSettled(uploadPromises);
 
-        // After uploads finish (success or failure), update UI and clear input
         const anySuccess = results.some(r => r.status === 'fulfilled');
         if (anySuccess) {
             if (!isPreSave && row) {
@@ -1962,8 +2049,9 @@
             setTimeout(hideIncidentFormMessage, 2000);
         }
 
-        // Keep file list visible so user can retry failed ones; clear file input
-        incidentAttachmentsInput.value = '';
+        // Keep queue visible so user can retry failed ones; clear native inputs
+        if (incidentPicturesInput) incidentPicturesInput.value = '';
+        if (incidentDocumentsInput) incidentDocumentsInput.value = '';
         updateOverallProgress();
         setButtonLoading(incidentUploadButton, false);
     }
