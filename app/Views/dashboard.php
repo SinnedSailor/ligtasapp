@@ -4,160 +4,217 @@
 
 <?= $this->section('content') ?>
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 md:pt-10 pb-10">
-  <!-- Header wrapper for system title -->
-  <div class="bg-white rounded-2xl border border-slate-100 p-4 mb-6 flex items-center justify-between">
-    <div class="flex items-center gap-3">
-      <div class="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold">L</div>
+
+  <!-- Four summary stat cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="w-full bg-white rounded-2xl border border-slate-200 p-4 shadow-sm flex items-center gap-4">
+      <div class="w-12 h-12 rounded-md bg-indigo-50 flex items-center justify-center"><?= svg_icon('chart', 'w-6 h-6 text-indigo-600') ?></div>
       <div>
-        <div class="text-sm text-slate-500">Welcome to</div>
-        <div class="text-lg font-semibold text-slate-900">LIGTAS Admin</div>
+        <div class="text-xs text-slate-400">Total incidents (year)</div>
+        <div class="mt-1 text-2xl font-semibold text-slate-900" id="stat-total-incidents">—</div>
+        <div class="text-xs text-slate-400">(All provinces)</div>
       </div>
     </div>
-    <div class="text-sm text-slate-400">Last updated: <?= date('M d, Y') ?></div>
-  </div>
 
-  <!-- Top stat cards (TailAdmin style) -->
-  <div class="mb-8">
-    <div class="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-      <div class="flex gap-6 min-w-max sm:grid sm:grid-cols-4">
-        <div class="w-56 shrink-0 sm:w-auto bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm relative">
-          <div class="absolute top-4 right-4 w-10 h-10 bg-slate-50 border border-slate-100 rounded-md flex items-center justify-center"><?= svg_icon('home', 'w-5 h-5 text-indigo-600') ?></div>
-          <div class="pt-4">
-            <div class="text-sm text-slate-500">Total Visitors</div>
-            <div class="mt-2 text-2xl font-semibold text-slate-900">4,564</div>
-            <div class="text-xs text-slate-400 mt-1">Today</div>
-          </div>
-          <div class="mt-4 text-sm text-indigo-600 font-medium">View data →</div>
-        </div>
+    <div class="w-full bg-white rounded-2xl border border-slate-200 p-4 shadow-sm flex items-center gap-4">
+      <div class="w-12 h-12 rounded-md bg-rose-50 flex items-center justify-center"><?= svg_icon('alert', 'w-6 h-6 text-rose-600') ?></div>
+      <div>
+        <div class="text-xs text-slate-400">Total fatalities</div>
+        <div class="mt-1 text-2xl font-semibold text-slate-900" id="stat-total-fatalities">—</div>
+        <div class="text-xs text-slate-400">(death rate)</div>
+      </div>
+    </div>
 
-        <div class="w-56 shrink-0 sm:w-auto bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm relative">
-          <div class="absolute top-4 right-4 w-10 h-10 bg-slate-50 border border-slate-100 rounded-md flex items-center justify-center"><?= svg_icon('cloud-upload', 'w-5 h-5 text-slate-600') ?></div>
-          <div class="pt-4">
-            <div class="text-sm text-slate-500">Revenue</div>
-            <div class="mt-2 text-2xl font-semibold text-slate-900">$7,564</div>
-            <div class="text-xs text-slate-400 mt-1">Monthly</div>
-          </div>
-          <div class="mt-4 text-sm text-indigo-600 font-medium">View data →</div>
-        </div>
+    <div class="w-full bg-white rounded-2xl border border-slate-200 p-4 shadow-sm flex items-center gap-4">
+      <div class="w-12 h-12 rounded-md bg-yellow-50 flex items-center justify-center"><?= svg_icon('map-pin', 'w-6 h-6 text-yellow-600') ?></div>
+      <div>
+        <div class="text-xs text-slate-400">Highest-risk province</div>
+        <div class="mt-1 text-2xl font-semibold text-slate-900" id="stat-highest-province">Region 1</div>
+        <div class="text-xs text-slate-400">(most incidents)</div>
+      </div>
+    </div>
 
-        <div class="w-56 shrink-0 sm:w-auto bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm relative">
-          <div class="absolute top-4 right-4 w-10 h-10 bg-slate-50 border border-slate-100 rounded-md flex items-center justify-center"><?= svg_icon('users', 'w-5 h-5 text-indigo-600') ?></div>
-          <div class="pt-4">
-            <div class="text-sm text-slate-500">Orders</div>
-            <div class="mt-2 text-2xl font-semibold text-slate-900">7,891+</div>
-            <div class="text-xs text-slate-400 mt-1">All time</div>
-          </div>
-          <div class="mt-4 text-sm text-indigo-600 font-medium">View data →</div>
-        </div>
-
-        <div class="w-56 shrink-0 sm:w-auto bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm relative">
-          <div class="absolute top-4 right-4 w-10 h-10 bg-slate-50 border border-slate-100 rounded-md flex items-center justify-center"><?= svg_icon('files', 'w-5 h-5 text-indigo-600') ?></div>
-          <div class="pt-4">
-            <div class="text-sm text-slate-500">Items</div>
-            <div class="mt-2 text-2xl font-semibold text-slate-900">486</div>
-            <div class="text-xs text-slate-400 mt-1">In inventory</div>
-          </div>
-          <div class="mt-4 text-sm text-indigo-600 font-medium">View data →</div>
-        </div>
+    <div class="w-full bg-white rounded-2xl border border-slate-200 p-4 shadow-sm flex items-center gap-4">
+      <div class="w-12 h-12 rounded-md bg-green-50 flex items-center justify-center"><?= svg_icon('users', 'w-6 h-6 text-green-600') ?></div>
+      <div>
+        <div class="text-xs text-slate-400">Most affected age group</div>
+        <div class="mt-1 text-2xl font-semibold text-slate-900" id="stat-age-group">15–24</div>
+        <div class="text-xs text-slate-400">(range)</div>
       </div>
     </div>
   </div>
 
-  <!-- Main content (no graphs) -->
-  <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <!-- Main chart area -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Primary chart: Incidents per province -->
     <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
       <div class="flex items-center justify-between mb-4">
-        <h3 class="text-sm font-semibold text-slate-900">Statistics</h3>
-        <div class="text-xs text-slate-400">Overview</div>
+        <h3 class="text-sm font-semibold text-slate-900">Incidents per province</h3>
+        <div class="text-xs text-slate-400">By count</div>
       </div>
-
-      <div class="mt-6 grid grid-cols-3 gap-3 h-48 items-end">
-        <div class="h-32 bg-indigo-50 rounded-md flex items-end justify-center"><div class="w-8 h-3 bg-indigo-600 rounded-t"></div></div>
-        <div class="h-40 bg-indigo-50 rounded-md flex items-end justify-center"><div class="w-8 h-10 bg-indigo-600 rounded-t"></div></div>
-        <div class="h-28 bg-indigo-50 rounded-md flex items-end justify-center"><div class="w-8 h-6 bg-indigo-600 rounded-t"></div></div>
-      </div>
-
-      <div class="mt-6 grid grid-cols-3 gap-4 text-sm text-slate-600">
-        <div>
-          <div class="text-xs text-slate-400">Target</div>
-          <div class="font-semibold text-slate-900 mt-1">$7.8k</div>
-        </div>
-        <div>
-          <div class="text-xs text-slate-400">Last Week</div>
-          <div class="font-semibold text-slate-900 mt-1">$1.4k</div>
-        </div>
-        <div>
-          <div class="text-xs text-slate-400">Open Campaigns</div>
-          <div class="font-semibold text-slate-900 mt-1">17</div>
-        </div>
-      </div>
+      <div id="chart-incidents-province" class="h-72 bg-indigo-50 rounded-md flex items-center justify-center text-slate-400">Chart placeholder</div>
     </div>
 
-    <!-- Right column — static widgets -->
+    <!-- Side widgets / small charts -->
     <div class="space-y-6">
       <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
         <div class="flex items-center justify-between mb-3">
-          <h3 class="text-sm font-semibold text-slate-900">Stock</h3>
-          <div class="text-xs text-slate-400">Today</div>
+          <h3 class="text-sm font-semibold text-slate-900">Remarks status</h3>
+          <div class="text-xs text-slate-400">deceased / rescued / missing</div>
         </div>
-        <div class="flex items-center gap-4">
-          <div class="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-50 to-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-xl">45</div>
-          <div class="flex-1">
-            <div class="text-sm text-slate-500">Total sales made today</div>
-            <div class="mt-3 grid grid-cols-2 gap-2 text-sm text-slate-600">
-              <div>Target <div class="font-semibold">$7.8k</div></div>
-              <div>Last week <div class="font-semibold">$1.4k</div></div>
-            </div>
-          </div>
-        </div>
+        <div id="chart-remarks-status" class="h-40 bg-indigo-50 rounded-md flex items-center justify-center text-slate-400">Chart placeholder</div>
       </div>
 
       <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
         <div class="flex items-center justify-between mb-3">
-          <h3 class="text-sm font-semibold text-slate-900">Total Revenue</h3>
-          <div class="text-xs text-slate-400">Monthly</div>
+          <h3 class="text-sm font-semibold text-slate-900">Incidents by sex</h3>
+          <div class="text-xs text-slate-400">Male / Female</div>
         </div>
-        <div class="text-2xl font-bold text-slate-900">$7,841.12</div>
-        <div class="mt-2 text-sm text-slate-500">17 Open Campaign</div>
+        <div id="chart-by-sex" class="h-36 bg-indigo-50 rounded-md flex items-center justify-center text-slate-400">Chart placeholder</div>
       </div>
-    </div>
-  </section>
 
-  <!-- Secondary info grid -->
-  <div class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
-      <h4 class="text-sm font-semibold text-slate-900">Incidents by Year</h4>
-      <div class="mt-4 grid grid-cols-2 gap-3 text-sm text-slate-700">
-        <div>2024 <div class="text-lg font-bold">410</div></div>
-        <div>2023 <div class="text-lg font-bold">702</div></div>
-        <div>2022 <div class="text-lg font-bold">625</div></div>
-        <div>2021 <div class="text-lg font-bold">598</div></div>
+      <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-semibold text-slate-900">Incidents by age group</h3>
+          <div class="text-xs text-slate-400">Group ranges</div>
+        </div>
+        <div id="chart-by-age" class="h-36 bg-indigo-50 rounded-md flex items-center justify-center text-slate-400">Chart placeholder</div>
       </div>
-    </div>
-
-    <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
-      <h4 class="text-sm font-semibold text-slate-900">Contributing Factors</h4>
-      <ul class="mt-4 space-y-2 text-sm text-slate-600">
-        <li>Unable to Swim — 52.3%</li>
-        <li>Lack of Supervision — 31.2%</li>
-        <li>Intoxication — 18.5%</li>
-      </ul>
-    </div>
-
-    <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
-      <h4 class="text-sm font-semibold text-slate-900">Incidents by Location</h4>
-      <ul class="mt-4 space-y-2 text-sm text-slate-600">
-        <li>Beach — 312</li>
-        <li>Resort — 124</li>
-        <li>River — 67</li>
-      </ul>
     </div>
   </div>
+
+  <!-- Additional charts: year, residence, holiday, factors by location -->
+  <div class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+      <h4 class="text-sm font-semibold text-slate-900 mb-3">Incidents by year</h4>
+      <div id="chart-by-year" class="h-36 bg-indigo-50 rounded-md flex items-center justify-center text-slate-400">Chart</div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+      <h4 class="text-sm font-semibold text-slate-900 mb-3">By residence (Region 1 municipalities)</h4>
+      <div id="chart-by-residence" class="h-36 bg-indigo-50 rounded-md flex items-center justify-center text-slate-400">Chart</div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+      <h4 class="text-sm font-semibold text-slate-900 mb-3">Incidents by holiday</h4>
+      <div id="chart-by-holiday" class="h-36 bg-indigo-50 rounded-md flex items-center justify-center text-slate-400">Chart</div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+      <h4 class="text-sm font-semibold text-slate-900 mb-3">Factors by location</h4>
+      <div id="chart-factors-location" class="h-36 bg-indigo-50 rounded-md flex items-center justify-center text-slate-400">Chart</div>
+    </div>
+  </div>
+
 </div>
 <?= $this->endSection() ?>
 
 <?= $this->section('pageScripts') ?>
+<!-- ApexCharts (CDN) -->
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
-  // Dashboard intentionally has no graphs — scripts removed.
+document.addEventListener('DOMContentLoaded', function () {
+  // -- sample stats (replace with server/API values) --
+  const stats = {
+    totalIncidents: 3142,
+    totalFatalities: 124,
+    highestProvince: 'Region 1',
+    ageGroup: '15–24'
+  };
+
+  document.getElementById('stat-total-incidents').innerText = stats.totalIncidents.toLocaleString();
+  document.getElementById('stat-total-fatalities').innerText = stats.totalFatalities + ' (' + ((stats.totalFatalities / stats.totalIncidents) * 100).toFixed(1) + '%)';
+  document.getElementById('stat-highest-province').innerText = stats.highestProvince;
+  document.getElementById('stat-age-group').innerText = stats.ageGroup;
+
+  // -- Incidents per province (bar) --
+  var optIncidentsProvince = {
+    chart: { type: 'bar', height: 320, toolbar: { show: false } },
+    series: [{ name: 'Incidents', data: [920, 640, 480, 310, 220] }],
+    colors: ['#6366F1'],
+    xaxis: { categories: ['Region 1','Region 2','Region 3','Region 4','Region 5'] },
+    dataLabels: { enabled: false },
+    tooltip: { y: { formatter: function (val) { return val; } } }
+  };
+  new ApexCharts(document.querySelector('#chart-incidents-province'), optIncidentsProvince).render();
+
+  // -- Remarks status (donut) --
+  var optRemarks = {
+    chart: { type: 'donut', height: 220 },
+    series: [124, 2800, 18],
+    labels: ['Deceased','Rescued','Missing'],
+    colors: ['#FB7185','#60A5FA','#A78BFA'],
+    legend: { position: 'bottom' }
+  };
+  new ApexCharts(document.querySelector('#chart-remarks-status'), optRemarks).render();
+
+  // -- Incidents by sex (donut) --
+  var optBySex = {
+    chart: { type: 'donut', height: 160 },
+    series: [2000, 1142],
+    labels: ['Male','Female'],
+    colors: ['#374151','#93C5FD'],
+    dataLabels: { enabled: false },
+    legend: { show: true }
+  };
+  new ApexCharts(document.querySelector('#chart-by-sex'), optBySex).render();
+
+  // -- Incidents by age group (bar) --
+  var optByAge = {
+    chart: { type: 'bar', height: 160 },
+    series: [{ name: 'Incidents', data: [50, 420, 920, 640, 210, 0] }],
+    xaxis: { categories: ['0-4','5-14','15-24','25-44','45-64','65+'] },
+    colors: ['#10B981'],
+    dataLabels: { enabled: false }
+  };
+  new ApexCharts(document.querySelector('#chart-by-age'), optByAge).render();
+
+  // -- Incidents by year (line) --
+  var optByYear = {
+    chart: { type: 'line', height: 140, toolbar: { show: false } },
+    series: [{ name: 'Incidents', data: [512, 680, 734, 842, 912, 1100] }],
+    stroke: { curve: 'smooth', width: 2 },
+    colors: ['#7C3AED'],
+    xaxis: { categories: ['2019','2020','2021','2022','2023','2024'] }
+  };
+  new ApexCharts(document.querySelector('#chart-by-year'), optByYear).render();
+
+  // -- By residence (Region 1 municipalities) --
+  var optByResidence = {
+    chart: { type: 'bar', height: 140 },
+    series: [{ name: 'Incidents', data: [120, 95, 80, 60, 45] }],
+    xaxis: { categories: ['Municipality A','Municipality B','Municipality C','Municipality D','Municipality E'] },
+    colors: ['#60A5FA'],
+    dataLabels: { enabled: false }
+  };
+  new ApexCharts(document.querySelector('#chart-by-residence'), optByResidence).render();
+
+  // -- Incidents by holiday (pie) --
+  var optByHoliday = {
+    chart: { type: 'pie', height: 140 },
+    series: [2450, 692],
+    labels: ['Non-holiday','Holiday'],
+    colors: ['#C7D2FE','#FDE68A'],
+    legend: { show: false }
+  };
+  new ApexCharts(document.querySelector('#chart-by-holiday'), optByHoliday).render();
+
+  // -- Factors by location (stacked bar) --
+  var optFactorsLocation = {
+    chart: { type: 'bar', height: 140, stacked: true },
+    series: [
+      { name: 'Unable to Swim', data: [120, 40, 30, 10] },
+      { name: 'Lack of Supervision', data: [80, 20, 40, 5] },
+      { name: 'Intoxication', data: [30, 5, 10, 1] },
+      { name: 'Other', data: [20, 10, 5, 2] }
+    ],
+    xaxis: { categories: ['Beach','Pool','River','Resort'] },
+    colors: ['#FB7185','#F59E0B','#34D399','#93C5FD'],
+    legend: { position: 'bottom' },
+    plotOptions: { bar: { horizontal: false, columnWidth: '60%' } }
+  };
+  new ApexCharts(document.querySelector('#chart-factors-location'), optFactorsLocation).render();
+
+});
 </script>
 <?= $this->endSection() ?>

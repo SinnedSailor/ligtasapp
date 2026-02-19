@@ -12,9 +12,17 @@
         /* shift fixed topbar to the right so it does not overlap the sidebar */
         @media (min-width: 768px) {
             .topbar-shift { left: 18rem !important; width: calc(100% - 18rem) !important; }
+            /* when sidebar exists, ensure main-panel is offset so content never sits underneath */
+            #sidebar + .main-panel, .main-panel { margin-left: 18rem !important; }
         }
         @media (min-width: 1024px) {
             .topbar-shift { left: 16rem !important; width: calc(100% - 16rem) !important; }
+            #sidebar + .main-panel, .main-panel { margin-left: 16rem !important; }
+        }
+        /* keep main-panel full-width on small screens */
+        @media (max-width: 767px) {
+            .main-panel { margin-left: 0 !important; }
+            .topbar-shift { left: 0 !important; width: 100% !important; }
         }
     </style>
 
@@ -77,7 +85,7 @@
 
     <div class="container-fluid <?= $pageBodyClass ?>">
         <?php if (!$hideSidebar): ?>
-            <nav id="sidebar" class="w-72 lg:w-64 h-screen flex flex-col bg-white border-r border-slate-100 p-4 <?= $hideNavbar ? '' : 'pt-20' ?>">
+            <nav id="sidebar" class="fixed left-0 top-0 z-30 w-72 lg:w-64 h-screen flex-shrink-0 flex flex-col bg-white border-r border-slate-100 p-4 <?= $hideNavbar ? '' : 'pt-20' ?>">
                 <!-- Brand -->
                 <div class="flex items-center gap-3 px-2 py-3 mb-4">
                     <div class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold">L</div>
@@ -86,7 +94,7 @@
                 </div>
 
                 <!-- Navigation -->
-                <div class="flex-1 mt-2">
+                <div class="flex-1 mt-2 overflow-y-auto">
                     <ul class="space-y-1">
                         <li>
                             <a href="<?= base_url('/dashboard') ?>" class="flex items-center gap-3 px-3 py-2 text-sm rounded-md <?= ($root === '' || $root === 'dashboard') ? 'bg-slate-100 text-indigo-600' : 'text-slate-600 hover:bg-slate-50' ?>">
@@ -130,7 +138,7 @@
             </nav>
         <?php endif; ?>
 
-        <div class="<?= $mainPanelClass ?>">
+        <div class="<?= $mainPanelClass ?> <?= $hideSidebar ? '' : 'ml-72 lg:ml-64' ?> h-screen overflow-y-auto <?= $hideNavbar ? '' : 'pt-20' ?>">
             <div class="content-wrapper">
                 <?= $this->renderSection('content') ?>
 
