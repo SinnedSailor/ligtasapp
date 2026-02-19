@@ -468,7 +468,10 @@
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="attachmentViewerLabel">Incident Attachments</h5>
+                <h5 class="modal-title d-flex align-items-center" id="attachmentViewerLabel">
+                    <span>Incident Attachments</span>
+                    <small id="attachmentCounts" class="text-muted ms-2" style="font-weight:400;"></small>
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -1877,9 +1880,17 @@
             }
 
             const attachments = result.attachments || [];
+            const counts = result.counts || { photo: 0, document: 0 };
             const listEl = document.getElementById('attachmentList');
             const previewEl = document.getElementById('attachmentPreview');
             const downloadEl = document.getElementById('attachmentDownload');
+            const countsEl = document.getElementById('attachmentCounts');
+
+            if (countsEl) {
+                const p = counts.photo || 0;
+                const d = counts.document || 0;
+                countsEl.textContent = `${p} photo${p !== 1 ? 's' : ''}, ${d} document${d !== 1 ? 's' : ''}`;
+            }
 
             listEl.innerHTML = '';
             previewEl.innerHTML = '<span class="text-muted">Select a file to preview.</span>';
@@ -1891,28 +1902,39 @@
                 attachments.forEach((item, index) => {
                     const button = document.createElement('button');
                     button.type = 'button';
-                    button.className = 'list-group-item list-group-item-action';
-                    button.textContent = `${item.original_name} (${item.file_kind})`;
+                    button.className = 'list-group-item list-group-item-action d-flex align-items-center';
+
+                    const viewUrl = `${attachmentViewUrl}/${item.id}`;
+                    const mimeType = item.mime_type || '';
+                    const isImage = mimeType.startsWith('image/');
+
+                    const thumbHtml = isImage
+                        ? `<img src="${viewUrl}" alt="${escapeHtml(item.original_name)}" style="width:64px;height:48px;object-fit:cover;border-radius:4px;margin-right:12px;display:inline-block;" />`
+                        : `<div style="width:64px;height:48px;display:inline-flex;align-items:center;justify-content:center;background:#f1f3f5;border-radius:4px;margin-right:12px;"><i class="mdi mdi-file-document-outline" style="font-size:20px;color:#6c757d;"></i></div>`;
+
+                    const meta = `<div style="flex:1;min-width:0;text-align:left;">
+                                    <div class="fw-semibold small text-truncate">${escapeHtml(item.original_name)}</div>
+                                    <div class="small text-muted">${item.file_kind || ''} • ${formatBytes(item.size_bytes || 0)}</div>
+                                  </div>`;
+
+                    button.innerHTML = thumbHtml + meta;
+
                     button.addEventListener('click', () => {
-                        const viewUrl = `${attachmentViewUrl}/${item.id}`;
                         const downloadUrl = `${attachmentDownloadUrl}/${item.id}`;
                         downloadEl.href = downloadUrl;
 
-                        const mimeType = item.mime_type || '';
-                        const isImage = mimeType.startsWith('image/');
                         const isPdf = mimeType === 'application/pdf';
-                        const isOffice = mimeType === 'application/msword'
-                            || mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+                        const isOffice = mimeType === 'application/msword' || mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
                         if (isImage) {
-                            previewEl.innerHTML = `<img src="${viewUrl}" alt="${item.original_name}" style="max-width:100%; max-height:520px;" />`;
+                            previewEl.innerHTML = `<img src="${viewUrl}" alt="${escapeHtml(item.original_name)}" style="max-width:100%; max-height:520px;" />`;
                         } else if (isPdf || isOffice) {
-                            previewEl.innerHTML = `<iframe src="${viewUrl}" style="width:100%; height:520px; border:0;" title="${item.original_name}"></iframe>`;
+                            previewEl.innerHTML = `<iframe src="${viewUrl}" style="width:100%; height:520px; border:0;" title="${escapeHtml(item.original_name)}"></iframe>`;
                         } else {
                             previewEl.innerHTML = `
                                 <div class="text-center p-4">
                                     <div class="text-muted mb-2">Preview not available for this file type.</div>
-                                    <a class="btn btn-outline-primary" href="${downloadUrl}" target="_blank" rel="noopener">Download ${item.original_name}</a>
+                                    <a class="btn btn-outline-primary" href="${downloadUrl}" target="_blank" rel="noopener">Download ${escapeHtml(item.original_name)}</a>
                                 </div>
                             `;
                         }

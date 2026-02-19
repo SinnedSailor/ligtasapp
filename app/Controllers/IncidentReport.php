@@ -669,8 +669,20 @@ class IncidentReport extends BaseController
             ->orderBy('created_at', 'desc')
             ->findAll();
 
+        // Provide per-type counts so the UI can display "X photos, Y documents"
+        $counts = ['photo' => 0, 'document' => 0];
+        foreach ($attachments as $a) {
+            $kind = $a['file_kind'] ?? (str_starts_with($a['mime_type'] ?? '', 'image/') ? 'photo' : 'document');
+            if ($kind === 'photo') {
+                $counts['photo']++;
+            } else {
+                $counts['document']++;
+            }
+        }
+
         return $this->response->setJSON([
             'attachments' => $attachments,
+            'counts' => $counts,
         ]);
     }
 
