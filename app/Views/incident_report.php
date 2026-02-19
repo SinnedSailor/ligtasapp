@@ -66,6 +66,35 @@
         border: 1px solid #e3e6ef;
     }
 
+    /* Attachment area improvements */
+    #incidentUploadFileListPictures, #incidentUploadFileListDocuments {
+        max-height: 260px;
+        overflow-y: auto;
+        padding-right: 6px;
+    }
+
+    #incidentUploadFileList {
+        margin-top: 8px;
+    }
+
+    #incidentUploadFileList .upload-file-item {
+        background: transparent;
+        padding: 6px 4px;
+        border-radius: 6px;
+    }
+
+    #incidentUploadFileList .upload-file-item .progress {
+        height: 6px;
+    }
+
+    #incidentUploadFileList .upload-file-item .small {
+        font-size: 0.75rem;
+    }
+
+    /* Make thumbnail icons tidy in attachment viewer */
+    #attachmentList .list-group-item img { border-radius:4px; }
+    #attachmentList .list-group-item { gap: 12px; }
+
     @media (max-width: 991.98px) {
         .col-tertiary {
             display: none;
@@ -745,7 +774,6 @@
                 <div class="small text-muted">${currentUploadFiles.length} file(s) queued</div>
                 <div class="d-flex gap-2">
                     <button type="button" class="btn btn-sm btn-outline-danger" id="incidentUploadCancelAllBtn" onclick="cancelAllUploads()" ${uploadingCount === 0 ? 'disabled' : ''}>Cancel all</button>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearUploadFileList()">Clear</button>
                 </div>
             </div>
         `;
@@ -782,7 +810,8 @@
 
         picsContainer.innerHTML = renderListFor(f => f.type === 'photo');
         docsContainer.innerHTML = renderListFor(f => f.type === 'document');
-        container.innerHTML = globalHeader + '<div class="row"><div class="col-md-6">' + (picsContainer.innerHTML) + '</div><div class="col-md-6">' + (docsContainer.innerHTML) + '</div></div>';
+        // Render only a minimal header in the combined container to avoid duplicating per-type lists
+        container.innerHTML = globalHeader;
     }
 
     function updateFileUploadUI(id) {
