@@ -3,7 +3,7 @@
 
 
 <?= $this->section('content') ?>
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 md:pt-28 pb-10">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 md:pt-10 pb-10">
   <!-- Header wrapper for system title -->
   <div class="bg-white rounded-2xl border border-slate-100 p-4 mb-6 flex items-center justify-between">
     <div class="flex items-center gap-3">
