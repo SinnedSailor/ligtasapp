@@ -4,7 +4,7 @@ $hideSidebar = true;
 $hideFooter = true;
 ?>
 
-<?= $this->extend('layouts/staradmin') ?>
+<?= $this->extend('layouts/main_tailwind') ?>
 
 <?= $this->section('pageStyles') ?>
 <!-- inline styles removed — replaced with Tailwind utilities in markup -->

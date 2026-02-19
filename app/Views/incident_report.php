@@ -1,5 +1,5 @@
 
-<?= $this->extend('layouts/staradmin') ?>
+<?= $this->extend('layouts/main_tailwind') ?>
 <?php $hasInitialRows = !empty($initialRows); ?>
 
 <?= $this->section('pageStyles'); ?>

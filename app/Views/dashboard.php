@@ -1,48 +1,25 @@
-<?= $this->extend('layouts/staradmin') ?>
+<?= $this->extend('layouts/main_tailwind') ?>
 
-<?= $this->section('pageStyles') ?>
-<style>
-  /* Minimal overrides for SaaS / Apple-style look (Tailwind-first; keep overrides tiny) */
-  :root {
-    --saas-primary: #4f46e5; /* indigo-600 */
-    --saas-muted: #64748b;   /* slate-500 */
-    --card-border: #eef2f7;  /* subtle border */
-    --page-bg: #f8fafc;      /* slate-50 */
-  }
 
-  /* Ensure the page uses a neutral canvas even if layout has older rules */
-  .content-wrapper { background: var(--page-bg) !important; }
-
-  /* Small helper for chart containers when Tailwind height utility isn't enough */
-  .chart-h-72 { height: 18rem; }
-
-  /* Reduce visual noise on cards when Tailwind utilities are not enough */
-  .saas-card { border-color: var(--card-border); }
-
-  /* Typography refinements */
-  .page-title-strong { font-weight: 700; color: #0f172a; }
-  .page-subtle { color: #64748b; }
-</style>
-<?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-10">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 md:pt-28 pb-10">
   <!-- Header -->
-  <header class="flex items-start justify-between gap-6 mb-8">
+  <header class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
     <div>
-      <h1 class="text-3xl page-title-strong">Dashboard</h1>
-      <p class="mt-2 text-sm page-subtle">Overview — Local Incident Gathering and Tracking for Aquatic Safety</p>
+      <h1 class="text-3xl font-bold text-slate-900">Dashboard</h1>
+      <p class="mt-2 text-sm text-slate-500">Overview — Local Incident Gathering and Tracking for Aquatic Safety</p>
     </div>
 
-    <div class="flex items-center gap-3">
-      <button class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-full shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-300"><?php echo view('components/icon', ['name' => 'plus', 'class' => 'w-4 h-4']); ?> <span>New Incident</span></button>
-      <button class="inline-flex items-center gap-2 px-3 py-2 bg-white border border-slate-100 rounded-full text-slate-700 shadow-sm"><?php echo view('components/icon', ['name' => 'cloud-upload', 'class' => 'w-4 h-4 text-slate-600']); ?> Export</button>
+    <div class="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 w-full sm:w-auto">
+      <button class="w-full sm:w-auto inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-full shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-300"><?php echo view('components/icon', ['name' => 'plus', 'class' => 'w-4 h-4']); ?> <span>New Incident</span></button>
+      <button class="w-full sm:w-auto inline-flex items-center gap-2 px-3 py-2 bg-white border border-slate-100 rounded-full text-slate-700 shadow-sm"><?php echo view('components/icon', ['name' => 'cloud-upload', 'class' => 'w-4 h-4 text-slate-600']); ?> Export</button>
     </div>
   </header>
 
   <!-- Stats -->
   <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-    <div class="bg-white rounded-2xl border saas-card p-6 shadow-sm">
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
       <div class="flex items-start justify-between gap-4">
         <div>
           <div class="text-sm text-slate-500">Total Incidents</div>
@@ -53,7 +30,7 @@
       </div>
     </div>
 
-    <div class="bg-white rounded-2xl border saas-card p-6 shadow-sm">
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
       <div class="flex items-start justify-between gap-4">
         <div>
           <div class="text-sm text-slate-500">Total Fatalities</div>
@@ -64,7 +41,7 @@
       </div>
     </div>
 
-    <div class="bg-white rounded-2xl border saas-card p-6 shadow-sm">
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
       <div class="flex items-start justify-between gap-4">
         <div>
           <div class="text-sm text-slate-500">Highest Risk Province</div>
@@ -75,7 +52,7 @@
       </div>
     </div>
 
-    <div class="bg-white rounded-2xl border saas-card p-6 shadow-sm">
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
       <div class="flex items-start justify-between gap-4">
         <div>
           <div class="text-sm text-slate-500">Most Affected Age Group</div>
@@ -89,39 +66,39 @@
 
   <!-- Charts grid -->
   <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <div class="lg:col-span-2 bg-white rounded-2xl border saas-card p-6 shadow-sm">
+    <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
       <div class="flex items-center justify-between mb-4">
         <h3 class="text-sm font-semibold text-slate-900">Incidents per Province</h3>
         <div class="text-xs text-slate-400">Last 12 months</div>
       </div>
-      <div class="chart-h-72">
+      <div class="h-56 sm:h-72">
         <canvas id="provinceChart"></canvas>
       </div>
     </div>
 
-    <div class="bg-white rounded-2xl border saas-card p-6 shadow-sm">
+<div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
       <h3 class="text-sm font-semibold text-slate-900 mb-4">Remarks Status</h3>
-      <div class="chart-h-72"><canvas id="remarksChart"></canvas></div>
+      <div class="h-56 sm:h-72"><canvas id="remarksChart"></canvas></div>
     </div>
 
     <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div class="bg-white rounded-2xl border saas-card p-6 shadow-sm">
+      <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
         <h3 class="text-sm font-semibold text-slate-900 mb-4">Incidents by Sex</h3>
-        <div class="h-56"><canvas id="sexChart"></canvas></div>
+        <div class="h-44 sm:h-56"><canvas id="sexChart"></canvas></div>
       </div>
 
-      <div class="bg-white rounded-2xl border saas-card p-6 shadow-sm">
+      <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
         <h3 class="text-sm font-semibold text-slate-900 mb-4">Incidents by Age Group</h3>
-        <div class="h-56"><canvas id="ageChart"></canvas></div>
+        <div class="h-44 sm:h-56"><canvas id="ageChart"></canvas></div>
       </div>
     </div>
 
-    <div class="bg-white rounded-2xl border saas-card p-6 shadow-sm">
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
       <h3 class="text-sm font-semibold text-slate-900 mb-4">Incidents by Year</h3>
-      <div class="h-56"><canvas id="yearChart"></canvas></div>
+      <div class="h-44 sm:h-56"><canvas id="yearChart"></canvas></div>
     </div>
 
-    <div class="lg:col-span-2 bg-white rounded-2xl border saas-card p-6 shadow-sm">
+    <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
       <div class="flex items-center justify-between">
         <h3 class="text-sm font-semibold text-slate-900">Incidents by Residence</h3>
         <div>
@@ -131,17 +108,17 @@
           </select>
         </div>
       </div>
-      <div class="mt-4 h-64"><canvas id="residenceChart"></canvas></div>
+      <div class="mt-4 h-48 sm:h-64"><canvas id="residenceChart"></canvas></div>
     </div>
 
-    <div class="bg-white rounded-2xl border saas-card p-6 shadow-sm">
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
       <h3 class="text-sm font-semibold text-slate-900 mb-4">Contributing Factors</h3>
-      <div class="h-64"><canvas id="factorsChart"></canvas></div>
+      <div class="h-48 sm:h-64"><canvas id="factorsChart"></canvas></div>
     </div>
 
-    <div class="lg:col-span-2 bg-white rounded-2xl border saas-card p-6 shadow-sm">
+    <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
       <h3 class="text-sm font-semibold text-slate-900 mb-4">Incidents by Location Category</h3>
-      <div class="h-64"><canvas id="locationChart"></canvas></div>
+      <div class="h-48 sm:h-64"><canvas id="locationChart"></canvas></div>
     </div>
   </section>
 </div>
