@@ -88,5 +88,5 @@ Commands (requires Node.js/npm):
 
    npm run watch:css
 
-The compiled stylesheet is already included in `app/Views/layouts/staradmin.php`. Remove any CDN Tailwind usages in individual views once you switch them to the compiled CSS.
+The compiled stylesheet is included in `app/Views/layouts/main_tailwind.php`. Remove any CDN Tailwind usages in individual views once you switch them to the compiled CSS.
 
