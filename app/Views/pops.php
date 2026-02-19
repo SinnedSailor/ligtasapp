@@ -13,7 +13,7 @@
         <p class="text-gray-500 text-sm">Peace and Order and Public Safety Plan - Upload required POPS documents</p>
     </div>
 
-    <div class="alert alert-warning flex items-center gap-2 rounded-lg border border-yellow-200 bg-yellow-50 text-yellow-800 mb-6 p-4">
+    <div class="flex items-center gap-2 rounded-lg border border-yellow-200 bg-yellow-50 text-yellow-800 mb-6 p-4">
         <i class="bi bi-exclamation-triangle text-xl"></i>
         <span>Upload your POPS Plan documents (PDF, DOC, DOCX) to complete the submission.</span>
     </div>
@@ -26,7 +26,7 @@
             <div class="upload-text text-lg font-semibold text-gray-700 mb-2">Click to upload or drag and drop</div>
             <div class="upload-hint text-gray-500 text-sm mb-2">Supported formats: PDF, DOC, DOCX (Max 10MB each)</div>
             <input type="file" id="fileInput" class="file-input hidden" multiple accept=".pdf,.doc,.docx" onchange="handleFiles(this.files)">
-            <button class="upload-btn btn-primary mt-4" type="button">Browse Files</button>
+            <button class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-md shadow-sm hover:bg-indigo-700 mt-4" type="button">Browse Files</button>
         </div>
 
         <div class="files-list mt-8" id="filesList" style="display: none;">
@@ -35,7 +35,7 @@
                 Uploaded Documents (<span id="fileCount">0</span>)
             </h3>
             <div id="filesContainer"></div>
-            <button class="submit-btn btn-primary flex items-center gap-2 mt-6" id="submitBtn" disabled onclick="submitDocuments()">
+            <button class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-md shadow-sm mt-6" id="submitBtn" disabled onclick="submitDocuments()">
                 <i class="bi bi-check-circle"></i>
                 <span>Submit POPS Plan</span>
             </button>

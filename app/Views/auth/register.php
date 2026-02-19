@@ -8,7 +8,7 @@ $hideFooter = true;
 
 <?= $this->section('pageStyles') ?>
 <style>
-    .auth-bg { background: url('<?= base_url('assets/staradmin/images/water.jpg') ?>') no-repeat center center; background-size: cover; }
+    .auth-bg { background: linear-gradient(135deg,#09637E 0%, #0B4F63 60%); }
 </style>
 <?= $this->endSection() ?>
 
@@ -16,9 +16,7 @@ $hideFooter = true;
 <div class="auth-page auth-bg min-h-screen flex items-center justify-center py-12 px-4">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-3xl p-8">
         <div class="text-center border-b pb-6 mb-6">
-            <div class="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-blue-900 to-teal-700 flex items-center justify-center text-white text-2xl shadow mb-3">
-                <i class="ti-water"></i>
-            </div>
+            <div class="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-blue-900 to-teal-700 flex items-center justify-center text-white text-2xl shadow mb-3">💧</div>
             <h3 class="text-2xl font-extrabold text-blue-900">LIGTAS</h3>
             <p class="text-sm text-gray-500 mt-1">Local Incident Gathering and Tracking for Aquatic Safety</p>
         </div>
@@ -28,7 +26,7 @@ $hideFooter = true;
 
         <?php if (session()->has('error')): ?>
             <div class="mb-4 rounded-md bg-red-50 border border-red-200 text-red-700 px-4 py-3">
-                <i class="ti-alert mr-2"></i><?= session()->getFlashdata('error') ?>
+                <span class="mr-2">⚠️</span><?= session()->getFlashdata('error') ?>
             </div>
         <?php endif; ?>
 

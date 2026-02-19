@@ -326,19 +326,19 @@
     <form action="<?= base_url('/documents/upload') ?>" method="post" enctype="multipart/form-data" id="documentUploadForm">
         <div class="documents-grid">
             <div class="document-card">
-                <h5><i class="ti-files"></i> Ordinance</h5>
+                <h5> Ordinance</h5>
                 <p class="text-muted">Local ordinance documents related to water safety regulations.</p>
                 <input type="file" name="ordinance_files[]" class="w-full rounded-md border border-gray-200 p-2 text-sm text-gray-700" multiple accept=".pdf,.doc,.docx">
             </div>
 
             <div class="document-card">
-                <h5><i class="ti-shield"></i> POPS Plan</h5>
+                <h5> POPS Plan</h5>
                 <p class="text-muted">Peace and Order and Public Safety Plan documents.</p>
                 <input type="file" name="pops_files[]" class="w-full rounded-md border border-gray-200 p-2 text-sm text-gray-700" multiple accept=".pdf,.doc,.docx">
             </div>
 
             <div class="document-card">
-                <h5><i class="ti-wallet"></i> Annual Budget Report</h5>
+                <h5> Annual Budget Report</h5>
                 <p class="text-muted">Annual budget reports for LIGTAS (Local Incident Gathering and Tracking for Aquatic Safety).</p>
                 <input type="file" name="budget_files[]" class="w-full rounded-md border border-gray-200 p-2 text-sm text-gray-700" multiple accept=".pdf,.doc,.docx">
             </div>
@@ -346,7 +346,7 @@
 
         <div class="submit-section">
             <button class="submit-btn" type="submit" id="submitDocumentsButton">
-                <i class="ti-check"></i>
+                ✔️
                 Submit Documents
             </button>
         </div>
@@ -435,7 +435,7 @@
                                     <td><?= esc(date('M d, Y', strtotime($doc['created_at']))) ?></td>
                                     <td>
                                         <div class="doc-actions">
-                                            <button class="btn btn-sm btn-outline-secondary doc-preview" type="button" data-doc-id="<?= $doc['id'] ?>" data-doc-name="<?= esc($doc['original_name']) ?>">
+                                            <button class="inline-flex items-center gap-2 px-2 py-1 border border-slate-200 rounded text-sm text-slate-700 hover:bg-slate-50 doc-preview" type="button" data-doc-id="<?= $doc['id'] ?>" data-doc-name="<?= esc($doc['original_name']) ?>">
                                                 View
                                             </button>
                                             <a class="inline-flex items-center gap-2 px-3 py-1 border border-blue-200 rounded text-sm text-blue-700 hover:bg-blue-50" href="<?= base_url('/documents/download/' . $doc['id']) ?>">Download</a>

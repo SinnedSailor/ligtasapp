@@ -158,7 +158,7 @@
             <div class="flex items-center gap-3">
                 <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" class="hidden" />
                 <button id="importButton" class="px-3 py-1.5 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700" onclick="document.getElementById('excelFile').click()" style="<?= $hasInitialRows ? 'display:none;' : '' ?>">
-                    <i class="ti-import mr-2"></i>Import Excel File
+                    📥 Import Excel File
                 </button>
                 <span class="text-gray-500 text-sm file-name" id="fileName" style="<?= $hasInitialRows ? 'display:none;' : '' ?>">No file selected</span>
             </div>
@@ -173,14 +173,14 @@
         <div class="flex flex-wrap gap-2 mb-4">
             <?php if ($isLgu || $isAdmin): ?>
                 <button class="px-3 py-1.5 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700" onclick="openIncidentModal()">
-                    <i class="ti-plus mr-2"></i>Add Incident
+                    ➕ Add Incident
                 </button>
             <?php endif; ?>
             <button id="saveButton" class="px-3 py-1.5 bg-green-600 text-white rounded-md text-sm hover:bg-green-700" onclick="openSaveModal()" style="<?= $hasInitialRows ? 'display:none;' : '' ?>">
-                <i class="ti-save mr-2"></i>Save to Database
+                💾 Save to Database
             </button>
             <button id="generateReportButton" class="px-3 py-1.5 bg-sky-500 text-white rounded-md text-sm hover:bg-sky-600" onclick="downloadIncidentReport()">
-                <i class="ti-bar-chart mr-2"></i>Generate Report
+                📊 Generate Report
             </button>
         </div>
 
@@ -233,219 +233,203 @@
     </div>
 </div>
 
-<div class="modal fade" id="saveConfirmModal" tabindex="-1" aria-labelledby="saveConfirmLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="saveConfirmLabel">Confirm Save</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                This will save the current imported rows into the database. Continue?
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="px-3 py-1.5 bg-green-600 text-white rounded-md" onclick="confirmSaveToDatabase()">Yes, Save</button>
-            </div>
-        </div>
+<div id="saveConfirmModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40" aria-hidden="true">
+  <div class="bg-white rounded-2xl shadow-lg max-w-md w-full p-6 mx-4">
+    <div class="flex items-start justify-between mb-4">
+      <h3 class="text-lg font-semibold">Confirm Save</h3>
+      <button type="button" class="text-slate-400 hover:text-slate-600" onclick="hideModal('saveConfirmModal')" aria-label="Close">&times;</button>
     </div>
+    <div class="text-sm text-slate-600 mb-6">This will save the current imported rows into the database. Continue?</div>
+    <div class="flex justify-end gap-3">
+      <button type="button" class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md" onclick="hideModal('saveConfirmModal')">Cancel</button>
+      <button type="button" class="px-3 py-1.5 bg-green-600 text-white rounded-md" onclick="confirmSaveToDatabase()">Yes, Save</button>
+    </div>
+  </div>
 </div>
 
-<div class="modal fade" id="importSuccessModal" tabindex="-1" aria-labelledby="importSuccessLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="importSuccessLabel">Import Complete</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div id="importSuccessMessage">Import completed.</div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="px-3 py-1.5 bg-blue-600 text-white rounded-md" data-bs-dismiss="modal">OK</button>
-            </div>
-        </div>
+<div id="importSuccessModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40" aria-hidden="true">
+  <div class="bg-white rounded-2xl shadow-lg max-w-md w-full p-6 mx-4">
+    <div class="flex items-start justify-between mb-4">
+      <h3 class="text-lg font-semibold">Import Complete</h3>
+      <button type="button" class="text-slate-400 hover:text-slate-600" onclick="hideModal('importSuccessModal')" aria-label="Close">&times;</button>
     </div>
+    <div class="text-sm text-slate-700 mb-6"><div id="importSuccessMessage">Import completed.</div></div>
+    <div class="flex justify-end">
+      <button type="button" class="px-3 py-1.5 bg-blue-600 text-white rounded-md" onclick="hideModal('importSuccessModal')">OK</button>
+    </div>
+  </div>
 </div>
 
-<div class="modal fade" id="saveResultModal" tabindex="-1" aria-labelledby="saveResultLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="saveResultLabel">Save Result</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div id="saveResultMessage">Save completed.</div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="px-3 py-1.5 bg-blue-600 text-white rounded-md" data-bs-dismiss="modal">OK</button>
-            </div>
-        </div>
+<div id="saveResultModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40" aria-hidden="true">
+  <div class="bg-white rounded-2xl shadow-lg max-w-md w-full p-6 mx-4">
+    <div class="flex items-start justify-between mb-4">
+      <h3 class="text-lg font-semibold">Save Result</h3>
+      <button type="button" class="text-slate-400 hover:text-slate-600" onclick="hideModal('saveResultModal')" aria-label="Close">&times;</button>
     </div>
+    <div class="text-sm text-slate-700 mb-6"><div id="saveResultMessage">Save completed.</div></div>
+    <div class="flex justify-end">
+      <button type="button" class="px-3 py-1.5 bg-blue-600 text-white rounded-md" onclick="hideModal('saveResultModal')">OK</button>
+    </div>
+  </div>
+</div>
 </div>
 
-<div class="modal fade" id="attachmentModal" tabindex="-1" aria-labelledby="attachmentModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="attachmentModalLabel">Upload Notice</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div id="attachmentModalMessage">Please upload at least one file.</div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="px-3 py-1.5 bg-blue-600 text-white rounded-md" data-bs-dismiss="modal">OK</button>
-            </div>
-        </div>
+<!-- Attachment notice modal (Tailwind) -->
+<div id="attachmentModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40" aria-hidden="true">
+  <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-4 mx-4">
+    <div class="flex items-center justify-between mb-3">
+      <h5 class="text-lg font-semibold">Upload Notice</h5>
+      <button type="button" class="text-slate-400 hover:text-slate-600" onclick="hideModal('attachmentModal')" aria-label="Close">&times;</button>
     </div>
+    <div class="text-sm text-slate-700 mb-4"><div id="attachmentModalMessage">Please upload at least one file.</div></div>
+    <div class="flex justify-end">
+      <button type="button" class="px-3 py-1.5 bg-blue-600 text-white rounded-md" onclick="hideModal('attachmentModal')">OK</button>
+
+
+<!-- Review confirm modal (Tailwind) -->
+<div id="reviewConfirmModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40" aria-hidden="true">
+  <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-4 mx-4">
+    <div class="flex items-center justify-between mb-3">
+      <h5 class="text-lg font-semibold">Confirm Review</h5>
+      <button type="button" class="text-slate-400 hover:text-slate-600" onclick="hideModal('reviewConfirmModal')" aria-label="Close">&times;</button>
+    </div>
+    <div class="text-sm text-slate-700 mb-4"><div id="reviewConfirmMessage">Are you sure you want to update this incident?</div></div>
+    <div class="flex justify-end gap-2">
+      <button type="button" class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md" onclick="hideModal('reviewConfirmModal')">Cancel</button>
+      <button type="button" id="reviewConfirmAction" class="px-3 py-1.5 bg-blue-600 text-white rounded-md" onclick="submitReview()">Confirm</button>
+    </div>
+  </div>
 </div>
 
-<div class="modal fade" id="reviewConfirmModal" tabindex="-1" aria-labelledby="reviewConfirmLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="reviewConfirmLabel">Confirm Review</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div id="reviewConfirmMessage">Are you sure you want to update this incident?</div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" id="reviewConfirmAction" class="px-3 py-1.5 bg-blue-600 text-white rounded-md">Confirm</button>
-            </div>
-        </div>
+<div id="incidentModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40" aria-hidden="true">
+  <div class="bg-white rounded-2xl shadow-lg max-w-4xl w-full p-6 mx-4">
+    <div class="flex items-start justify-between mb-4">
+      <h3 class="text-lg font-semibold">Add Incident</h3>
+      <button type="button" class="text-slate-400 hover:text-slate-600" onclick="hideModal('incidentModal')" aria-label="Close">&times;</button>
     </div>
-</div>
 
-<div class="modal fade" id="incidentModal" tabindex="-1" aria-labelledby="incidentModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="incidentModalLabel">Add Incident</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="incidentForm">
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <label class="form-label" for="incidentMonth">Month of Incident</label>
-                            <select class="form-select form-select-sm" id="incidentMonth" style="background-color: #fff; color: #222; font-weight: 500;">
-                                <option value="" disabled selected style="color: #888; font-weight: 400;">Select month</option>
-                                <?php for ($month = 1; $month <= 12; $month++): ?>
-                                    <option value="<?= $month ?>" style="color: #222; font-weight: 500;">
-                                        <?= $month ?>
-                                    </option>
-                                <?php endfor; ?>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label" for="incidentYear">Year of Incident</label>
-                            <input type="text" id="incidentYear" class="block w-full rounded-md border-gray-200 py-2 px-3 text-sm shadow-sm focus:ring-2 focus:ring-blue-300" />
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label" for="incidentProvince">Province</label>
-                            <select class="form-select form-select-sm" id="incidentProvince" style="background-color: #fff; color: #222; font-weight: 500;">
-                                <option value="" disabled selected style="color: #888; font-weight: 400;">Select province</option>
-                                <?php foreach ($provinceList as $province): ?>
-                                    <option value="<?= esc($province) ?>" style="color: #222; font-weight: 500;">
-                                        <?= esc($province) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label" for="incidentMunicipality">Municipality/City where Incidence Occurred</label>
-                            <select class="form-select form-select-sm" id="incidentMunicipality" style="background-color: #fff; color: #222; font-weight: 500;">
-                                <option value="" disabled selected style="color: #888; font-weight: 400;">Select municipality</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label" for="incidentVictim">Name of Victim</label>
-                            <input type="text" id="incidentVictim" class="block w-full rounded-md border-gray-200 py-2 px-3 text-sm shadow-sm focus:ring-2 focus:ring-blue-300" />
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label" for="incidentLocation">Location Category</label>
-                            <input type="text" id="incidentLocation" class="block w-full rounded-md border-gray-200 py-2 px-3 text-sm shadow-sm focus:ring-2 focus:ring-blue-300" />
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label" for="incidentAge">Age of the Person</label>
-                            <input type="text" id="incidentAge" class="block w-full rounded-md border-gray-200 py-2 px-3 text-sm shadow-sm focus:ring-2 focus:ring-blue-300" />
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label" for="incidentGender">Sex</label>
-                            <select class="form-select form-select-sm" id="incidentGender" style="background-color: #fff; color: #222; font-weight: 500;">
-                                <option value="" disabled selected style="color: #888; font-weight: 400;">Select sex</option>
-                                <option value="Male" style="color: #222; font-weight: 500;">Male</option>
-                                <option value="Female" style="color: #222; font-weight: 500;">Female</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label" for="incidentOccasion">Occasion</label>
-                            <input type="text" id="incidentOccasion" class="block w-full rounded-md border-gray-200 py-2 px-3 text-sm shadow-sm focus:ring-2 focus:ring-blue-300" />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label" for="incidentFactors">Other Factors</label>
-                            <input type="text" id="incidentFactors" class="block w-full rounded-md border-gray-200 py-2 px-3 text-sm shadow-sm focus:ring-2 focus:ring-blue-300" />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label" for="incidentResidence">Person's Residence</label>
-                            <input type="text" id="incidentResidence" class="block w-full rounded-md border-gray-200 py-2 px-3 text-sm shadow-sm focus:ring-2 focus:ring-blue-300" />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label" for="incidentOccupation">Occupation of the Victim</label>
-                            <input type="text" id="incidentOccupation" class="block w-full rounded-md border-gray-200 py-2 px-3 text-sm shadow-sm focus:ring-2 focus:ring-blue-300" />
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label" for="incidentRemarks">Remarks</label>
-                            <input type="text" id="incidentRemarks" class="block w-full rounded-md border-gray-200 py-2 px-3 text-sm shadow-sm focus:ring-2 focus:ring-blue-300" />
-                        </div>
-                    </div>
-
-                    <?php if ($isLgu || $isAdmin): ?>
-                        <div class="border-top pt-3 mt-3" id="incidentAttachmentSection">
-                            <div class="d-flex align-items-center justify-content-between mb-2">
-                                <h6 class="mb-0">Attachments</h6>
-                                <span class="text-muted" id="incidentAttachmentStatus" style="font-size: 0.85rem;"></span>
-                            </div>
-                            <div class="text-muted" id="incidentAttachmentHint" style="font-size: 0.85rem;"></div>
-                            <div class="d-flex flex-wrap gap-2 mt-2">
-                                <input type="file" id="incidentAttachments" class="block w-full text-sm text-gray-700" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx" multiple />
-                                <button type="button" id="incidentUploadButton" class="px-3 py-1.5 border border-blue-600 text-blue-600 rounded-md text-sm hover:bg-blue-50" onclick="uploadIncidentAttachments()">Upload Attachments</button>
-                            </div>
-                        </div>
-                    <?php endif; ?>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" id="incidentSaveButton" class="px-3 py-1.5 bg-blue-600 text-white rounded-md" onclick="saveIncidentFromModal()">Save Incident</button>
-            </div>
+    <form id="incidentForm">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div class="col-span-1">
+          <label for="incidentMonth" class="text-sm text-slate-600 block mb-1">Month of Incident</label>
+          <select id="incidentMonth" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
+            <option value="" disabled selected class="text-slate-400">Select month</option>
+            <?php for ($month = 1; $month <= 12; $month++): ?>
+              <option value="<?= $month ?>"><?= $month ?></option>
+            <?php endfor; ?>
+          </select>
         </div>
-    </div>
-</div>
 
-<div class="modal fade" id="attachmentViewerModal" tabindex="-1" aria-labelledby="attachmentViewerLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="attachmentViewerLabel">Incident Attachments</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div id="attachmentList" class="list-group mb-3"></div>
-                <div id="attachmentPreview" class="border rounded" style="min-height: 320px; background: #f8fafc; display: flex; align-items: center; justify-content: center;">
-                    <span class="text-muted">Select a file to preview.</span>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <a id="attachmentDownload" href="#" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-3 py-1.5 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50">Download</a>
-                <button type="button" class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md" onclick="closeAttachmentViewer && closeAttachmentViewer()">Close</button>
-            </div>
+        <div class="col-span-1">
+          <label for="incidentYear" class="text-sm text-slate-600 block mb-1">Year of Incident</label>
+          <input type="text" id="incidentYear" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
         </div>
+
+        <div class="col-span-1">
+          <label for="incidentProvince" class="text-sm text-slate-600 block mb-1">Province</label>
+          <select id="incidentProvince" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
+            <option value="" disabled selected class="text-slate-400">Select province</option>
+            <?php foreach ($provinceList as $province): ?>
+              <option value="<?= esc($province) ?>"><?= esc($province) ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+
+        <div class="md:col-span-2">
+          <label for="incidentMunicipality" class="text-sm text-slate-600 block mb-1">Municipality / City where Incident Occurred</label>
+          <select id="incidentMunicipality" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
+            <option value="" disabled selected class="text-slate-400">Select municipality</option>
+          </select>
+        </div>
+
+        <div class="md:col-span-1">
+          <label for="incidentVictim" class="text-sm text-slate-600 block mb-1">Name of Victim</label>
+          <input type="text" id="incidentVictim" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+        </div>
+
+        <div class="col-span-1">
+          <label for="incidentLocation" class="text-sm text-slate-600 block mb-1">Location Category</label>
+          <input type="text" id="incidentLocation" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+        </div>
+
+        <div class="col-span-1">
+          <label for="incidentAge" class="text-sm text-slate-600 block mb-1">Age of the Person</label>
+          <input type="text" id="incidentAge" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+        </div>
+
+        <div class="col-span-1">
+          <label for="incidentGender" class="text-sm text-slate-600 block mb-1">Sex</label>
+          <select id="incidentGender" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
+            <option value="" disabled selected class="text-slate-400">Select sex</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+          </select>
+        </div>
+
+        <div class="md:col-span-1">
+          <label for="incidentOccasion" class="text-sm text-slate-600 block mb-1">Occasion</label>
+          <input type="text" id="incidentOccasion" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+        </div>
+
+        <div class="md:col-span-1">
+          <label for="incidentFactors" class="text-sm text-slate-600 block mb-1">Other Factors</label>
+          <input type="text" id="incidentFactors" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+        </div>
+
+        <div class="md:col-span-1">
+          <label for="incidentResidence" class="text-sm text-slate-600 block mb-1">Person's Residence</label>
+          <input type="text" id="incidentResidence" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+        </div>
+
+        <div class="md:col-span-1">
+          <label for="incidentOccupation" class="text-sm text-slate-600 block mb-1">Occupation of the Victim</label>
+          <input type="text" id="incidentOccupation" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+        </div>
+
+        <div class="md:col-span-3">
+          <label for="incidentRemarks" class="text-sm text-slate-600 block mb-1">Remarks</label>
+          <input type="text" id="incidentRemarks" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+        </div>
+      </div>
+
+      <?php if ($isLgu || $isAdmin): ?>
+        <div class="border-t pt-3 mt-3" id="incidentAttachmentSection">
+          <div class="flex items-center justify-between mb-2">
+            <h6 class="mb-0">Attachments</h6>
+            <span class="text-muted text-sm" id="incidentAttachmentStatus"></span>
+          </div>
+          <div class="text-muted text-sm" id="incidentAttachmentHint"></div>
+          <div class="flex flex-wrap gap-2 mt-2">
+            <input type="file" id="incidentAttachments" class="block w-full text-sm text-slate-700" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx" multiple />
+            <button type="button" id="incidentUploadButton" class="px-3 py-1.5 border border-indigo-600 text-indigo-600 rounded-md text-sm hover:bg-indigo-50" onclick="uploadIncidentAttachments()">Upload Attachments</button>
+          </div>
+        </div>
+      <?php endif; ?>
+
+    </form>
+  </div>
+</div> 
+
+<!-- Attachment viewer modal (Tailwind) -->
+<div id="attachmentViewerModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40" aria-hidden="true">
+  <div class="bg-white rounded-lg shadow-lg max-w-4xl w-full p-4 mx-4">
+    <div class="flex items-center justify-between mb-3">
+      <h5 class="text-lg font-semibold">Incident Attachments</h5>
+      <button type="button" class="text-slate-400 hover:text-slate-600" onclick="hideModal('attachmentViewerModal')" aria-label="Close">&times;</button>
     </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div id="attachmentList" class="space-y-2 md:col-span-1"></div>
+      <div id="attachmentPreview" class="md:col-span-2 border rounded p-4 flex items-center justify-center" style="min-height:320px; background: #f8fafc;">
+        <span class="text-muted">Select a file to preview.</span>
+      </div>
+    </div>
+    <div class="flex justify-between items-center gap-2 mt-4">
+      <a id="attachmentDownload" href="#" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-3 py-1.5 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50">Download</a>
+      <div class="flex justify-end gap-2">
+        <button type="button" class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md" onclick="hideModal('attachmentViewerModal'); closeAttachmentViewer && closeAttachmentViewer()">Close</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <?= $this->endSection() ?>
@@ -867,6 +851,7 @@
         updateIncidentAttachmentSection(row);
 
         if (typeof bootstrap === 'undefined') {
+            showModal('incidentModal');
             return;
         }
 
@@ -1255,17 +1240,32 @@
         }
     }
 
+    // Tailwind modal helpers (show/hide by toggling hidden)
+    function showModal(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.classList.remove('hidden');
+        el.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('overflow-hidden');
+    }
+
+    function hideModal(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.classList.add('hidden');
+        el.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('overflow-hidden');
+    }
+
     function openSaveModal() {
-        if (typeof bootstrap === 'undefined') {
-            if (confirm('This will save the current imported rows into the database. Continue?')) {
-                confirmSaveToDatabase();
-            }
+        if (typeof bootstrap !== 'undefined') {
+            const modalElement = document.getElementById('saveConfirmModal');
+            const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+            modal.show();
             return;
         }
 
-        const modalElement = document.getElementById('saveConfirmModal');
-        const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
-        modal.show();
+        showModal('saveConfirmModal');
     }
 
     function confirmSaveToDatabase() {
@@ -1273,6 +1273,8 @@
             const modalElement = document.getElementById('saveConfirmModal');
             const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
             modal.hide();
+        } else {
+            hideModal('saveConfirmModal');
         }
 
         saveToDatabase();
@@ -1280,12 +1282,10 @@
 
     function showImportSuccess(count) {
         const messageEl = document.getElementById('importSuccessMessage');
-        if (messageEl) {
-            messageEl.textContent = `Successfully imported ${count} rows.`;
-        }
+        if (messageEl) messageEl.textContent = `Successfully imported ${count} rows.`;
 
         if (typeof bootstrap === 'undefined') {
-            alert(`Successfully imported ${count} rows.`);
+            showModal('importSuccessModal');
             return;
         }
 
@@ -1296,13 +1296,13 @@
 
     function showSaveResult(message) {
         const messageEl = document.getElementById('saveResultMessage');
-        if (messageEl) {
-            messageEl.textContent = message;
-        }
+        if (messageEl) messageEl.textContent = message;
 
         if (typeof bootstrap === 'undefined') {
-            alert(message);
-            window.location.reload();
+            const modalId = 'saveResultModal';
+            showModal(modalId);
+            const el = document.getElementById(modalId);
+            el.addEventListener('click', () => window.location.reload(), { once: true });
             return;
         }
 
@@ -1321,7 +1321,7 @@
         }
 
         if (typeof bootstrap === 'undefined') {
-            alert(message);
+            showModal('attachmentModal');
             return;
         }
 
@@ -1398,6 +1398,7 @@
             }
 
             if (typeof bootstrap === 'undefined') {
+                showModal('attachmentViewerModal');
                 return;
             }
 
@@ -1421,9 +1422,7 @@
         pendingReview = { incidentN, action };
 
         if (typeof bootstrap === 'undefined') {
-            if (confirm(`Are you sure you want to ${actionLabel} this incident?`)) {
-                submitReview();
-            }
+            showModal('reviewConfirmModal');
             return;
         }
 
@@ -1442,6 +1441,8 @@
             const modalElement = document.getElementById('reviewConfirmModal');
             const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
             modal.hide();
+        } else {
+            hideModal('reviewConfirmModal');
         }
 
         performReview(incidentN, action);

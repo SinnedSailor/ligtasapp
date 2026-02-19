@@ -2,190 +2,166 @@
 
 <?= $this->section('pageStyles') ?>
 <style>
-    .chart-container {
-        position: relative;
-        height: 280px;
-        width: 100%;
-    }
+  /* Minimal overrides for SaaS / Apple-style look (Tailwind-first; keep overrides tiny) */
+  :root {
+    --saas-primary: #4f46e5; /* indigo-600 */
+    --saas-muted: #64748b;   /* slate-500 */
+    --card-border: #eef2f7;  /* subtle border */
+    --page-bg: #f8fafc;      /* slate-50 */
+  }
 
-    .stat-card h4 {
-        font-size: 0.9rem;
-        margin-bottom: 8px;
-        color: #6c757d;
-    }
+  /* Ensure the page uses a neutral canvas even if layout has older rules */
+  .content-wrapper { background: var(--page-bg) !important; }
 
-    .stat-card {
-        background: #FFFCFB;
-        border: 1px solid #FFFCFB;
-    }
+  /* Small helper for chart containers when Tailwind height utility isn't enough */
+  .chart-h-72 { height: 18rem; }
 
-    .stat-number {
-        font-size: 1.6rem;
-        font-weight: 700;
-        color: #09637E;
-    }
+  /* Reduce visual noise on cards when Tailwind utilities are not enough */
+  .saas-card { border-color: var(--card-border); }
 
-    .section-title {
-        font-size: 1rem;
-        font-weight: 600;
-        margin-bottom: 15px;
-        color: #343a40;
-    }
-
-    .page-header {
-        background: #002C76;
-        color: #fff;
-        border-radius: 8px;
-        padding: 16px 20px;
-    }
-
-    .page-header .page-title,
-    .page-header .text-muted {
-        color: #fff !important;
-    }
-
-    .content-wrapper {
-        background: #E8F9FF !important;
-    }
+  /* Typography refinements */
+  .page-title-strong { font-weight: 700; color: #0f172a; }
+  .page-subtle { color: #64748b; }
 </style>
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-<div class="page-header">
-    <h3 class="page-title">Dashboard</h3>
-    <div class="text-muted">Welcome, <?= esc(session()->get('username') ?? 'User') ?></div>
-</div>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+  <!-- Header -->
+  <header class="flex items-start justify-between gap-6 mb-8">
+    <div>
+      <h1 class="text-3xl page-title-strong">Dashboard</h1>
+      <p class="mt-2 text-sm page-subtle">Overview — Local Incident Gathering and Tracking for Aquatic Safety</p>
+    </div>
 
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-    <div>
-        <div class="stat-card bg-white rounded-md shadow p-4">
-                <h4>Total Incidents</h4>
-                <div class="stat-number">2,847</div>
-                <div class="text-gray-500">All Provinces (2020-2024)</div>
-        </div>
+    <div class="flex items-center gap-3">
+      <button class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-300">+ New Incident</button>
+      <button class="px-3 py-2 bg-white border border-slate-100 rounded-md text-slate-700 shadow-sm">Export</button>
     </div>
-    <div>
-        <div class="stat-card bg-white rounded-md shadow p-4">
-                <h4>Total Fatalities</h4>
-                <div class="stat-number">1,256</div>
-                <div class="text-gray-500">Death Rate: 44.1%</div>
-        </div>
-    </div>
-    <div>
-        <div class="stat-card bg-white rounded-md shadow p-4">
-                <h4>Highest Risk Province</h4>
-                <div class="stat-number">Pangasinan</div>
-                <div class="text-gray-500">612 incidents (21.5%)</div>
-        </div>
-    </div>
-    <div>
-        <div class="stat-card bg-white rounded-md shadow p-4">
-                <h4>Most Affected Age Group</h4>
-                <div class="stat-number">0-14 Years</div>
-                <div class="text-gray-500">38.2% of incidents</div>
-        </div>
-    </div>
-</div>
+  </header>
 
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <div>
-        <div class="bg-white rounded-md shadow p-4">
-                <div class="section-title">Incidents per Province</div>
-                <div class="chart-container">
-                    <canvas id="provinceChart"></canvas>
-                </div>
+  <!-- Stats -->
+  <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white rounded-2xl border saas-card p-6 shadow-sm">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <div class="text-sm text-slate-500">Total Incidents</div>
+          <div class="mt-2 text-2xl font-semibold text-slate-900">2,847</div>
+          <div class="text-xs text-slate-400 mt-1">All Provinces (2020–2024)</div>
         </div>
+        <div class="w-12 h-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-indigo-600">📈</div>
+      </div>
     </div>
-    <div>
-        <div class="bg-white rounded-md shadow p-4">
-                <div class="section-title">Remarks Status</div>
-                <div class="chart-container">
-                    <canvas id="remarksChart"></canvas>
-                </div>
-        </div>
-    </div>
-</div>
 
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <div>
-        <div class="bg-white rounded-md shadow p-4">
-                <div class="section-title">Incidents by Sex</div>
-                <div class="chart-container">
-                    <canvas id="sexChart"></canvas>
-                </div>
+    <div class="bg-white rounded-2xl border saas-card p-6 shadow-sm">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <div class="text-sm text-slate-500">Total Fatalities</div>
+          <div class="mt-2 text-2xl font-semibold text-slate-900">1,256</div>
+          <div class="text-xs text-slate-400 mt-1">Death Rate: 44.1%</div>
         </div>
+        <div class="w-12 h-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-red-500">⚠️</div>
+      </div>
     </div>
-    <div>
-        <div class="bg-white rounded-md shadow p-4">
-                <div class="section-title">Incidents by Age Group</div>
-                <div class="chart-container">
-                    <canvas id="ageChart"></canvas>
-                </div>
-        </div>
-    </div>
-</div>
 
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <div>
-        <div class="bg-white rounded-md shadow p-4">
-                <div class="section-title">Incidents by Year</div>
-                <div class="chart-container">
-                    <canvas id="yearChart"></canvas>
-                </div>
+    <div class="bg-white rounded-2xl border saas-card p-6 shadow-sm">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <div class="text-sm text-slate-500">Highest Risk Province</div>
+          <div class="mt-2 text-2xl font-semibold text-slate-900">Pangasinan</div>
+          <div class="text-xs text-slate-400 mt-1">612 incidents (21.5%)</div>
         </div>
+        <div class="w-12 h-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-indigo-600">📍</div>
+      </div>
     </div>
-    <div>
-        <div class="bg-white rounded-md shadow p-4">
-                <div class="section-title">Incidents by Holiday</div>
-                <div class="chart-container">
-                    <canvas id="occasionChart"></canvas>
-                </div>
-        </div>
-    </div>
-</div>
 
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <div>
-        <div class="bg-white rounded-md shadow p-4">
-                <div class="section-title">Incidents by Residence</div>
-                <div class="flex items-center gap-2 mb-2">
-                    <label for="residenceFilter" class="text-gray-500 mb-0">Filter by:</label>
-                    <select id="residenceFilter" onchange="updateResidenceChart()" class="ml-2 rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300" style="max-width: 180px;">
-                        <option value="province">Province</option>
-                        <option value="municipality">Municipality</option>
-                    </select>
-                </div>
-                <div class="chart-container">
-                    <canvas id="residenceChart"></canvas>
-                </div>
+    <div class="bg-white rounded-2xl border saas-card p-6 shadow-sm">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <div class="text-sm text-slate-500">Most Affected Age Group</div>
+          <div class="mt-2 text-2xl font-semibold text-slate-900">0–14 Years</div>
+          <div class="text-xs text-slate-400 mt-1">38.2% of incidents</div>
         </div>
+        <div class="w-12 h-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-indigo-600">👪</div>
+      </div>
     </div>
-    <div>
-        <div class="bg-white rounded-md shadow p-4">
-                <div class="section-title">Contributing Factors</div>
-                <div class="chart-container">
-                    <canvas id="factorsChart"></canvas>
-                </div>
-        </div>
+  </section>
 
-        <!-- Incidents by Location Category (added) -->
-        <div class="bg-white rounded-md shadow p-4 mt-4">
-                <div class="section-title">Incidents by Location Category</div>
-                <div class="chart-container">
-                    <canvas id="locationChart"></canvas>
-                </div>
-        </div>
+  <!-- Charts grid -->
+  <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 bg-white rounded-2xl border saas-card p-6 shadow-sm">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-sm font-semibold text-slate-900">Incidents per Province</h3>
+        <div class="text-xs text-slate-400">Last 12 months</div>
+      </div>
+      <div class="chart-h-72">
+        <canvas id="provinceChart"></canvas>
+      </div>
     </div>
+
+    <div class="bg-white rounded-2xl border saas-card p-6 shadow-sm">
+      <h3 class="text-sm font-semibold text-slate-900 mb-4">Remarks Status</h3>
+      <div class="chart-h-72"><canvas id="remarksChart"></canvas></div>
+    </div>
+
+    <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="bg-white rounded-2xl border saas-card p-6 shadow-sm">
+        <h3 class="text-sm font-semibold text-slate-900 mb-4">Incidents by Sex</h3>
+        <div class="h-56"><canvas id="sexChart"></canvas></div>
+      </div>
+
+      <div class="bg-white rounded-2xl border saas-card p-6 shadow-sm">
+        <h3 class="text-sm font-semibold text-slate-900 mb-4">Incidents by Age Group</h3>
+        <div class="h-56"><canvas id="ageChart"></canvas></div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border saas-card p-6 shadow-sm">
+      <h3 class="text-sm font-semibold text-slate-900 mb-4">Incidents by Year</h3>
+      <div class="h-56"><canvas id="yearChart"></canvas></div>
+    </div>
+
+    <div class="lg:col-span-2 bg-white rounded-2xl border saas-card p-6 shadow-sm">
+      <div class="flex items-center justify-between">
+        <h3 class="text-sm font-semibold text-slate-900">Incidents by Residence</h3>
+        <div>
+          <select id="residenceFilter" onchange="updateResidenceChart()" class="rounded-md border border-slate-100 px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-300">
+            <option value="province">Province</option>
+            <option value="municipality">Municipality</option>
+          </select>
+        </div>
+      </div>
+      <div class="mt-4 h-64"><canvas id="residenceChart"></canvas></div>
+    </div>
+
+    <div class="bg-white rounded-2xl border saas-card p-6 shadow-sm">
+      <h3 class="text-sm font-semibold text-slate-900 mb-4">Contributing Factors</h3>
+      <div class="h-64"><canvas id="factorsChart"></canvas></div>
+    </div>
+
+    <div class="lg:col-span-2 bg-white rounded-2xl border saas-card p-6 shadow-sm">
+      <h3 class="text-sm font-semibold text-slate-900 mb-4">Incidents by Location Category</h3>
+      <div class="h-64"><canvas id="locationChart"></canvas></div>
+    </div>
+  </section>
 </div>
 <?= $this->endSection() ?>
 
 <?= $this->section('pageScripts') ?>
-<script src="<?= base_url('assets/staradmin/vendors/chart.js/chart.umd.js') ?>"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
-    const chartColors = ['#09637E', '#0E7EA0', '#0B4F63', '#5FA8B3', '#C94A4A', '#D6B443', '#3FAF7B', '#94C7CF'];
-    const accentRed = '#C94A4A';
-    const accentYellow = '#D6B443';
-    const accentGreen = '#3FAF7B';
+    const palette = {
+        bg: '#f8fafc',        // slate-50
+        cardBorder: '#eef2f7',
+        primary: '#4f46e5',   // indigo-600
+        muted: '#64748b',     // slate-500
+        accentRed: '#ef4444'
+    };
+
+    const chartColors = [palette.primary, palette.muted, '#cbd5e1', '#e6edf3', '#94a3b8', '#a78bfa'];
+    const accentRed = palette.accentRed;
+    const accentYellow = '#f59e0b';
+    const accentGreen = '#10b981';
 
     new Chart(document.getElementById('provinceChart'), {
         type: 'bar',

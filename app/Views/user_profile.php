@@ -173,10 +173,10 @@
             <div class="profile-picture-section">
                 <div class="profile-picture-upload">
                     <div class="profile-picture-preview" id="profilePreview">
-                        <i class="ti-user"></i>
+                        👤
                     </div>
                     <div class="upload-overlay" onclick="document.getElementById('profilePicture').click()">
-                        <i class="ti-camera"></i> Change Photo
+                        📷 Change Photo
                     </div>
                     <input type="file" id="profilePicture" class="hidden" accept="image/*" onchange="previewImage(event)">
                 </div>
@@ -246,13 +246,13 @@
                     <h5>Password Settings</h5>
                     <p class="text-muted">Need to change your password?</p>
                     <a href="#" class="forgot-password-link" onclick="forgotPassword(event)">
-                        <i class="ti-lock"></i> Reset Password via Email
+                        🔒 Reset Password via Email
                     </a>
                 </div>
 
                 <div class="mt-4 flex flex-wrap gap-2">
                     <button type="submit" class="bg-blue-800 hover:bg-blue-900 text-white py-2 px-4 rounded-md inline-flex items-center gap-2">
-                        <i class="ti-check"></i> <span>Save Changes</span>
+                        ✔️ <span>Save Changes</span>
                     </button>
                     <button type="button" class="bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded-md" onclick="window.location.href='<?= base_url('/dashboard') ?>'">
                         Cancel
@@ -265,9 +265,7 @@
 
 <div class="success-modal" id="profileSuccessModal" aria-hidden="true">
     <div class="success-card">
-        <div class="success-icon">
-            <i class="ti-check"></i>
-        </div>
+        <div class="success-icon">✔️</div>
         <div class="success-message">Profile updated successfully!</div>
         <div class="success-subtext">Your changes have been saved.</div>
         <button type="button" class="bg-blue-800 hover:bg-blue-900 text-white py-2 px-4 rounded-md" id="closeSuccessModal">OK</button>

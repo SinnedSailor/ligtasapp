@@ -84,7 +84,7 @@ $hideFooter = true;
                     <div class="flex items-center gap-2"><span class="text-green-600">✓</span><span>One special character (!@#$%^&* etc.)</span></div>
                 </div>
 
-                <button type="submit" class="btn-primary w-full mt-4">Create Admin Account</button>
+                <button type="submit" class="w-full mt-4 inline-flex justify-center px-4 py-2 bg-indigo-600 text-white rounded-md shadow-sm hover:bg-indigo-700">Create Admin Account</button>
 
                 <div class="text-center mt-3">
                     <p class="text-gray-500 text-sm">

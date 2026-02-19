@@ -4,11 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= esc($title ?? 'IWAS') ?></title>
-    <link rel="stylesheet" href="<?= base_url('assets/staradmin/vendors/feather/feather.css') ?>">
-    <link rel="stylesheet" href="<?= base_url('assets/staradmin/vendors/ti-icons/css/themify-icons.css') ?>">
-    <link rel="stylesheet" href="<?= base_url('assets/staradmin/vendors/css/vendor.bundle.base.css') ?>">
-    <link rel="stylesheet" href="<?= base_url('assets/staradmin/css/style.css') ?>">
-    <link rel="shortcut icon" href="<?= base_url('assets/staradmin/images/favicon.png') ?>" />
+    <link rel="stylesheet" href="<?= base_url('assets/css/tailwind.css') ?>">
     <style>
         :root {
             --iwas-primary: #09637E;
@@ -68,19 +64,13 @@
 </head>
 <body class="auth">
     <div class="container-scroller">
-        <div class="container-fluid page-body-wrapper full-page-wrapper">
-            <div class="content-wrapper d-flex align-items-center auth px-0">
-                <div class="row w-100 mx-0">
-                    <div class="col-lg-5 mx-auto">
-                        <?= $this->renderSection('content') ?>
-                    </div>
-                </div>
-            </div>
+        <div class="min-h-screen flex items-center justify-center px-4">
+        <div class="w-full max-w-md mx-auto">
+            <?= $this->renderSection('content') ?>
         </div>
     </div>
+    </div>
 
-    <script src="<?= base_url('assets/staradmin/vendors/js/vendor.bundle.base.js') ?>"></script>
-    <script src="<?= base_url('assets/staradmin/js/template.js') ?>"></script>
     <?= $this->renderSection('pageScripts') ?>
 </body>
 </html>
