@@ -13,11 +13,11 @@
         @media (min-width: 768px) {
             .topbar-shift { left: 18rem !important; width: calc(100% - 18rem) !important; }
             /* when sidebar exists, ensure main-panel is offset so content never sits underneath */
-            #sidebar + .main-panel, .main-panel { margin-left: 18rem !important; }
+            #sidebar + .main-panel { margin-left: 18rem !important; }
         }
         @media (min-width: 1024px) {
             .topbar-shift { left: 16rem !important; width: calc(100% - 16rem) !important; }
-            #sidebar + .main-panel, .main-panel { margin-left: 16rem !important; }
+            #sidebar + .main-panel { margin-left: 16rem !important; }
         }
         /* keep main-panel full-width on small screens */
         @media (max-width: 767px) {
