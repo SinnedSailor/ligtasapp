@@ -90,29 +90,32 @@
 
                 <!-- Navigation -->
                 <div class="flex-1 mt-2 overflow-y-auto">
+                    <div class="text-xs text-slate-400 uppercase tracking-wide mb-3">Menu</div>
                     <ul class="space-y-1">
                         <li>
-                            <a href="<?= base_url('/dashboard') ?>" class="flex items-center gap-3 px-3 py-2 text-sm rounded-md <?= ($root === '' || $root === 'dashboard') ? 'bg-slate-100 text-indigo-600' : 'text-slate-600 hover:bg-slate-50' ?>">
+                            <a href="<?= base_url('/dashboard') ?>" class="flex items-center gap-3 px-3 py-2 text-sm rounded-md <?= ($root === '' || $root === 'dashboard') ? 'bg-slate-100 text-indigo-600' : 'text-slate-600 hover:bg-slate-50' ?>" <?= ($root === '' || $root === 'dashboard') ? 'aria-current="page"' : '' ?>>
                                 <?= svg_icon('home', 'w-5 h-5') ?>
                                 <span class="menu-title">Dashboard</span>
-                                <span class="ml-auto text-xs bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full">01</span>
                             </a>
                         </li>
+
                         <li>
-                            <a href="<?= base_url('/incident-report') ?>" class="flex items-center gap-3 px-3 py-2 text-sm rounded-md <?= $root === 'incident-report' ? 'bg-slate-100 text-indigo-600' : 'text-slate-600 hover:bg-slate-50' ?>">
+                            <a href="<?= base_url('/incident-report') ?>" class="flex items-center gap-3 px-3 py-2 text-sm rounded-md <?= $root === 'incident-report' ? 'bg-slate-100 text-indigo-600' : 'text-slate-600 hover:bg-slate-50' ?>" <?= $root === 'incident-report' ? 'aria-current="page"' : '' ?>>
                                 <?= svg_icon('files', 'w-5 h-5') ?>
-                                <span class="menu-title">Incident Reports</span>
+                                <span class="menu-title">Incident Report</span>
                             </a>
                         </li>
+
                         <li>
-                            <a href="<?= base_url('/ordinance') ?>" class="flex items-center gap-3 px-3 py-2 text-sm rounded-md <?= $root === 'ordinance' ? 'bg-slate-100 text-indigo-600' : 'text-slate-600 hover:bg-slate-50' ?>">
-                                <?= svg_icon('files', 'w-5 h-5') ?>
+                            <a href="<?= base_url('/ordinance') ?>" class="flex items-center gap-3 px-3 py-2 text-sm rounded-md <?= $root === 'ordinance' ? 'bg-slate-100 text-indigo-600' : 'text-slate-600 hover:bg-slate-50' ?>" <?= $root === 'ordinance' ? 'aria-current="page"' : '' ?>>
+                                <?= svg_icon('file', 'w-5 h-5') ?>
                                 <span class="menu-title">Documents</span>
                             </a>
                         </li>
+
                         <?php if (session()->get('is_admin')): ?>
                         <li>
-                            <a href="<?= base_url('/admin-panel') ?>" class="flex items-center gap-3 px-3 py-2 text-sm rounded-md <?= $root === 'admin-panel' ? 'bg-slate-100 text-indigo-600' : 'text-slate-600 hover:bg-slate-50' ?>">
+                            <a href="<?= base_url('/admin-panel') ?>" class="flex items-center gap-3 px-3 py-2 text-sm rounded-md <?= $root === 'admin-panel' ? 'bg-slate-100 text-indigo-600' : 'text-slate-600 hover:bg-slate-50' ?>" <?= $root === 'admin-panel' ? 'aria-current="page"' : '' ?>>
                                 <?= svg_icon('users', 'w-5 h-5') ?>
                                 <span class="menu-title">Admin Panel</span>
                             </a>
