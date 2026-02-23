@@ -31,7 +31,7 @@
         align-items: center;
         justify-content: center;
         font-size: 48px;
-        color: #09637E;
+        color: #002C76;
         overflow: hidden;
     }
 
@@ -46,7 +46,7 @@
         bottom: 0;
         left: 0;
         right: 0;
-        background: rgba(9, 99, 126, 0.85);
+        background: rgba(0, 44, 118, 0.85);
         color: #fff;
         text-align: center;
         padding: 6px 0;
@@ -62,7 +62,7 @@
     }
 
     .form-section h5 {
-        color: #09637E;
+        color: #002C76;
         margin-bottom: 10px;
     }
 
@@ -79,7 +79,7 @@
 
     .forgot-password-link {
         text-decoration: none;
-        color: #09637E;
+        color: #002C76;
         font-weight: 600;
     }
 

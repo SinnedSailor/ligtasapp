@@ -21,7 +21,7 @@
     }
 
     .document-card h5 {
-        color: #09637E;
+        color: #002C76;
         margin-bottom: 10px;
     }
 
@@ -44,7 +44,7 @@
     }
 
     .submit-btn {
-        background: #09637E;
+        background: #002C76;
         color: #fff;
         border: none;
         padding: 10px 24px;
@@ -89,7 +89,7 @@
     }
 
     .table-docs th {
-        color: #0B5FB3;
+        color: #002C76;
         font-weight: 600;
     }
 
@@ -227,13 +227,13 @@
     }
 
     .filter-btn:hover {
-        border-color: #09637E;
-        color: #09637E;
+        border-color: #002C76;
+        color: #002C76;
     }
 
     .filter-btn.active {
-        background: #09637E;
-        border-color: #09637E;
+        background: #002C76;
+        border-color: #002C76;
         color: #fff;
     }
 </style>

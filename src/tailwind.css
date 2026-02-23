@@ -5,13 +5,15 @@
 /* Project customizations */
 @layer base {
   :root {
-    --ligtas-primary: #0B5FB3;
+    --ligtas-primary: #002C76;
   }
   body { @apply antialiased text-gray-800; }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-blue-800 text-white font-semibold py-2 px-4 rounded-lg;
+    /* theme color */
+    background-color: var(--ligtas-primary);
+    @apply text-white font-semibold py-2 px-4 rounded-lg;
   }
 }

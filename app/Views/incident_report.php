@@ -148,7 +148,7 @@
     $provinceList = $provinces ?? [];
 ?>
 <div class="page-header">
-    <h3 class="page-title">Incident Report</h3>
+    <h1 class="page-title">Incident Report</h1>
 </div>
 
 <div class="px-4">
@@ -157,7 +157,7 @@
         <div class="flex flex-wrap items-center gap-3 mt-4 mb-4">
             <div class="flex items-center gap-3">
                 <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" class="hidden" />
-                <button id="importButton" class="px-3 py-1.5 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700" onclick="document.getElementById('excelFile').click()" style="<?= $hasInitialRows ? 'display:none;' : '' ?>">
+                <button id="importButton" class="px-3 py-1.5 border border-blue-600 text-blue-600 rounded-md text-sm hover:bg-blue-600 hover:text-white active:bg-blue-700" onclick="document.getElementById('excelFile').click()" style="<?= $hasInitialRows ? 'display:none;' : '' ?>">
                     📥 Import Excel File
                 </button>
                 <span class="text-gray-500 text-sm file-name" id="fileName" style="<?= $hasInitialRows ? 'display:none;' : '' ?>">No file selected</span>
@@ -172,14 +172,14 @@
 
         <div class="flex flex-wrap gap-2 mb-4">
             <?php if ($isLgu || $isAdmin): ?>
-                <button class="px-3 py-1.5 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700" onclick="openIncidentModal()">
+                <button class="px-3 py-1.5 border border-blue-600 text-blue-600 rounded-md text-sm hover:bg-blue-600 hover:text-white active:bg-blue-700" onclick="openIncidentModal()">
                     ➕ Add Incident
                 </button>
             <?php endif; ?>
-            <button id="saveButton" class="px-3 py-1.5 bg-green-600 text-white rounded-md text-sm hover:bg-green-700" onclick="openSaveModal()" style="<?= $hasInitialRows ? 'display:none;' : '' ?>">
+            <button id="saveButton" class="px-3 py-1.5 border border-green-600 text-green-600 rounded-md text-sm hover:bg-green-600 hover:text-white active:bg-green-700" onclick="openSaveModal()" style="<?= $hasInitialRows ? 'display:none;' : '' ?>">
                 💾 Save to Database
             </button>
-            <button id="generateReportButton" class="px-3 py-1.5 bg-sky-500 text-white rounded-md text-sm hover:bg-sky-600" onclick="downloadIncidentReport()">
+            <button id="generateReportButton" class="px-3 py-1.5 border border-sky-500 text-sky-500 rounded-md text-sm hover:bg-sky-500 hover:text-white active:bg-sky-600" onclick="downloadIncidentReport()">
                 📊 Generate Report
             </button>
         </div>
@@ -241,8 +241,8 @@
     </div>
     <div class="text-sm text-slate-600 mb-6">This will save the current imported rows into the database. Continue?</div>
     <div class="flex justify-end gap-3">
-      <button type="button" class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md" onclick="hideModal('saveConfirmModal')">Cancel</button>
-      <button type="button" class="px-3 py-1.5 bg-green-600 text-white rounded-md" onclick="confirmSaveToDatabase()">Yes, Save</button>
+      <button type="button" class="px-3 py-1.5 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-300 hover:text-white active:bg-gray-400" onclick="hideModal('saveConfirmModal')">Cancel</button>
+      <button type="button" class="px-3 py-1.5 border border-green-600 text-green-600 rounded-md hover:bg-green-600 hover:text-white active:bg-green-700" onclick="confirmSaveToDatabase()">Yes, Save</button>
     </div>
   </div>
 </div>
@@ -255,7 +255,7 @@
     </div>
     <div class="text-sm text-slate-700 mb-6"><div id="importSuccessMessage">Import completed.</div></div>
     <div class="flex justify-end">
-      <button type="button" class="px-3 py-1.5 bg-blue-600 text-white rounded-md" onclick="hideModal('importSuccessModal')">OK</button>
+      <button type="button" class="px-3 py-1.5 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-600 hover:text-white active:bg-blue-700" onclick="hideModal('importSuccessModal')">OK</button>
     </div>
   </div>
 </div>
@@ -268,7 +268,7 @@
     </div>
     <div class="text-sm text-slate-700 mb-6"><div id="saveResultMessage">Save completed.</div></div>
     <div class="flex justify-end">
-      <button type="button" class="px-3 py-1.5 bg-blue-600 text-white rounded-md" onclick="hideModal('saveResultModal')">OK</button>
+      <button type="button" class="px-3 py-1.5 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-600 hover:text-white active:bg-blue-700" onclick="hideModal('saveResultModal')">OK</button>
     </div>
   </div>
 </div>
@@ -283,7 +283,7 @@
     </div>
     <div class="text-sm text-slate-700 mb-4"><div id="attachmentModalMessage">Please upload at least one file.</div></div>
     <div class="flex justify-end">
-      <button type="button" class="px-3 py-1.5 bg-blue-600 text-white rounded-md" onclick="hideModal('attachmentModal')">OK</button>
+      <button type="button" class="px-3 py-1.5 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-600 hover:text-white active:bg-blue-700" onclick="hideModal('attachmentModal')">OK</button>
 
 
 <!-- Review confirm modal (Tailwind) -->
@@ -295,8 +295,8 @@
     </div>
     <div class="text-sm text-slate-700 mb-4"><div id="reviewConfirmMessage">Are you sure you want to update this incident?</div></div>
     <div class="flex justify-end gap-2">
-      <button type="button" class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md" onclick="hideModal('reviewConfirmModal')">Cancel</button>
-      <button type="button" id="reviewConfirmAction" class="px-3 py-1.5 bg-blue-600 text-white rounded-md" onclick="submitReview()">Confirm</button>
+      <button type="button" class="px-3 py-1.5 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-300 hover:text-white active:bg-gray-400" onclick="hideModal('reviewConfirmModal')">Cancel</button>
+      <button type="button" id="reviewConfirmAction" class="px-3 py-1.5 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-600 hover:text-white active:bg-blue-700" onclick="submitReview()">Confirm</button>
     </div>
   </div>
 </div>
@@ -401,7 +401,7 @@
           <div class="text-gray-500 text-sm" id="incidentAttachmentHint"></div>
           <div class="flex flex-wrap gap-2 mt-2">
             <input type="file" id="incidentAttachments" class="block w-full text-sm text-slate-700" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx" multiple />
-            <button type="button" id="incidentUploadButton" class="px-3 py-1.5 border border-indigo-600 text-indigo-600 rounded-md text-sm hover:bg-indigo-50" onclick="uploadIncidentAttachments()">Upload Attachments</button>
+            <button type="button" id="incidentUploadButton" class="px-3 py-1.5 border border-indigo-600 text-indigo-600 rounded-md text-sm hover:bg-indigo-600 hover:text-white active:bg-indigo-700" onclick="uploadIncidentAttachments()">Upload Attachments</button>
           </div>
         </div>
       <?php endif; ?>
@@ -424,7 +424,7 @@
       </div>
     </div>
     <div class="flex justify-between items-center gap-2 mt-4">
-      <a id="attachmentDownload" href="#" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-3 py-1.5 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50">Download</a>
+      <a id="attachmentDownload" href="#" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-3 py-1.5 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-600 hover:text-white active:bg-blue-700">Download</a>
       <div class="flex justify-end gap-2">
         <button type="button" class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md" onclick="hideModal('attachmentViewerModal'); closeAttachmentViewer && closeAttachmentViewer()">Close</button>
       </div>
@@ -464,6 +464,11 @@
         'Occupation of the Victim',
         'Remarks'
     ];
+    //icons
+    const iconCheck   = `<?= svg_icon('check', 'w-4 h-4') ?>`;
+    const iconX       = `<?= svg_icon('x', 'w-4 h-4') ?>`;
+    const iconPencil  = `<?= svg_icon('pencil', 'w-4 h-4') ?>`;
+    const iconTrash   = `<?= svg_icon('trash', 'w-4 h-4') ?>`;
     const editableColumns = columns.filter(col => col !== 'N');
     const columnAliases = {
         'Year': 'Year of Incident',
@@ -733,14 +738,17 @@
             const reviewStatus = row.review_status || 'pending';
             const statusClass = reviewStatus === 'approved' ? 'status-approved' : (reviewStatus === 'rejected' ? 'status-rejected' : 'status-pending');
 
-            const viewButton = `<button class="inline-flex items-center gap-2 px-3 py-1 border rounded text-sm text-gray-700 bg-white hover:bg-gray-50 mt-1" onclick="openAttachmentViewer(${row['N']})">View</button>`;
+            const viewButton = `<button class="inline-flex items-center gap-2 px-3 py-1 border border-gray-400 text-gray-700 rounded text-sm hover:bg-gray-400 hover:text-white mt-1" onclick="openAttachmentViewer(${row['N']})">View</button>`;
 
             let reviewControls = '';
             if (canReviewIncidents) {
+                
+                const approveBtn = `<button aria-label="Approve" class="inline-flex items-center justify-center px-2 py-1 border border-green-600 text-green-600 rounded text-sm hover:bg-green-600 hover:text-white active:bg-green-700" onclick="reviewIncident(${row['N']}, 'approve')">${iconCheck}</button>`;
+                const rejectBtn  = `<button aria-label="Reject"  class="inline-flex items-center justify-center px-2 py-1 border border-red-600 text-red-600 rounded text-sm hover:bg-red-600 hover:text-white active:bg-red-700" onclick="reviewIncident(${row['N']}, 'reject')">${iconX}</button>`;
                 reviewControls = `
                     <div class="flex gap-1 flex-wrap">
-                        <button class="inline-flex items-center gap-2 px-3 py-1 bg-green-600 text-white rounded text-sm" onclick="reviewIncident(${row['N']}, 'approve')">Approve</button>
-                        <button class="inline-flex items-center gap-2 px-3 py-1 bg-red-600 text-white rounded text-sm" onclick="reviewIncident(${row['N']}, 'reject')">Reject</button>
+                        ${approveBtn}
+                        ${rejectBtn}
                     </div>
                 `;
             }
@@ -754,8 +762,8 @@
                 ${reviewControls || '<span class="text-gray-500">-</span>'}
             </td>
             <td>
-                <button class="inline-flex items-center gap-2 px-3 py-1 bg-blue-800 text-white rounded text-sm" onclick="openIncidentModal(${index})">Edit</button>
-                <button class="inline-flex items-center gap-2 px-3 py-1 bg-red-600 text-white rounded text-sm" onclick="deleteRow(${index})">Delete</button>
+                <button aria-label="Edit" class="inline-flex items-center justify-center px-2 py-1 border border-blue-800 text-blue-800 rounded text-sm hover:bg-blue-800 hover:text-white active:bg-blue-900" onclick="openIncidentModal(${index})">${iconPencil}</button>
+                <button aria-label="Delete" class="inline-flex items-center justify-center px-2 py-1 border border-red-600 text-red-600 rounded text-sm hover:bg-red-600 hover:text-white active:bg-red-700" onclick="deleteRow(${index})">${iconTrash}</button>
             </td></tr>`;
         });
 

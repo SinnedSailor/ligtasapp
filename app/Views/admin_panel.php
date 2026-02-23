@@ -3,13 +3,13 @@
 <?= $this->section('pageStyles') ?>
 <style>
     .page-header {
-        background: linear-gradient(135deg, rgba(11, 95, 179, 0.15), rgba(11, 95, 179, 0.04));
+        background: linear-gradient(135deg, rgba(0, 44, 118, 0.15), rgba(0, 44, 118, 0.04));
         border-radius: 12px;
         padding: 16px 20px;
     }
 
     .admin-card {
-        border-left: 4px solid #09637E;
+        border-left: 4px solid #002C76;
         box-shadow: 0 2px 10px rgba(9, 99, 126, 0.1);
     }
 
@@ -38,7 +38,7 @@
     }
 
     .role-lgu {
-        background: #2563EB;
+        background: #002C76;
     }
 
     .role-province {
@@ -71,7 +71,7 @@
     }
 
     .table thead th {
-        color: #09637E;
+        color: #002C76;
         font-weight: 600;
     }
 
@@ -113,7 +113,7 @@
 
     .modal-header h3 {
         margin: 0;
-        color: #09637E;
+        color: #002C76;
         font-size: 20px;
     }
 
@@ -138,7 +138,7 @@
     }
 
     .modal-btn-primary {
-        background: #09637E;
+        background: #002C76;
         color: #fff;
     }
 
@@ -165,7 +165,7 @@
 
     .success-message {
         text-align: center;
-        color: #09637E;
+        color: #002C76;
         font-size: 18px;
         font-weight: 600;
         margin-bottom: 10px;

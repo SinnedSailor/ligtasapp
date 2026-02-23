@@ -9,7 +9,7 @@ $hideFooter = true;
 <style>
     /* page background image (Tailwind compiled CSS provides utilities) */
     .auth-bg {
-        background: linear-gradient(135deg,#09637E 0%, #0B4F63 60%);
+        background: linear-gradient(135deg,#002C76 0%, #001F5C 60%);
     }
 </style>
 <?= $this->endSection() ?>
@@ -19,7 +19,7 @@ $hideFooter = true;
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 md:divide-x md:divide-gray-100 overflow-hidden items-stretch">
         <div class="hidden md:flex items-center justify-center bg-gray-50 p-10">
             <div class="w-full max-w-lg rounded-xl overflow-hidden bg-gradient-to-br from-blue-200 to-teal-100 h-64 flex items-center justify-center shadow-sm">
-                <!-- Illustration — preserve aspect ratio, do not stretch; centers inside area -->
+                <!-- Illustration -->
                 <img src="<?= base_url('assets/images/ligtas-logo.png') ?>" alt="LIGTAS illustration" class="max-w-full max-h-full object-contain block" loading="lazy" />
             </div>
         </div>
@@ -33,13 +33,13 @@ $hideFooter = true;
 
                 <?php if (session()->getFlashdata('success')): ?>
                     <div role="alert" class="mb-4 rounded-md bg-green-50 border border-green-200 text-green-700 px-4 py-3">
-                        <span class="mr-2">✅</span><?= session()->getFlashdata('success') ?>
+                        <span class="mr-2">/</span><?= session()->getFlashdata('success') ?>
                     </div>
                 <?php endif; ?>
 
                 <?php if (session()->getFlashdata('error')): ?>
                     <div role="alert" class="mb-4 rounded-md bg-red-50 border border-red-200 text-red-700 px-4 py-3">
-                        <span class="mr-2">⚠️</span><?= session()->getFlashdata('error') ?>
+                        <span class="mr-2">X</span><?= session()->getFlashdata('error') ?>
                     </div>
                 <?php endif; ?>
 

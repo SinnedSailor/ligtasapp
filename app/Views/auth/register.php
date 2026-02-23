@@ -8,7 +8,7 @@ $hideFooter = true;
 
 <?= $this->section('pageStyles') ?>
 <style>
-    .auth-bg { background: linear-gradient(135deg,#09637E 0%, #0B4F63 60%); }
+    .auth-bg { background: linear-gradient(135deg,#002C76 0%, #001F5C 60%); }
 </style>
 <?= $this->endSection() ?>
 
