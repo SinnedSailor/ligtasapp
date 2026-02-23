@@ -630,7 +630,11 @@
         'Age': 'Age of the Person',
         'Gender': 'Gender of the Person',
         'Factors': 'Other Factors',
-        'Occupation': 'Occupation of the Victim'
+        'Occupation': 'Occupation of the Victim',
+        // support split name columns commonly used in templates
+        'Last Name': 'Name of Victim',
+        'First Name': 'Name of Victim',
+        'Middle Name': 'Name of Victim'
     };
     const normalizedHeaderMap = buildNormalizedHeaderMap();
     const serverRows = <?= json_encode($initialRows ?? []) ?>;
@@ -1752,11 +1756,25 @@
             normalized[col] = '';
         });
 
+        // Append parts when multiple input columns map to the same canonical header
+        // (e.g. Last Name / First Name / Middle Name => Name of Victim)
         Object.keys(row).forEach(key => {
             const target = resolveHeader(key);
-            if (editableColumns.includes(target)) {
-                normalized[target] = row[key] ?? '';
+            if (!editableColumns.includes(target)) return;
+
+            const part = String(row[key] ?? '').trim();
+            if (part === '') return;
+
+            if (!normalized[target]) {
+                normalized[target] = part;
+            } else {
+                normalized[target] = (String(normalized[target]) + ' ' + part).trim();
             }
+        });
+
+        // Normalize spacing for all columns
+        editableColumns.forEach(col => {
+            normalized[col] = String(normalized[col] || '').replace(/\s+/g, ' ').trim();
         });
 
         return normalized;
@@ -1822,7 +1840,11 @@
         }
 
         const { headerRowIndex, headers } = headerInfo;
-        const dataRows = rows.slice(headerRowIndex + 1);
+        // detect whether the next row is a sub-header row (e.g. Last / First / Middle)
+        const possibleSubheader = rows[headerRowIndex + 1] || [];
+        const isSubheaderRow = possibleSubheader.some(c => typeof c === 'string' && /\b(last|first|middle|surname|given|family)\b/i.test(String(c)));
+
+        const dataRows = isSubheaderRow ? rows.slice(headerRowIndex + 2) : rows.slice(headerRowIndex + 1);
         const results = [];
 
         dataRows.forEach(row => {
@@ -1835,7 +1857,30 @@
                 if (!header) {
                     return;
                 }
-                record[header] = row[colIndex] ?? '';
+
+                const cellValue = row[colIndex] ?? '';
+
+                // If the same canonical header appears multiple times (e.g. Last/First/Middle
+                // all resolved to "Name of Victim"), append non-empty parts rather than overwrite.
+                if (record[header] && String(cellValue).trim() !== '') {
+                    record[header] = (String(record[header]) + ' ' + String(cellValue)).trim();
+                    return;
+                }
+
+                // If header is the merged "Name of Victim" and the sheet used a sub-row
+                // for Last/First/Middle, read adjacent columns as name parts.
+                if (header === 'Name of Victim' && isSubheaderRow) {
+                    const parts = [];
+                    if (String(row[colIndex] || '').trim() !== '') parts.push(String(row[colIndex]).trim());
+                    if (String(row[colIndex + 1] || '').trim() !== '') parts.push(String(row[colIndex + 1]).trim());
+                    if (String(row[colIndex + 2] || '').trim() !== '') parts.push(String(row[colIndex + 2]).trim());
+                    if (parts.length) {
+                        record[header] = parts.join(' ');
+                        return; // consumed composite columns
+                    }
+                }
+
+                record[header] = cellValue;
             });
 
             if (isInstructionRow(record)) {

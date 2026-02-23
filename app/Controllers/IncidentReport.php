@@ -380,6 +380,20 @@ class IncidentReport extends BaseController
                 continue;
             }
 
+            // Defensive merge: if the uploaded row contains separate name parts
+            // (Last/First/Middle or Surname/Given), combine them into a single
+            // `Name of Victim` field so downstream mapping always sees the full name.
+            $nameParts = [];
+            $partKeys = ['Last Name', 'First Name', 'Middle Name', 'Surname', 'Given Name'];
+            foreach ($partKeys as $pk) {
+                if (isset($row[$pk]) && trim((string) $row[$pk]) !== '') {
+                    $nameParts[] = trim((string) $row[$pk]);
+                }
+            }
+            if (!empty($nameParts)) {
+                $row['Name of Victim'] = implode(' ', $nameParts);
+            }
+
             $mapped = $this->mapRow($row, $index);
             if ($mapped['n'] === null) {
                 $mapped['n'] = $nextN;
@@ -933,7 +947,12 @@ class IncidentReport extends BaseController
             'Municipality/City where Incidence Occurred' => 'municipality',
             'Municipality/City where Incident Occurred' => 'municipality',
             'Municipality' => 'municipality',
+            // primary single-column victim name
             'Name of Victim' => 'name_of_victim',
+            // support spreadsheets that split the name into parts
+            'Last Name' => 'last_name',
+            'First Name' => 'first_name',
+            'Middle Name' => 'middle_name',
             'Location Category' => 'location_category',
             'Age of the Person' => 'age',
             'Age' => 'age',
@@ -955,6 +974,17 @@ class IncidentReport extends BaseController
             }
             $field = $map[$key];
             $data[$field] = $value;
+        }
+
+        // If the sheet provided separate Last/First/Middle columns, combine them
+        $last = $this->toString($data['last_name'] ?? '');
+        $first = $this->toString($data['first_name'] ?? '');
+        $middle = $this->toString($data['middle_name'] ?? '');
+        if ($last !== '' || $first !== '' || $middle !== '') {
+            $combined = trim(implode(' ', array_filter([$last, $first, $middle])));
+            // prefer the explicitly combined parts over a single-column value
+            $data['name_of_victim'] = $combined;
+            unset($data['last_name'], $data['first_name'], $data['middle_name']);
         }
 
         $n = $this->toInt($data['n'] ?? null);
