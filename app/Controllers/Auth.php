@@ -234,6 +234,16 @@ class Auth extends BaseController
         $incidentModel = new \App\Models\IncidentReportModel();
         foreach ($rows as &$r) {
             $r = $incidentModel->decryptRow($r);
+            // convert stored gender codes to human-readable labels so the
+            // frontend doesn't have to worry about normalization artifacts
+            if (isset($r['gender']) && is_string($r['gender'])) {
+                $g = trim(strtolower($r['gender']));
+                if ($g === 'm') {
+                    $r['gender'] = 'Male';
+                } elseif ($g === 'f') {
+                    $r['gender'] = 'Female';
+                }
+            }
         }
         unset($r);
 

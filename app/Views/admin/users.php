@@ -81,10 +81,6 @@
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Regular</span>
                                         <?php endif; ?>
                                     </td>
-<<<<<<< HEAD
-                                    <td><?= htmlspecialchars($user['province'] ?? '-') ?></td>
-                                    <td><?= htmlspecialchars($user['municipality'] ?? '-') ?></td>
-                                    <td>
                                     <td class="px-4 py-4 text-sm text-gray-600"><?= htmlspecialchars($user['province'] ?? '-') ?></td>
                                     <td class="px-4 py-4 text-sm text-gray-600"><?= htmlspecialchars($user['municipality'] ?? '-') ?></td>
                                     <td class="px-4 py-4 text-sm flex gap-2">

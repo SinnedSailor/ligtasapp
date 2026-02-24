@@ -262,7 +262,7 @@
     </div>
 </div>
 
-<div id="saveConfirmModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40" aria-hidden="true">
+<div id="saveConfirmModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/40 w-screen h-screen" aria-hidden="true">
   <div class="bg-white rounded-2xl shadow-lg max-w-md w-full p-6 mx-4">
     <div class="flex items-start justify-between mb-4">
       <h3 class="text-lg font-semibold">Confirm Save</h3>
@@ -276,7 +276,7 @@
   </div>
 </div>
 
-<div id="importSuccessModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40" aria-hidden="true">
+<div id="importSuccessModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/40 w-screen h-screen" aria-hidden="true">
   <div class="bg-white rounded-2xl shadow-lg max-w-md w-full p-6 mx-4">
     <div class="flex items-start justify-between mb-4">
       <h3 class="text-lg font-semibold">Import Complete</h3>
@@ -289,7 +289,7 @@
   </div>
 </div>
 
-<div id="saveResultModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40" aria-hidden="true">
+<div id="saveResultModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/40 w-screen h-screen" aria-hidden="true">
   <div class="bg-white rounded-2xl shadow-lg max-w-md w-full p-6 mx-4">
     <div class="flex items-start justify-between mb-4">
       <h3 class="text-lg font-semibold">Save Result</h3>
@@ -304,7 +304,7 @@
 </div>
 
 <!-- Attachment notice modal (Tailwind) -->
-<div id="attachmentModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40" aria-hidden="true">
+<div id="attachmentModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/40 w-screen h-screen" aria-hidden="true">
   <div class="bg-white rounded-2xl shadow-lg max-w-md w-full p-4 mx-4">
     <div class="flex items-center justify-between mb-3">
       <h5 class="text-lg font-semibold">Upload Notice</h5>
@@ -316,7 +316,7 @@
 
 
 <!-- Review confirm modal (Tailwind) -->
-<div id="reviewConfirmModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40" aria-hidden="true">
+<div id="reviewConfirmModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/40 w-screen h-screen" aria-hidden="true">
   <div class="bg-white rounded-2xl shadow-lg max-w-md w-full p-4 mx-4">
     <div class="flex items-center justify-between mb-3">
       <h5 class="text-lg font-semibold">Confirm Review</h5>
@@ -330,7 +330,7 @@
   </div>
 </div>
 
-<div id="incidentModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40" aria-hidden="true">
+<div id="incidentModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/40 w-screen h-screen" aria-hidden="true">
   <div class="bg-white rounded-2xl shadow-lg max-w-4xl w-full p-6 mx-4">
     <div class="flex items-start justify-between mb-4">
       <h3 class="text-lg font-semibold">Add Incident</h3>
@@ -347,13 +347,11 @@
               <option value="<?= $month ?>"><?= $month ?></option>
             <?php endfor; ?>
           </select>
->>>>>>> origin/refactor/tailwind-complete
         </div>
 
         <div class="col-span-1">
           <label for="incidentYear" class="text-sm text-slate-600 block mb-1">Year of Incident</label>
           <input type="text" id="incidentYear" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
->>>>>>> origin/refactor/tailwind-complete
         </div>
 
         <div class="col-span-1">
@@ -430,8 +428,15 @@
             <span class="text-gray-500 text-sm" id="incidentAttachmentStatus"></span>
           </div>
           <div class="text-gray-500 text-sm" id="incidentAttachmentHint"></div>
-          <div class="flex flex-wrap gap-2 mt-2">
-            <input type="file" id="incidentAttachments" class="block w-full text-sm text-slate-700" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx" multiple />
+          <div class="flex flex-wrap gap-4 mt-2 items-end">
+            <div class="flex flex-col w-full md:w-auto">
+                <label for="incidentPicturesInput" class="text-sm text-slate-600 mb-1">Photos</label>
+                <input type="file" id="incidentPicturesInput" class="block w-full text-sm text-slate-700" accept=".jpg,.jpeg,.png" multiple />
+            </div>
+            <div class="flex flex-col w-full md:w-auto">
+                <label for="incidentDocumentsInput" class="text-sm text-slate-600 mb-1">Documents</label>
+                <input type="file" id="incidentDocumentsInput" class="block w-full text-sm text-slate-700" accept=".pdf,.doc,.docx" multiple />
+            </div>
             <button type="button" id="incidentUploadButton" class="px-3 py-1.5 border border-indigo-600 text-indigo-600 rounded-md text-sm hover:bg-indigo-600 hover:text-white active:bg-indigo-700" onclick="uploadIncidentAttachments()">Upload Attachments</button>
           </div>
         </div>
@@ -442,7 +447,7 @@
 </div> 
 
 <!-- Attachment viewer modal (Tailwind) -->
-<div id="attachmentViewerModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40" aria-hidden="true">
+<div id="attachmentViewerModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/40 w-screen h-screen" aria-hidden="true">
   <div class="bg-white rounded-2xl shadow-lg max-w-4xl w-full p-4 mx-4">
     <div class="flex items-center justify-between mb-3">
       <h5 class="text-lg font-semibold">Incident Attachments</h5>
@@ -570,6 +575,7 @@
         'Municipality/City where Incident Occurred': 'Municipality/City where Incidence Occurred',
         'Age': 'Age of the Person',
         'Gender': 'Gender of the Person',
+        'Sex': 'Gender of the Person', // Excel files often use "Sex" header
         'Factors': 'Other Factors',
         'Occupation': 'Occupation of the Victim',
         // support split name columns commonly used in templates
@@ -1105,6 +1111,14 @@
     function formatBytes(bytes) { if (bytes === 0) return '0 B'; const sizes = ['B','KB','MB','GB','TB']; const i = Math.floor(Math.log(bytes)/Math.log(1024)); return (bytes/Math.pow(1024,i)).toFixed(1) + ' ' + sizes[i]; }
 
     document.addEventListener('DOMContentLoaded', function() {
+        // move modals out of the scrolling panel so fixed positioning works
+        ['incidentModal','saveConfirmModal','importSuccessModal','saveResultModal','attachmentModal','reviewConfirmModal','attachmentViewerModal'].forEach(id => {
+            const m = document.getElementById(id);
+            if (m && m.parentNode && m.parentNode !== document.body) {
+                document.body.appendChild(m);
+            }
+        });
+
         if (pageSizeSelect) {
             pageSize = parseInt(pageSizeSelect.value, 10) || pageSize;
             pageSizeSelect.addEventListener('change', function() {
@@ -1338,6 +1352,7 @@
     }
 
     function openIncidentModal(index) {
+        console.log('openIncidentModal invoked, index=', index);
         currentIncidentIndex = (index === 0 || index) ? index : null;
         const isEdit = currentIncidentIndex !== null;
         const row = isEdit ? tableData[currentIncidentIndex] : null;
@@ -1729,6 +1744,16 @@
     }
 
     function mapServerRow(row) {
+        // convert backend gender codes to full labels so the UI can show and
+        // edit them consistently.  The API stores 'm' / 'f' but the select uses
+        // "Male" / "Female" and imported spreadsheets might contain either.
+        let genderVal = row.gender || '';
+        if (typeof genderVal === 'string') {
+            const lc = genderVal.trim().toLowerCase();
+            if (lc === 'm' || lc === 'male') genderVal = 'Male';
+            else if (lc === 'f' || lc === 'female') genderVal = 'Female';
+        }
+
         return {
             'N': row.n || '',
             'Month of Incident': row.month_of_incident || '',
@@ -1738,7 +1763,7 @@
             'Name of Victim': row.name_of_victim || '',
             'Location Category': row.location_category || '',
             'Age of the Person': row.age || '',
-            'Gender of the Person': row.gender || '',
+            'Gender of the Person': genderVal,
             'Occasion': row.occasion || '',
             'Other Factors': row.factors || '',
             "Person's Residence": row.residence || '',
@@ -1824,6 +1849,15 @@
 
             const hasValue = Object.values(record).some(value => String(value).trim() !== '');
             if (hasValue) {
+                // convert any simple gender codes to consistent labels for the UI
+                if (record['Gender of the Person']) {
+                    let g = String(record['Gender of the Person']).trim().toLowerCase();
+                    if (g === 'm' || g === 'male') {
+                        record['Gender of the Person'] = 'Male';
+                    } else if (g === 'f' || g === 'female') {
+                        record['Gender of the Person'] = 'Female';
+                    }
+                }
                 results.push(record);
             }
         });
@@ -1942,8 +1976,17 @@
         const el = document.getElementById(id);
         if (!el) return;
         el.classList.remove('hidden');
+        el.style.display = 'flex';
+        // enforce full-screen offsets in case Tailwind classes aren't applied
+        el.style.top = '0';
+        el.style.left = '0';
+        el.style.right = '0';
+        el.style.bottom = '0';
+        el.style.position = 'fixed';
+        el.style.width = '100vw';
+        el.style.height = '100vh';
+        el.style.zIndex = '9999';
         el.setAttribute('aria-hidden', 'false');
-        // prevent background scrolling when modal is open
         document.body.classList.add('overflow-hidden');
         try { setScrollLock(true); } catch (e) { /* noop */ }
     }
@@ -1952,6 +1995,7 @@
         const el = document.getElementById(id);
         if (!el) return;
         el.classList.add('hidden');
+        el.style.display = 'none';
         el.setAttribute('aria-hidden', 'true');
         // restore scrolling
         document.body.classList.remove('overflow-hidden');
@@ -2030,7 +2074,6 @@
                 attachments.forEach((item, index) => {
                     const button = document.createElement('button');
                     button.type = 'button';
-<<<<<<< HEAD
                     button.className = 'w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md flex items-center';
 
                     const viewUrl = `${attachmentViewUrl}/${item.id}`;
@@ -2091,12 +2134,6 @@
                     }
 
                     button.addEventListener('click', async () => {
-=======
-                    button.className = 'w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md';
-
-                    button.addEventListener('click', async () => {
-                        const viewUrl = `${attachmentViewUrl}/${item.id}`;
->>>>>>> origin/refactor/tailwind-complete
                         const downloadUrl = `${attachmentDownloadUrl}/${item.id}`;
                         downloadEl.href = downloadUrl;
 
@@ -2146,13 +2183,8 @@
                         } else {
                             previewEl.innerHTML = `
                                 <div class="text-center p-4">
-<<<<<<< HEAD
-                                    <div class="text-muted mb-2">Preview not available for this file type.</div>
-                                    <a class="btn btn-outline-primary" href="${downloadUrl}" target="_blank" rel="noopener">Download ${escapeHtml(item.original_name)}</a>
-=======
                                     <div class="text-gray-500 mb-2">Preview not available for this file type.</div>
                                     <a class="inline-flex items-center gap-2 px-3 py-1.5 border border-blue-600 text-blue-600 rounded-md text-sm" href="${downloadUrl}" target="_blank" rel="noopener">Download ${item.original_name}</a>
->>>>>>> origin/refactor/tailwind-complete
                                 </div>
                             `;
                         }

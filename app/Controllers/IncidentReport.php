@@ -40,6 +40,12 @@ class IncidentReport extends BaseController
             ]);
         }
 
+        // normalize gender value before further processing so the same format
+        // used by createIncident is preserved during updates.
+        if (isset($data['gender'])) {
+            $data['gender'] = $this->normalizeGender($data['gender']);
+        }
+
         // Reject invalid year values early (prevent bypassing client-side UI)
         if (isset($data['year_of_incident'])) {
             $yearValue = $this->toInt($data['year_of_incident']);
@@ -958,6 +964,9 @@ class IncidentReport extends BaseController
             'Age' => 'age',
             'Sex' => 'gender',
             'Gender' => 'gender',
+            // when client-side normalization runs, rows use the canonical header
+            // coming from the table columns
+            'Gender of the Person' => 'gender',
             'Occasion' => 'occasion',
             'Other Factors' => 'factors',
             'Factors' => 'factors',
