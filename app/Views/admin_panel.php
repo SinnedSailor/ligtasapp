@@ -227,7 +227,7 @@
 
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
+                <thead class="bg #002C76">
                     <tr>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-600">Username</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-600">Name</th>

@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var optionsAge = {
      chart: { type: 'bar', height: 224 },
     series: [{ name: 'Incidents', data: [8, 34, 120, 234, 165, 90, 30] }],
-    xaxis: { categories: ['0-4','5-14','15-24','25-34','35-44','45-64','65+'] },
+    xaxis: { categories: ['0-4 (Preschool)','5-12 (Gradeschool)','13-17 (Highschool)','18-24 (College/Early Adult)','25-34 (Adult)','35-44 (Adult)','45-64 (Middle Age)','65+ (Elderly)'] },
     colors: ['#2C4E80'],
     plotOptions: { bar: { borderRadius: 6, columnWidth: '48%' } },
     dataLabels: { enabled: false }
@@ -169,9 +169,9 @@ document.addEventListener('DOMContentLoaded', function () {
   // Contributing factors 
   var optionsFactors = {
      chart: { type: 'bar', height: 224 },
-    series: [{ name: 'Count', data: [210, 150, 90, 60, 30] }],
+    series: [{ name: 'Count', data: [210, 150, 90, 60, 30, 45, 22] }],
     plotOptions: { bar: { horizontal: true, barHeight: '48%', borderRadius: 6 } },
-    xaxis: { categories: ['Unable to swim','Lack of supervision','Alcohol','Hazardous conditions','Overcrowding'] },
+    xaxis: { categories: ['Unable to swim','Lack of supervision','Alcohol','Hazardous conditions','Overcrowding','No life jacket','Sudden illness'] },
     colors: ['#002C76'],
     dataLabels: { enabled: false }
   };
@@ -214,9 +214,9 @@ document.addEventListener('DOMContentLoaded', function () {
   // Incidents by location category 
   var optionsLocation = {
      chart: { type: 'donut', height: 224 },
-    series: [210,30,120,50,15,40],
-    labels: ['Beach','Lake','River','Pool','Swamp','Other'],
-    colors: ['#06b6d4','#60a5fa','#3b82f6','#60a5fa','#f97316','#9ca3af'],
+    series: [210,30,120,50,15,40,25,18],
+    labels: ['Beach','Lake','River','Pool','Swamp','Other','Resort','Pier'],
+    colors: ['#06b6d4','#60a5fa','#3b82f6','#60a5fa','#f97316','#9ca3af','#a3e635','#fbbf24'],
     legend: { position: 'bottom' },
     dataLabels: { enabled: false }
   };

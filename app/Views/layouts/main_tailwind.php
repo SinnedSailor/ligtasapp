@@ -115,10 +115,9 @@
             <nav id="sidebar" class="fixed left-0 top-0 z-30 w-72 lg:w-64 h-screen flex-shrink-0 flex flex-col bg-white border-r border-slate-100 p-4 <?= $hideNavbar ? '' : 'pt-16' ?>">
                 <!-- Brand -->
                 <div class="flex items-center gap-3 px-2 py-3 mb-4">
-                <div class="flex flex-col items-center justify-start pt-6 pb-4 mb-4 w-full">
-                    <div class="w-28 h-28 rounded-full bg-indigo-600 flex items-center justify-center overflow-hidden">
-                        <!-- Logo placeholder: replace src when logo is uploaded -->
-                        <img src="<?= base_url('assets/img/logo-placeholder.png') ?>" alt="Logo" class="w-28 h-28 object-cover rounded-full" />
+                <div class="flex items-center gap-4 pt-6 pb-4 mb-4 w-full">
+                    <div class="w-16 h-16 rounded-full bg-indigo-600 flex items-center justify-center overflow-hidden">
+                        <img src="<?= base_url('assets/images/ligtas.png') ?>" alt="Logo" class="w-14 h-14 object-cover rounded-full mx-auto my-auto" />
                     </div>
                 </div>
                     <button class="ml-auto inline-flex items-center justify-center p-2 rounded-md text-slate-400 hover:bg-slate-50" aria-label="Toggle sidebar"><?= svg_icon('menu', 'w-5 h-5') ?></button>
