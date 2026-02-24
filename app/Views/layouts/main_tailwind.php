@@ -50,6 +50,8 @@
     </style>
 
     <?= $this->renderSection('pageStyles') ?>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 </head>
 <body class="antialiased bg-slate-50 text-slate-900 min-h-screen">
@@ -171,5 +173,8 @@
 </div>
 
 <?= $this->renderSection('pageScripts') ?>
+
+<!-- SweetAlert2 fallback include -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 </html>

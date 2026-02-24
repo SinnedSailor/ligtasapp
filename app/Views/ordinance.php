@@ -324,6 +324,7 @@
     </div>
 
     <form action="<?= base_url('/documents/upload') ?>" method="post" enctype="multipart/form-data" id="documentUploadForm">
+        <?= csrf_field() ?>
         <div class="documents-grid">
             <div class="document-card">
                 <h5> Ordinance</h5>
