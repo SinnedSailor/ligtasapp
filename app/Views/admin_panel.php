@@ -1,16 +1,15 @@
-<?= $this->extend('layouts/staradmin') ?>
+<?= $this->extend('layouts/main_tailwind') ?>
 
 <?= $this->section('pageStyles') ?>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>
     .page-header {
-        background: linear-gradient(135deg, rgba(11, 95, 179, 0.15), rgba(11, 95, 179, 0.04));
+        background: linear-gradient(135deg, rgba(0, 44, 118, 0.15), rgba(0, 44, 118, 0.04));
         border-radius: 12px;
         padding: 16px 20px;
     }
 
     .admin-card {
-        border-left: 4px solid #09637E;
+        border-left: 4px solid #002C76;
         box-shadow: 0 2px 10px rgba(9, 99, 126, 0.1);
     }
 
@@ -39,7 +38,7 @@
     }
 
     .role-lgu {
-        background: #2563EB;
+        background: #002C76;
     }
 
     .role-province {
@@ -72,7 +71,7 @@
     }
 
     .table thead th {
-        color: #09637E;
+        color: #002C76;
         font-weight: 600;
     }
 
@@ -114,7 +113,7 @@
 
     .modal-header h3 {
         margin: 0;
-        color: #09637E;
+        color: #002C76;
         font-size: 20px;
     }
 
@@ -139,7 +138,7 @@
     }
 
     .modal-btn-primary {
-        background: #09637E;
+        background: #002C76;
         color: #fff;
     }
 
@@ -166,7 +165,7 @@
 
     .success-message {
         text-align: center;
-        color: #09637E;
+        color: #002C76;
         font-size: 18px;
         font-weight: 600;
         margin-bottom: 10px;
@@ -197,29 +196,26 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-<div class="page-header d-flex flex-wrap justify-content-between align-items-center mb-4">
+<div class="page-header flex flex-wrap justify-between items-center mb-4">
     <div>
-        <h3 class="page-title mb-1"><i class="bi bi-shield-lock me-2"></i>User Management</h3>
-        <div class="text-muted">Manage users, roles, and administrative access.</div>
+        <h3 class="page-title mb-1"><?= svg_icon('shield', 'w-5 h-5 mr-3 text-blue-900') ?><span class="text-xl font-semibold">User Management</span></h3>
+        <div class="text-gray-500">Manage users, roles, and administrative access.</div>
     </div>
-</div>           
+</div>
 
-<div id="user-management-section" class="card">
-    <div class="card-body">
-        <h4 class="card-title mb-0">User Management</h4>
+<div id="user-management-section" class="bg-white rounded-2xl shadow admin-card">
+    <div class="p-6">
+        <h4 class="text-lg font-semibold mb-4">User Management</h4>
 
-        <div class="d-flex flex-wrap align-items-center gap-3 mb-3" style="margin-top: 10px;">
-            <div class="input-group" style="max-width: 320px;">
-                <span class="input-group-text bg-white border-end-0" style="border-radius: 999px 0 0 999px; border-color: #e5e7eb;">
-                    <i class="bi bi-search" style="color: #6c757d;"></i>
-                </span>
-                <input type="text" id="userSearch" class="form-control form-control-sm border-start-0" placeholder="Search" onkeyup="filterUsers()" style="border-radius: 0 999px 999px 0; border-color: #e5e7eb; background: #f9fafb;">
+        <div class="flex flex-wrap items-center gap-3 mb-4 mt-2">
+            <div class="flex items-center rounded-full bg-gray-50 border border-gray-200 overflow-hidden" style="max-width:320px;">
+                <div class="px-3 text-gray-500"><?= svg_icon('search', 'w-4 h-4') ?></div>
+                <input type="text" id="userSearch" class="py-2 px-3 text-sm bg-transparent outline-none" placeholder="Search" onkeyup="filterUsers()" />
             </div>
-            <div class="input-group" style="max-width: 180px;">
-                <span class="input-group-text bg-white border-end-0" style="border-radius: 999px 0 0 999px; border-color: #e5e7eb;">
-                    <i class="bi bi-person" style="color: #6c757d;"></i>
-                </span>
-                <select id="roleFilter" class="form-select form-select-sm border-start-0" style="border-radius: 0 999px 999px 0; border-color: #e5e7eb; background: #f9fafb;" onchange="filterUsers()">
+
+            <div class="flex items-center rounded-full bg-gray-50 border border-gray-200 overflow-hidden" style="max-width:180px;">
+                <div class="px-3 text-gray-500"><?= svg_icon('users', 'w-4 h-4') ?></div>
+                <select id="roleFilter" class="py-2 pr-3 pl-1 text-sm bg-transparent outline-none" onchange="filterUsers()">
                     <option value="">Role</option>
                     <option value="ADMIN">ADMIN</option>
                     <option value="FOCAL">FOCAL</option>
@@ -229,19 +225,19 @@
             </div>
         </div>
 
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
                     <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Username</th>
-                        <th>Role</th>
-                        <th>Actions</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600">Name</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600">Email</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600">Username</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600">Role</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600">Actions</th>
                     </tr>
                 </thead>
-                <tbody id="user-tbody">
-                    <tr><td colspan="5" class="text-center text-muted">Loading users...</td></tr>
+                <tbody id="user-tbody" class="bg-white divide-y divide-gray-100">
+                    <tr><td colspan="5" class="px-4 py-4 text-center text-sm text-gray-400">Loading users...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -251,14 +247,14 @@
 <div id="assignRoleModal" class="modal-overlay">
     <div class="modal-content">
         <div class="modal-header mb-3">
-            <h3><i class="bi bi-person-badge"></i> Assign Role</h3>
+            <h3><?= svg_icon('users', 'w-5 h-5') ?> Assign Role</h3>
         </div>
         <div class="modal-body">
             <p>Assign a role to <strong id="modalUserName"></strong></p>
             <div id="roleModalError" class="modal-error"></div>
             <div class="form-group">
-                <label for="roleSelect" class="form-label">Select Role:</label>
-                <select id="roleSelect" class="form-control">
+                <label for="roleSelect" class="text-sm font-medium text-gray-600 block mb-1">Select Role:</label>
+                <select id="roleSelect" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
                     <option value="">-- Select a role --</option>
                     <option value="1">ADMIN</option>
                     <option value="2">FOCAL</option>
@@ -278,7 +274,7 @@
     <div class="modal-content">
         <div class="modal-body">
             <div class="success-icon">
-                <i class="bi bi-check-lg"></i>
+                <?= svg_icon('check', 'w-4 h-4 text-white') ?>
             </div>
             <div class="success-message" id="successMessage">Role assigned successfully!</div>
             <div class="success-detail" id="successDetail"></div>
@@ -292,7 +288,7 @@
 <div id="revokeAdminModal" class="modal-overlay">
     <div class="modal-content">
         <div class="modal-header mb-3">
-            <h3><i class="bi bi-exclamation-triangle" style="color: #DC2626;"></i> Confirm Action</h3>
+            <h3><?= svg_icon('alert', 'w-5 h-5 text-red-600') ?> Confirm Action</h3>
         </div>
         <div class="modal-body">
             <p>Are you sure you want to <strong style="color: #DC2626;">revoke admin privileges</strong> from <strong id="revokeUserName"></strong>?</p>
@@ -308,7 +304,7 @@
 <div id="grantAdminModal" class="modal-overlay">
     <div class="modal-content">
         <div class="modal-header mb-3">
-            <h3><i class="bi bi-shield-check" style="color: #10B981;"></i> Confirm Action</h3>
+            <h3><?= svg_icon('shield', 'w-5 h-5 text-green-500') ?> Confirm Action</h3>
         </div>
         <div class="modal-body">
             <p>Are you sure you want to <strong style="color: #10B981;">grant admin privileges</strong> to <strong id="grantUserName"></strong>?</p>
@@ -324,7 +320,7 @@
 <div id="clearRoleModal" class="modal-overlay">
     <div class="modal-content">
         <div class="modal-header mb-3">
-            <h3><i class="bi bi-exclamation-triangle" style="color: #F59E0B;"></i> Confirm Action</h3>
+            <h3><?= svg_icon('alert', 'w-5 h-5 text-yellow-500') ?> Confirm Action</h3>
         </div>
         <div class="modal-body">
             <p>Are you sure you want to <strong style="color: #F59E0B;">clear the role</strong> for <strong id="clearUserName"></strong>?</p>
@@ -396,16 +392,16 @@
                         // Only show edit and disable icons for actions
                         return `
                             <tr>
-                                <td><strong>${titleCase(fullName)}</strong></td>
-                                <td>${user.email || ''}</td>
-                                <td>${user.username}</td>
-                                <td>${roleBadge}</td>
-                                <td class="d-flex flex-wrap gap-2">
-                                    <button class="btn btn-sm btn-outline-primary" title="Edit User" onclick="editUser(${user.id})">
-                                        <i class="bi bi-pencil"></i>
+                                <td class="px-4 py-4"><strong>${titleCase(fullName)}</strong></td>
+                                <td class="px-4 py-4">${user.email || ''}</td>
+                                <td class="px-4 py-4">${user.username}</td>
+                                <td class="px-4 py-4">${roleBadge}</td>
+                                <td class="px-4 py-4 flex flex-wrap gap-2">
+                                    <button class="px-2.5 py-1.5 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-100" title="Edit User" onclick="editUser(${user.id})">
+                                        <?= svg_icon('pencil', 'w-4 h-4') ?>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-secondary" title="Disable User" onclick="disableUser(${user.id})">
-                                        <i class="bi bi-person-x"></i>
+                                    <button class="px-2.5 py-1.5 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-100" title="Disable User" onclick="disableUser(${user.id})">
+                                        <?= svg_icon('users', 'w-4 h-4') ?>
                                     </button>
                                 </td>
                             </tr>

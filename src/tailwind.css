@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Project customizations */
+@layer base {
+  :root {
+    --ligtas-primary: #002C76;
+  }
+  body { @apply antialiased text-gray-800; }
+}
+
+@layer components {
+  .btn-primary {
+    /* theme color */
+    background-color: var(--ligtas-primary);
+    @apply text-white font-semibold py-2 px-4 rounded-lg;
+  }
+}

@@ -1,0 +1,790 @@
+﻿
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>LIGTAS</title>
+
+    <!-- Tailwind (compiled) only -->
+    <link rel="stylesheet" href="http://localhost:8080/assets/css/tailwind.css">
+
+    </head>
+<body class="antialiased bg-slate-50 text-slate-900 min-h-screen">
+
+    <!-- Simple, framework-free wrapper so `max-w-7xl mx-auto` in views centers correctly -->
+    <main role="main" class="min-h-screen">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 md:pt-28 pb-10">
+  <!-- Header -->
+  <header class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+    <div>
+      <h1 class="text-3xl font-bold text-slate-900">Dashboard</h1>
+      <p class="mt-2 text-sm text-slate-500">Overview — Local Incident Gathering and Tracking for Aquatic Safety</p>
+    </div>
+
+    <div class="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 w-full sm:w-auto">
+      <button class="w-full sm:w-auto inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-full shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-300">$name = $name ?? '';
+$cls  = isset($class) ? 'class="' . esc($class) . '"' : 'class="w-5 h-5 inline-block"';
+switch ($name) {
+    case 'upload':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M7 10l5-5 5 5M12 5v12'/></svg>";
+        break;
+    case 'plus':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path fill-rule='evenodd' d='M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z' clip-rule='evenodd'/></svg>";
+        break;
+    case 'save':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M17 3H5a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2zM9 12a3 3 0 116 0 3 3 0 01-6 0z'/></svg>";
+        break;
+    case 'chart':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M11 3v18M4 6v12M18 10v8'/></svg>";
+        break;
+    case 'alert':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path fill-rule='evenodd' d='M8.257 3.099c.765-1.36 2.72-1.36 3.485 0l5.516 9.808c.75 1.336-.213 2.993-1.742 2.993H4.483c-1.53 0-2.492-1.657-1.742-2.993L8.257 3.1zM11 13a1 1 0 10-2 0 1 1 0 002 0zm-1-3a1 1 0 01-1-1V7a1 1 0 112 0v2a1 1 0 01-1 1z' clip-rule='evenodd'/></svg>";
+        break;
+    case 'map-pin':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' aria-hidden='true'><path d='M12 2a6 6 0 00-6 6c0 5.25 6 13 6 13s6-7.75 6-13a6 6 0 00-6-6zM12 11a2 2 0 110-4 2 2 0 010 4z'/></svg>";
+        break;
+    case 'users':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M13 7a3 3 0 11-6 0 3 3 0 016 0z'/><path fill-rule='evenodd' d='M5 14a5 5 0 1110 0v1H5v-1z' clip-rule='evenodd'/></svg>";
+        break;
+    case 'camera':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M4 5a2 2 0 00-2 2v7a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-3.172a2 2 0 01-1.414-.586l-.828-.828A2 2 0 008.172 3H6a2 2 0 00-2 2z'/><path d='M10 8a4 4 0 100 8 4 4 0 000-8z'/></svg>";
+        break;
+    case 'check':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path fill-rule='evenodd' d='M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 10-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z' clip-rule='evenodd'/></svg>";
+        break;
+    case 'power':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 3v9m4.24 6.24A9 9 0 1111.76 3.76'/></svg>";
+        break;
+    case 'pencil':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M11 5h6M4 7v10a2 2 0 002 2h10'/></svg>";
+        break;
+    case 'shield':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/></svg>";
+        break;
+    case 'heart':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 18.657l-6.828-7.828a4 4 0 010-5.657z'/></svg>";
+        break;
+    case 'menu':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 6h16M4 12h16M4 18h16'/></svg>";
+        break;
+    case 'home':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M10.707 1.293a1 1 0 00-1.414 0L2 8.586V17a1 1 0 001 1h5v-5a1 1 0 011-1h2a1 1 0 011 1v5h5a1 1 0 001-1V8.586l-7.293-7.293z'/></svg>";
+        break;
+    case 'search':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path fill-rule='evenodd' d='M12.9 14.32a8 8 0 111.414-1.414l4.387 4.387a1 1 0 01-1.414 1.414l-4.387-4.387zM8 14a6 6 0 100-12 6 6 0 000 12z' clip-rule='evenodd'/></svg>";
+        break;
+    case 'cloud-upload':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' aria-hidden='true'><path d='M16.88 7.47A5 5 0 007 8.1a4 4 0 00-.5 7.97h10.38A3.62 3.62 0 0021 12.47 3.5 3.5 0 0016.88 7.47z'/><path d='M11 11V3h2v8h3l-4 4-4-4h3z'/></svg>";
+        break;
+    case 'files':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M4 3a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0013.586 6L10 2.414A2 2 0 008.586 2H4z'/></svg>";
+        break;
+    case 'file':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M8 2a2 2 0 00-2 2v12a2 2 0 002 2h6a2 2 0 002-2V7.414A2 2 0 0014.586 6L11 2.414A2 2 0 009.586 2H8z'/></svg>";
+        break;
+    case 'eye':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z'/><circle cx='12' cy='12' r='3'/></svg>";
+        break;
+    case 'trash':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path fill-rule='evenodd' d='M6 2a1 1 0 00-1 1v1H3a1 1 0 100 2h14a1 1 0 100-2h-2V3a1 1 0 00-1-1H6zm3 7a1 1 0 012 0v5a1 1 0 11-2 0V9zm-4 0a1 1 0 012 0v5a1 1 0 11-2 0V9zm8 0a1 1 0 012 0v5a1 1 0 11-2 0V9z' clip-rule='evenodd'/></svg>";
+        break;
+    default:
+        // fallback: empty spacer
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' aria-hidden='true'></svg>";
+        break;
+}
+ <span>New Incident</span></button>
+      <button class="w-full sm:w-auto inline-flex items-center gap-2 px-3 py-2 bg-white border border-slate-100 rounded-full text-slate-700 shadow-sm">$name = $name ?? '';
+$cls  = isset($class) ? 'class="' . esc($class) . '"' : 'class="w-5 h-5 inline-block"';
+switch ($name) {
+    case 'upload':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M7 10l5-5 5 5M12 5v12'/></svg>";
+        break;
+    case 'plus':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path fill-rule='evenodd' d='M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z' clip-rule='evenodd'/></svg>";
+        break;
+    case 'save':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M17 3H5a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2zM9 12a3 3 0 116 0 3 3 0 01-6 0z'/></svg>";
+        break;
+    case 'chart':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M11 3v18M4 6v12M18 10v8'/></svg>";
+        break;
+    case 'alert':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path fill-rule='evenodd' d='M8.257 3.099c.765-1.36 2.72-1.36 3.485 0l5.516 9.808c.75 1.336-.213 2.993-1.742 2.993H4.483c-1.53 0-2.492-1.657-1.742-2.993L8.257 3.1zM11 13a1 1 0 10-2 0 1 1 0 002 0zm-1-3a1 1 0 01-1-1V7a1 1 0 112 0v2a1 1 0 01-1 1z' clip-rule='evenodd'/></svg>";
+        break;
+    case 'map-pin':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' aria-hidden='true'><path d='M12 2a6 6 0 00-6 6c0 5.25 6 13 6 13s6-7.75 6-13a6 6 0 00-6-6zM12 11a2 2 0 110-4 2 2 0 010 4z'/></svg>";
+        break;
+    case 'users':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M13 7a3 3 0 11-6 0 3 3 0 016 0z'/><path fill-rule='evenodd' d='M5 14a5 5 0 1110 0v1H5v-1z' clip-rule='evenodd'/></svg>";
+        break;
+    case 'camera':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M4 5a2 2 0 00-2 2v7a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-3.172a2 2 0 01-1.414-.586l-.828-.828A2 2 0 008.172 3H6a2 2 0 00-2 2z'/><path d='M10 8a4 4 0 100 8 4 4 0 000-8z'/></svg>";
+        break;
+    case 'check':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path fill-rule='evenodd' d='M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 10-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z' clip-rule='evenodd'/></svg>";
+        break;
+    case 'power':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 3v9m4.24 6.24A9 9 0 1111.76 3.76'/></svg>";
+        break;
+    case 'pencil':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M11 5h6M4 7v10a2 2 0 002 2h10'/></svg>";
+        break;
+    case 'shield':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/></svg>";
+        break;
+    case 'heart':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 18.657l-6.828-7.828a4 4 0 010-5.657z'/></svg>";
+        break;
+    case 'menu':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 6h16M4 12h16M4 18h16'/></svg>";
+        break;
+    case 'home':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M10.707 1.293a1 1 0 00-1.414 0L2 8.586V17a1 1 0 001 1h5v-5a1 1 0 011-1h2a1 1 0 011 1v5h5a1 1 0 001-1V8.586l-7.293-7.293z'/></svg>";
+        break;
+    case 'search':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path fill-rule='evenodd' d='M12.9 14.32a8 8 0 111.414-1.414l4.387 4.387a1 1 0 01-1.414 1.414l-4.387-4.387zM8 14a6 6 0 100-12 6 6 0 000 12z' clip-rule='evenodd'/></svg>";
+        break;
+    case 'cloud-upload':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' aria-hidden='true'><path d='M16.88 7.47A5 5 0 007 8.1a4 4 0 00-.5 7.97h10.38A3.62 3.62 0 0021 12.47 3.5 3.5 0 0016.88 7.47z'/><path d='M11 11V3h2v8h3l-4 4-4-4h3z'/></svg>";
+        break;
+    case 'files':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M4 3a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0013.586 6L10 2.414A2 2 0 008.586 2H4z'/></svg>";
+        break;
+    case 'file':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M8 2a2 2 0 00-2 2v12a2 2 0 002 2h6a2 2 0 002-2V7.414A2 2 0 0014.586 6L11 2.414A2 2 0 009.586 2H8z'/></svg>";
+        break;
+    case 'eye':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z'/><circle cx='12' cy='12' r='3'/></svg>";
+        break;
+    case 'trash':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path fill-rule='evenodd' d='M6 2a1 1 0 00-1 1v1H3a1 1 0 100 2h14a1 1 0 100-2h-2V3a1 1 0 00-1-1H6zm3 7a1 1 0 012 0v5a1 1 0 11-2 0V9zm-4 0a1 1 0 012 0v5a1 1 0 11-2 0V9zm8 0a1 1 0 012 0v5a1 1 0 11-2 0V9z' clip-rule='evenodd'/></svg>";
+        break;
+    default:
+        // fallback: empty spacer
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' aria-hidden='true'></svg>";
+        break;
+}
+ Export</button>
+    </div>
+  </header>
+
+  <!-- Stats -->
+  <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <div class="text-sm text-slate-500">Total Incidents</div>
+          <div class="mt-2 text-2xl font-semibold text-slate-900">2,847</div>
+          <div class="text-xs text-slate-400 mt-1">All Provinces (2020–2024)</div>
+        </div>
+        <div class="w-12 h-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-indigo-600">$name = $name ?? '';
+$cls  = isset($class) ? 'class="' . esc($class) . '"' : 'class="w-5 h-5 inline-block"';
+switch ($name) {
+    case 'upload':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M7 10l5-5 5 5M12 5v12'/></svg>";
+        break;
+    case 'plus':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path fill-rule='evenodd' d='M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z' clip-rule='evenodd'/></svg>";
+        break;
+    case 'save':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M17 3H5a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2zM9 12a3 3 0 116 0 3 3 0 01-6 0z'/></svg>";
+        break;
+    case 'chart':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M11 3v18M4 6v12M18 10v8'/></svg>";
+        break;
+    case 'alert':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path fill-rule='evenodd' d='M8.257 3.099c.765-1.36 2.72-1.36 3.485 0l5.516 9.808c.75 1.336-.213 2.993-1.742 2.993H4.483c-1.53 0-2.492-1.657-1.742-2.993L8.257 3.1zM11 13a1 1 0 10-2 0 1 1 0 002 0zm-1-3a1 1 0 01-1-1V7a1 1 0 112 0v2a1 1 0 01-1 1z' clip-rule='evenodd'/></svg>";
+        break;
+    case 'map-pin':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' aria-hidden='true'><path d='M12 2a6 6 0 00-6 6c0 5.25 6 13 6 13s6-7.75 6-13a6 6 0 00-6-6zM12 11a2 2 0 110-4 2 2 0 010 4z'/></svg>";
+        break;
+    case 'users':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M13 7a3 3 0 11-6 0 3 3 0 016 0z'/><path fill-rule='evenodd' d='M5 14a5 5 0 1110 0v1H5v-1z' clip-rule='evenodd'/></svg>";
+        break;
+    case 'camera':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M4 5a2 2 0 00-2 2v7a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-3.172a2 2 0 01-1.414-.586l-.828-.828A2 2 0 008.172 3H6a2 2 0 00-2 2z'/><path d='M10 8a4 4 0 100 8 4 4 0 000-8z'/></svg>";
+        break;
+    case 'check':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path fill-rule='evenodd' d='M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 10-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z' clip-rule='evenodd'/></svg>";
+        break;
+    case 'power':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 3v9m4.24 6.24A9 9 0 1111.76 3.76'/></svg>";
+        break;
+    case 'pencil':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M11 5h6M4 7v10a2 2 0 002 2h10'/></svg>";
+        break;
+    case 'shield':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/></svg>";
+        break;
+    case 'heart':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 18.657l-6.828-7.828a4 4 0 010-5.657z'/></svg>";
+        break;
+    case 'menu':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 6h16M4 12h16M4 18h16'/></svg>";
+        break;
+    case 'home':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M10.707 1.293a1 1 0 00-1.414 0L2 8.586V17a1 1 0 001 1h5v-5a1 1 0 011-1h2a1 1 0 011 1v5h5a1 1 0 001-1V8.586l-7.293-7.293z'/></svg>";
+        break;
+    case 'search':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path fill-rule='evenodd' d='M12.9 14.32a8 8 0 111.414-1.414l4.387 4.387a1 1 0 01-1.414 1.414l-4.387-4.387zM8 14a6 6 0 100-12 6 6 0 000 12z' clip-rule='evenodd'/></svg>";
+        break;
+    case 'cloud-upload':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' aria-hidden='true'><path d='M16.88 7.47A5 5 0 007 8.1a4 4 0 00-.5 7.97h10.38A3.62 3.62 0 0021 12.47 3.5 3.5 0 0016.88 7.47z'/><path d='M11 11V3h2v8h3l-4 4-4-4h3z'/></svg>";
+        break;
+    case 'files':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M4 3a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0013.586 6L10 2.414A2 2 0 008.586 2H4z'/></svg>";
+        break;
+    case 'file':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M8 2a2 2 0 00-2 2v12a2 2 0 002 2h6a2 2 0 002-2V7.414A2 2 0 0014.586 6L11 2.414A2 2 0 009.586 2H8z'/></svg>";
+        break;
+    case 'eye':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z'/><circle cx='12' cy='12' r='3'/></svg>";
+        break;
+    case 'trash':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path fill-rule='evenodd' d='M6 2a1 1 0 00-1 1v1H3a1 1 0 100 2h14a1 1 0 100-2h-2V3a1 1 0 00-1-1H6zm3 7a1 1 0 012 0v5a1 1 0 11-2 0V9zm-4 0a1 1 0 012 0v5a1 1 0 11-2 0V9zm8 0a1 1 0 012 0v5a1 1 0 11-2 0V9z' clip-rule='evenodd'/></svg>";
+        break;
+    default:
+        // fallback: empty spacer
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' aria-hidden='true'></svg>";
+        break;
+}
+</div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <div class="text-sm text-slate-500">Total Fatalities</div>
+          <div class="mt-2 text-2xl font-semibold text-slate-900">1,256</div>
+          <div class="text-xs text-slate-400 mt-1">Death Rate: 44.1%</div>
+        </div>
+        <div class="w-12 h-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-red-500">$name = $name ?? '';
+$cls  = isset($class) ? 'class="' . esc($class) . '"' : 'class="w-5 h-5 inline-block"';
+switch ($name) {
+    case 'upload':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M7 10l5-5 5 5M12 5v12'/></svg>";
+        break;
+    case 'plus':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path fill-rule='evenodd' d='M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z' clip-rule='evenodd'/></svg>";
+        break;
+    case 'save':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M17 3H5a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2zM9 12a3 3 0 116 0 3 3 0 01-6 0z'/></svg>";
+        break;
+    case 'chart':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M11 3v18M4 6v12M18 10v8'/></svg>";
+        break;
+    case 'alert':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path fill-rule='evenodd' d='M8.257 3.099c.765-1.36 2.72-1.36 3.485 0l5.516 9.808c.75 1.336-.213 2.993-1.742 2.993H4.483c-1.53 0-2.492-1.657-1.742-2.993L8.257 3.1zM11 13a1 1 0 10-2 0 1 1 0 002 0zm-1-3a1 1 0 01-1-1V7a1 1 0 112 0v2a1 1 0 01-1 1z' clip-rule='evenodd'/></svg>";
+        break;
+    case 'map-pin':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' aria-hidden='true'><path d='M12 2a6 6 0 00-6 6c0 5.25 6 13 6 13s6-7.75 6-13a6 6 0 00-6-6zM12 11a2 2 0 110-4 2 2 0 010 4z'/></svg>";
+        break;
+    case 'users':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M13 7a3 3 0 11-6 0 3 3 0 016 0z'/><path fill-rule='evenodd' d='M5 14a5 5 0 1110 0v1H5v-1z' clip-rule='evenodd'/></svg>";
+        break;
+    case 'camera':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M4 5a2 2 0 00-2 2v7a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-3.172a2 2 0 01-1.414-.586l-.828-.828A2 2 0 008.172 3H6a2 2 0 00-2 2z'/><path d='M10 8a4 4 0 100 8 4 4 0 000-8z'/></svg>";
+        break;
+    case 'check':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path fill-rule='evenodd' d='M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 10-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z' clip-rule='evenodd'/></svg>";
+        break;
+    case 'power':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 3v9m4.24 6.24A9 9 0 1111.76 3.76'/></svg>";
+        break;
+    case 'pencil':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M11 5h6M4 7v10a2 2 0 002 2h10'/></svg>";
+        break;
+    case 'shield':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/></svg>";
+        break;
+    case 'heart':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 18.657l-6.828-7.828a4 4 0 010-5.657z'/></svg>";
+        break;
+    case 'menu':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 6h16M4 12h16M4 18h16'/></svg>";
+        break;
+    case 'home':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M10.707 1.293a1 1 0 00-1.414 0L2 8.586V17a1 1 0 001 1h5v-5a1 1 0 011-1h2a1 1 0 011 1v5h5a1 1 0 001-1V8.586l-7.293-7.293z'/></svg>";
+        break;
+    case 'search':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path fill-rule='evenodd' d='M12.9 14.32a8 8 0 111.414-1.414l4.387 4.387a1 1 0 01-1.414 1.414l-4.387-4.387zM8 14a6 6 0 100-12 6 6 0 000 12z' clip-rule='evenodd'/></svg>";
+        break;
+    case 'cloud-upload':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' aria-hidden='true'><path d='M16.88 7.47A5 5 0 007 8.1a4 4 0 00-.5 7.97h10.38A3.62 3.62 0 0021 12.47 3.5 3.5 0 0016.88 7.47z'/><path d='M11 11V3h2v8h3l-4 4-4-4h3z'/></svg>";
+        break;
+    case 'files':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M4 3a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0013.586 6L10 2.414A2 2 0 008.586 2H4z'/></svg>";
+        break;
+    case 'file':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M8 2a2 2 0 00-2 2v12a2 2 0 002 2h6a2 2 0 002-2V7.414A2 2 0 0014.586 6L11 2.414A2 2 0 009.586 2H8z'/></svg>";
+        break;
+    case 'eye':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z'/><circle cx='12' cy='12' r='3'/></svg>";
+        break;
+    case 'trash':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path fill-rule='evenodd' d='M6 2a1 1 0 00-1 1v1H3a1 1 0 100 2h14a1 1 0 100-2h-2V3a1 1 0 00-1-1H6zm3 7a1 1 0 012 0v5a1 1 0 11-2 0V9zm-4 0a1 1 0 012 0v5a1 1 0 11-2 0V9zm8 0a1 1 0 012 0v5a1 1 0 11-2 0V9z' clip-rule='evenodd'/></svg>";
+        break;
+    default:
+        // fallback: empty spacer
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' aria-hidden='true'></svg>";
+        break;
+}
+</div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <div class="text-sm text-slate-500">Highest Risk Province</div>
+          <div class="mt-2 text-2xl font-semibold text-slate-900">Pangasinan</div>
+          <div class="text-xs text-slate-400 mt-1">612 incidents (21.5%)</div>
+        </div>
+        <div class="w-12 h-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-indigo-600">$name = $name ?? '';
+$cls  = isset($class) ? 'class="' . esc($class) . '"' : 'class="w-5 h-5 inline-block"';
+switch ($name) {
+    case 'upload':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M7 10l5-5 5 5M12 5v12'/></svg>";
+        break;
+    case 'plus':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path fill-rule='evenodd' d='M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z' clip-rule='evenodd'/></svg>";
+        break;
+    case 'save':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M17 3H5a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2zM9 12a3 3 0 116 0 3 3 0 01-6 0z'/></svg>";
+        break;
+    case 'chart':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M11 3v18M4 6v12M18 10v8'/></svg>";
+        break;
+    case 'alert':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path fill-rule='evenodd' d='M8.257 3.099c.765-1.36 2.72-1.36 3.485 0l5.516 9.808c.75 1.336-.213 2.993-1.742 2.993H4.483c-1.53 0-2.492-1.657-1.742-2.993L8.257 3.1zM11 13a1 1 0 10-2 0 1 1 0 002 0zm-1-3a1 1 0 01-1-1V7a1 1 0 112 0v2a1 1 0 01-1 1z' clip-rule='evenodd'/></svg>";
+        break;
+    case 'map-pin':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' aria-hidden='true'><path d='M12 2a6 6 0 00-6 6c0 5.25 6 13 6 13s6-7.75 6-13a6 6 0 00-6-6zM12 11a2 2 0 110-4 2 2 0 010 4z'/></svg>";
+        break;
+    case 'users':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M13 7a3 3 0 11-6 0 3 3 0 016 0z'/><path fill-rule='evenodd' d='M5 14a5 5 0 1110 0v1H5v-1z' clip-rule='evenodd'/></svg>";
+        break;
+    case 'camera':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M4 5a2 2 0 00-2 2v7a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-3.172a2 2 0 01-1.414-.586l-.828-.828A2 2 0 008.172 3H6a2 2 0 00-2 2z'/><path d='M10 8a4 4 0 100 8 4 4 0 000-8z'/></svg>";
+        break;
+    case 'check':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path fill-rule='evenodd' d='M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 10-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z' clip-rule='evenodd'/></svg>";
+        break;
+    case 'power':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 3v9m4.24 6.24A9 9 0 1111.76 3.76'/></svg>";
+        break;
+    case 'pencil':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M11 5h6M4 7v10a2 2 0 002 2h10'/></svg>";
+        break;
+    case 'shield':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/></svg>";
+        break;
+    case 'heart':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 18.657l-6.828-7.828a4 4 0 010-5.657z'/></svg>";
+        break;
+    case 'menu':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 6h16M4 12h16M4 18h16'/></svg>";
+        break;
+    case 'home':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M10.707 1.293a1 1 0 00-1.414 0L2 8.586V17a1 1 0 001 1h5v-5a1 1 0 011-1h2a1 1 0 011 1v5h5a1 1 0 001-1V8.586l-7.293-7.293z'/></svg>";
+        break;
+    case 'search':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path fill-rule='evenodd' d='M12.9 14.32a8 8 0 111.414-1.414l4.387 4.387a1 1 0 01-1.414 1.414l-4.387-4.387zM8 14a6 6 0 100-12 6 6 0 000 12z' clip-rule='evenodd'/></svg>";
+        break;
+    case 'cloud-upload':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' aria-hidden='true'><path d='M16.88 7.47A5 5 0 007 8.1a4 4 0 00-.5 7.97h10.38A3.62 3.62 0 0021 12.47 3.5 3.5 0 0016.88 7.47z'/><path d='M11 11V3h2v8h3l-4 4-4-4h3z'/></svg>";
+        break;
+    case 'files':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M4 3a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0013.586 6L10 2.414A2 2 0 008.586 2H4z'/></svg>";
+        break;
+    case 'file':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M8 2a2 2 0 00-2 2v12a2 2 0 002 2h6a2 2 0 002-2V7.414A2 2 0 0014.586 6L11 2.414A2 2 0 009.586 2H8z'/></svg>";
+        break;
+    case 'eye':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z'/><circle cx='12' cy='12' r='3'/></svg>";
+        break;
+    case 'trash':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path fill-rule='evenodd' d='M6 2a1 1 0 00-1 1v1H3a1 1 0 100 2h14a1 1 0 100-2h-2V3a1 1 0 00-1-1H6zm3 7a1 1 0 012 0v5a1 1 0 11-2 0V9zm-4 0a1 1 0 012 0v5a1 1 0 11-2 0V9zm8 0a1 1 0 012 0v5a1 1 0 11-2 0V9z' clip-rule='evenodd'/></svg>";
+        break;
+    default:
+        // fallback: empty spacer
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' aria-hidden='true'></svg>";
+        break;
+}
+</div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <div class="text-sm text-slate-500">Most Affected Age Group</div>
+          <div class="mt-2 text-2xl font-semibold text-slate-900">0–14 Years</div>
+          <div class="text-xs text-slate-400 mt-1">38.2% of incidents</div>
+        </div>
+        <div class="w-12 h-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-indigo-600">$name = $name ?? '';
+$cls  = isset($class) ? 'class="' . esc($class) . '"' : 'class="w-5 h-5 inline-block"';
+switch ($name) {
+    case 'upload':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M7 10l5-5 5 5M12 5v12'/></svg>";
+        break;
+    case 'plus':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path fill-rule='evenodd' d='M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z' clip-rule='evenodd'/></svg>";
+        break;
+    case 'save':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M17 3H5a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2zM9 12a3 3 0 116 0 3 3 0 01-6 0z'/></svg>";
+        break;
+    case 'chart':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M11 3v18M4 6v12M18 10v8'/></svg>";
+        break;
+    case 'alert':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path fill-rule='evenodd' d='M8.257 3.099c.765-1.36 2.72-1.36 3.485 0l5.516 9.808c.75 1.336-.213 2.993-1.742 2.993H4.483c-1.53 0-2.492-1.657-1.742-2.993L8.257 3.1zM11 13a1 1 0 10-2 0 1 1 0 002 0zm-1-3a1 1 0 01-1-1V7a1 1 0 112 0v2a1 1 0 01-1 1z' clip-rule='evenodd'/></svg>";
+        break;
+    case 'map-pin':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' aria-hidden='true'><path d='M12 2a6 6 0 00-6 6c0 5.25 6 13 6 13s6-7.75 6-13a6 6 0 00-6-6zM12 11a2 2 0 110-4 2 2 0 010 4z'/></svg>";
+        break;
+    case 'users':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M13 7a3 3 0 11-6 0 3 3 0 016 0z'/><path fill-rule='evenodd' d='M5 14a5 5 0 1110 0v1H5v-1z' clip-rule='evenodd'/></svg>";
+        break;
+    case 'camera':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M4 5a2 2 0 00-2 2v7a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-3.172a2 2 0 01-1.414-.586l-.828-.828A2 2 0 008.172 3H6a2 2 0 00-2 2z'/><path d='M10 8a4 4 0 100 8 4 4 0 000-8z'/></svg>";
+        break;
+    case 'check':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path fill-rule='evenodd' d='M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 10-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z' clip-rule='evenodd'/></svg>";
+        break;
+    case 'power':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 3v9m4.24 6.24A9 9 0 1111.76 3.76'/></svg>";
+        break;
+    case 'pencil':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M11 5h6M4 7v10a2 2 0 002 2h10'/></svg>";
+        break;
+    case 'shield':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/></svg>";
+        break;
+    case 'heart':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 18.657l-6.828-7.828a4 4 0 010-5.657z'/></svg>";
+        break;
+    case 'menu':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 6h16M4 12h16M4 18h16'/></svg>";
+        break;
+    case 'home':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M10.707 1.293a1 1 0 00-1.414 0L2 8.586V17a1 1 0 001 1h5v-5a1 1 0 011-1h2a1 1 0 011 1v5h5a1 1 0 001-1V8.586l-7.293-7.293z'/></svg>";
+        break;
+    case 'search':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path fill-rule='evenodd' d='M12.9 14.32a8 8 0 111.414-1.414l4.387 4.387a1 1 0 01-1.414 1.414l-4.387-4.387zM8 14a6 6 0 100-12 6 6 0 000 12z' clip-rule='evenodd'/></svg>";
+        break;
+    case 'cloud-upload':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' aria-hidden='true'><path d='M16.88 7.47A5 5 0 007 8.1a4 4 0 00-.5 7.97h10.38A3.62 3.62 0 0021 12.47 3.5 3.5 0 0016.88 7.47z'/><path d='M11 11V3h2v8h3l-4 4-4-4h3z'/></svg>";
+        break;
+    case 'files':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M4 3a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0013.586 6L10 2.414A2 2 0 008.586 2H4z'/></svg>";
+        break;
+    case 'file':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path d='M8 2a2 2 0 00-2 2v12a2 2 0 002 2h6a2 2 0 002-2V7.414A2 2 0 0014.586 6L11 2.414A2 2 0 009.586 2H8z'/></svg>";
+        break;
+    case 'eye':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z'/><circle cx='12' cy='12' r='3'/></svg>";
+        break;
+    case 'trash':
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'><path fill-rule='evenodd' d='M6 2a1 1 0 00-1 1v1H3a1 1 0 100 2h14a1 1 0 100-2h-2V3a1 1 0 00-1-1H6zm3 7a1 1 0 012 0v5a1 1 0 11-2 0V9zm-4 0a1 1 0 012 0v5a1 1 0 11-2 0V9zm8 0a1 1 0 012 0v5a1 1 0 11-2 0V9z' clip-rule='evenodd'/></svg>";
+        break;
+    default:
+        // fallback: empty spacer
+        echo "<svg $cls xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' aria-hidden='true'></svg>";
+        break;
+}
+</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Charts grid -->
+  <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-sm font-semibold text-slate-900">Incidents per Province</h3>
+        <div class="text-xs text-slate-400">Last 12 months</div>
+      </div>
+      <div class="h-56 sm:h-72">
+        <canvas id="provinceChart"></canvas>
+      </div>
+    </div>
+
+<div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
+      <h3 class="text-sm font-semibold text-slate-900 mb-4">Remarks Status</h3>
+      <div class="h-56 sm:h-72"><canvas id="remarksChart"></canvas></div>
+    </div>
+
+    <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
+        <h3 class="text-sm font-semibold text-slate-900 mb-4">Incidents by Sex</h3>
+        <div class="h-44 sm:h-56"><canvas id="sexChart"></canvas></div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
+        <h3 class="text-sm font-semibold text-slate-900 mb-4">Incidents by Age Group</h3>
+        <div class="h-44 sm:h-56"><canvas id="ageChart"></canvas></div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
+      <h3 class="text-sm font-semibold text-slate-900 mb-4">Incidents by Year</h3>
+      <div class="h-44 sm:h-56"><canvas id="yearChart"></canvas></div>
+    </div>
+
+    <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
+      <div class="flex items-center justify-between">
+        <h3 class="text-sm font-semibold text-slate-900">Incidents by Residence</h3>
+        <div>
+          <select id="residenceFilter" onchange="updateResidenceChart()" class="rounded-md border border-slate-100 px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-300">
+            <option value="province">Province</option>
+            <option value="municipality">Municipality</option>
+          </select>
+        </div>
+      </div>
+      <div class="mt-4 h-48 sm:h-64"><canvas id="residenceChart"></canvas></div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
+      <h3 class="text-sm font-semibold text-slate-900 mb-4">Contributing Factors</h3>
+      <div class="h-48 sm:h-64"><canvas id="factorsChart"></canvas></div>
+    </div>
+
+    <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
+      <h3 class="text-sm font-semibold text-slate-900 mb-4">Incidents by Location Category</h3>
+      <div class="h-48 sm:h-64"><canvas id="locationChart"></canvas></div>
+    </div>
+  </section>
+</div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+    const palette = {
+        bg: '#f8fafc',        // slate-50
+        cardBorder: '#eef2f7',
+        primary: '#4f46e5',   // indigo-600
+        muted: '#64748b',     // slate-500
+        accentRed: '#ef4444'
+    };
+
+    const chartColors = [palette.primary, palette.muted, '#cbd5e1', '#e6edf3', '#94a3b8', '#a78bfa'];
+    const accentRed = palette.accentRed;
+    const accentYellow = '#f59e0b';
+    const accentGreen = '#10b981';
+
+    new Chart(document.getElementById('provinceChart'), {
+        type: 'bar',
+        data: {
+            labels: ['Ilocos Norte', 'Ilocos Sur', 'La Union', 'Pangasinan'],
+            datasets: [{
+                label: 'Number of Incidents',
+                data: [456, 523, 378, 612],
+                backgroundColor: chartColors.slice(0, 4),
+                borderColor: chartColors.slice(0, 4),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: true } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+
+    new Chart(document.getElementById('remarksChart'), {
+        type: 'pie',
+        data: {
+            labels: ['Saved', 'Deceased', 'Missing'],
+            datasets: [{
+                data: [892, 1256, 118],
+                backgroundColor: [accentGreen, accentRed, accentYellow],
+                borderColor: '#fff',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom' } }
+        }
+    });
+
+    new Chart(document.getElementById('sexChart'), {
+        type: 'pie',
+        data: {
+            labels: ['Male', 'Female'],
+            datasets: [{
+                data: [72.5, 27.5],
+                backgroundColor: ['#002C76', accentRed],
+                borderColor: '#fff',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom' } }
+        }
+    });
+
+    new Chart(document.getElementById('ageChart'), {
+        type: 'bar',
+        data: {
+            labels: [
+                'Preschool (0-4)',
+                'Gradeschool (5-12)',
+                'High School (13-17)',
+                'College (18-22)',
+                'Young Adult (23-35)',
+                'Middle Age (36-59)',
+                'Senior Citizen (60+)'
+            ],
+            datasets: [{
+                label: 'Percentage (%)',
+                data: [8.2, 15.7, 12.3, 14.1, 18.4, 19.2, 12.1], // Example data, adjust as needed
+                backgroundColor: accentRed,
+                borderColor: accentRed,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            plugins: { legend: { display: true } },
+            scales: { x: { beginAtZero: true } }
+        }
+    });
+
+    new Chart(document.getElementById('yearChart'), {
+        type: 'line',
+        data: {
+            labels: ['2020', '2021', '2022', '2023', '2024'],
+            datasets: [{
+                label: 'Total Incidents',
+                data: [512, 598, 625, 702, 410],
+                borderColor: accentYellow,
+                backgroundColor: 'rgba(214, 180, 67, 0.15)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: true } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+
+    new Chart(document.getElementById('occasionChart'), {
+        type: 'bar',
+        data: {
+            labels: ['Christmas', 'New Year', 'Holy Week', 'All Saints Day', 'Independence Day', 'Halloween', 'Summer Break', 'Other Holidays'],
+            datasets: [{
+                label: 'Number of Incidents',
+                data: [523, 487, 412, 298, 234, 189, 645, 159],
+                backgroundColor: chartColors,
+                borderColor: chartColors,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: true } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+
+    let residenceChartInstance;
+
+    const residenceDataByProvince = {
+        labels: ['Ilocos Norte', 'Ilocos Sur', 'La Union', 'Pangasinan'],
+        data: [456, 523, 378, 612],
+        backgroundColor: chartColors.slice(0, 4)
+    };
+
+    const residenceDataByMunicipality = {
+        labels: ['San Fernando', 'Dagupan', 'Laoag', 'Vigan', 'Alaminos', 'Candon', 'Batac', 'San Juan'],
+        data: [234, 198, 167, 189, 145, 123, 156, 134],
+        backgroundColor: chartColors
+    };
+
+    function updateResidenceChart() {
+        const filterValue = document.getElementById('residenceFilter').value;
+        const data = filterValue === 'province' ? residenceDataByProvince : residenceDataByMunicipality;
+
+        if (residenceChartInstance) {
+            residenceChartInstance.destroy();
+        }
+
+        residenceChartInstance = new Chart(document.getElementById('residenceChart'), {
+            type: 'doughnut',
+            data: {
+                labels: data.labels,
+                datasets: [{
+                    data: data.data,
+                    backgroundColor: data.backgroundColor,
+                    borderColor: '#fff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
+    }
+
+    updateResidenceChart();
+
+    new Chart(document.getElementById('factorsChart'), {
+        type: 'bar',
+        data: {
+            labels: ['Unable to Swim', 'Lack of Supervision', 'Intoxication', 'Sudden Illness', 'Water Hazards', 'No Life Jacket'],
+            datasets: [{
+                label: 'Percentage (%)',
+                data: [52.3, 31.2, 18.5, 14.7, 22.1, 28.4],
+                backgroundColor: [accentRed, '#002C76', accentYellow, accentGreen, '#0E7EA0', '#001F5C'],
+                borderColor: [accentRed, '#002C76', accentYellow, accentGreen, '#0E7EA0', '#001F5C'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            plugins: { legend: { display: true } },
+            scales: { x: { beginAtZero: true } }
+        }
+    });
+
+    // Incidents by Location Category
+    new Chart(document.getElementById('locationChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Resort', 'Tourist Spot', 'Beach', 'River', 'Lake', 'Pier/Port', 'Other'],
+            datasets: [{
+                label: 'Number of Incidents',
+                data: [124, 89, 312, 67, 42, 25, 48], // sample data — replace with real numbers from backend when available
+                backgroundColor: chartColors.slice(0, 7),
+                borderColor: '#fff',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom' } }
+        }
+    });
+</script>
+</body>
+</html>

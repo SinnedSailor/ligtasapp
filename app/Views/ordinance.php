@@ -1,4 +1,4 @@
-<?= $this->extend('layouts/staradmin') ?>
+<?= $this->extend('layouts/main_tailwind') ?>
 
 <?= $this->section('pageStyles') ?>
 <style>
@@ -21,7 +21,7 @@
     }
 
     .document-card h5 {
-        color: #09637E;
+        color: #002C76;
         margin-bottom: 10px;
     }
 
@@ -44,7 +44,7 @@
     }
 
     .submit-btn {
-        background: #09637E;
+        background: #002C76;
         color: #fff;
         border: none;
         padding: 10px 24px;
@@ -89,7 +89,7 @@
     }
 
     .table-docs th {
-        color: #0B5FB3;
+        color: #002C76;
         font-weight: 600;
     }
 
@@ -227,13 +227,13 @@
     }
 
     .filter-btn:hover {
-        border-color: #09637E;
-        color: #09637E;
+        border-color: #002C76;
+        color: #002C76;
     }
 
     .filter-btn.active {
-        background: #09637E;
-        border-color: #09637E;
+        background: #002C76;
+        border-color: #002C76;
         color: #fff;
     }
 </style>
@@ -268,16 +268,18 @@
 </div>
 
 <?php if (session()->getFlashdata('success')): ?>
-    <div class="alert alert-success">
+    <div class="mb-4 rounded-md bg-green-50 border border-green-200 text-green-700 px-4 py-3">
         <?= esc(session()->getFlashdata('success')) ?>
     </div>
 <?php endif; ?>
 
+
 <?php if (session()->getFlashdata('error')): ?>
-    <div class="alert alert-danger">
+    <div class="mb-4 rounded-md bg-red-50 border border-red-200 text-red-700 px-4 py-3">
         <?= esc(session()->getFlashdata('error')) ?>
     </div>
 <?php endif; ?>
+
 
 <?php if ($isLgu || $canReview || $canViewApproved): ?>
     <div class="doc-filter-card">
@@ -286,7 +288,7 @@
             <div class="filter-group">
                 <div class="filter-label">Document</div>
                 <div>
-                    <select class="form-control" id="docTypeDropdown" onchange="filterDocumentsByDropdown()">
+                    <select id="docTypeDropdown" onchange="filterDocumentsByDropdown()" class="rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
                         <option value="">All</option>
                         <option value="ordinance">Ordinance</option>
                         <option value="pops">POPS</option>
@@ -310,62 +312,61 @@
                 <div class="filter-buttons" id="municipalityButtons"></div>
             </div>
             <div class="filter-group">
-                <button class="btn btn-outline-secondary btn-sm mt-2" type="button" onclick="clearFilters()">Clear Filters</button>
+                <button class="inline-flex items-center gap-2 px-3 py-1.5 border rounded text-sm text-gray-700 bg-white hover:bg-gray-50 mt-2" type="button" onclick="clearFilters()">Clear Filters</button>
             </div>
         </div>
     </div>
 <?php endif; ?>
 
 <?php if ($isLgu): ?>
-    <div class="alert alert-info">
+    <div class="mb-4 rounded-md bg-blue-50 border border-blue-100 text-blue-700 px-4 py-3">
         Upload PDF, DOC, or DOCX files (Max 10MB each). Submitted documents are reviewed by the Province role.
     </div>
 
     <form action="<?= base_url('/documents/upload') ?>" method="post" enctype="multipart/form-data" id="documentUploadForm">
         <div class="documents-grid">
             <div class="document-card">
-                <h5><i class="ti-files"></i> Ordinance</h5>
+                <h5> Ordinance</h5>
                 <p class="text-muted">Local ordinance documents related to water safety regulations.</p>
-                <input type="file" name="ordinance_files[]" class="form-control" multiple accept=".pdf,.doc,.docx">
+                <input type="file" name="ordinance_files[]" class="w-full rounded-md border border-gray-200 p-2 text-sm text-gray-700" multiple accept=".pdf,.doc,.docx">
             </div>
 
             <div class="document-card">
-                <h5><i class="ti-shield"></i> POPS Plan</h5>
+                <h5> POPS Plan</h5>
                 <p class="text-muted">Peace and Order and Public Safety Plan documents.</p>
-                <input type="file" name="pops_files[]" class="form-control" multiple accept=".pdf,.doc,.docx">
+                <input type="file" name="pops_files[]" class="w-full rounded-md border border-gray-200 p-2 text-sm text-gray-700" multiple accept=".pdf,.doc,.docx">
             </div>
 
             <div class="document-card">
-                <h5><i class="ti-wallet"></i> Annual Budget Report</h5>
+                <h5> Annual Budget Report</h5>
                 <p class="text-muted">Annual budget reports for LIGTAS (Local Incident Gathering and Tracking for Aquatic Safety).</p>
-                <input type="file" name="budget_files[]" class="form-control" multiple accept=".pdf,.doc,.docx">
+                <input type="file" name="budget_files[]" class="w-full rounded-md border border-gray-200 p-2 text-sm text-gray-700" multiple accept=".pdf,.doc,.docx">
             </div>
         </div>
 
         <div class="submit-section">
             <button class="submit-btn" type="submit" id="submitDocumentsButton">
-                <i class="ti-check"></i>
+                ✔️
                 Submit Documents
             </button>
         </div>
     </form>
 <?php elseif ($canReview || $canViewApproved): ?>
-    <div class="alert alert-info">
+    <div class="mb-4 rounded-md bg-blue-50 border border-blue-100 text-blue-700 px-4 py-3">
         Documents are managed by role-based review. Only approved documents are visible to FOCAL users.
     </div>
 <?php else: ?>
-    <div class="alert alert-warning">
+    <div class="mb-4 rounded-md bg-yellow-50 border border-yellow-100 text-yellow-800 px-4 py-3">
         Your account does not have access to the document workflow. Please contact an administrator.
     </div>
 <?php endif; ?>
 
 <?php if ($isLgu): ?>
-    <div class="card mt-4">
-        <div class="card-body">
+    <div class="bg-white rounded-md shadow p-4 mt-4">
             <div class="section-title">My Submissions</div>
             <?php if (!empty($myDocuments)): ?>
                 <div class="table-responsive">
-                    <table class="table table-hover table-docs">
+                    <table class="w-full table-docs">
                         <thead>
                             <tr>
                                 <th>Document Type</th>
@@ -388,10 +389,10 @@
                                     <td><?= esc(date('M d, Y', strtotime($doc['created_at']))) ?></td>
                                     <td>
                                         <div class="doc-actions">
-                                            <button class="btn btn-sm btn-outline-secondary doc-preview" type="button" data-doc-id="<?= $doc['id'] ?>" data-doc-name="<?= esc($doc['original_name']) ?>">
+                                            <button class="inline-flex items-center gap-2 px-3 py-1 border rounded text-sm text-gray-700 bg-white hover:bg-gray-50 doc-preview" type="button" data-doc-id="<?= $doc['id'] ?>" data-doc-name="<?= esc($doc['original_name']) ?>">
                                                 View
                                             </button>
-                                            <a class="btn btn-sm btn-outline-primary" href="<?= base_url('/documents/download/' . $doc['id']) ?>">
+                                            <a class="inline-flex items-center gap-2 px-3 py-1 border border-blue-200 rounded text-sm text-blue-700 hover:bg-blue-50" href="<?= base_url('/documents/download/' . $doc['id']) ?>">
                                                 Download
                                             </a>
                                         </div>
@@ -409,12 +410,11 @@
 <?php endif; ?>
 
 <?php if ($canReview): ?>
-    <div class="card mt-4">
-        <div class="card-body">
+    <div class="bg-white rounded-md shadow p-4 mt-4">
             <div class="section-title">Pending Documents for Review</div>
             <?php if (!empty($pendingDocuments)): ?>
                 <div class="table-responsive">
-                    <table class="table table-hover table-docs">
+                    <table class="w-full table-docs">
                         <thead>
                             <tr>
                                 <th>Document Type</th>
@@ -435,10 +435,10 @@
                                     <td><?= esc(date('M d, Y', strtotime($doc['created_at']))) ?></td>
                                     <td>
                                         <div class="doc-actions">
-                                            <button class="btn btn-sm btn-outline-secondary doc-preview" type="button" data-doc-id="<?= $doc['id'] ?>" data-doc-name="<?= esc($doc['original_name']) ?>">
+                                            <button class="inline-flex items-center gap-2 px-2 py-1 border border-slate-200 rounded text-sm text-slate-700 hover:bg-slate-50 doc-preview" type="button" data-doc-id="<?= $doc['id'] ?>" data-doc-name="<?= esc($doc['original_name']) ?>">
                                                 View
                                             </button>
-                                            <a class="btn btn-sm btn-outline-primary" href="<?= base_url('/documents/download/' . $doc['id']) ?>">Download</a>
+                                            <a class="inline-flex items-center gap-2 px-3 py-1 border border-blue-200 rounded text-sm text-blue-700 hover:bg-blue-50" href="<?= base_url('/documents/download/' . $doc['id']) ?>">Download</a>
                                         </div>
                                     </td>
                                 </tr>
@@ -454,12 +454,11 @@
 <?php endif; ?>
 
 <?php if ($canViewApproved): ?>
-    <div class="card mt-4">
-        <div class="card-body">
+    <div class="bg-white rounded-md shadow p-4 mt-4">
             <div class="section-title">Approved Documents</div>
             <?php if (!empty($approvedDocuments)): ?>
                 <div class="table-responsive">
-                    <table class="table table-hover table-docs">
+                    <table class="w-full table-docs">
                         <thead>
                             <tr>
                                 <th>Document Type</th>
@@ -480,10 +479,10 @@
                                     <td><?= esc($doc['reviewed_at'] ? date('M d, Y', strtotime($doc['reviewed_at'])) : '-') ?></td>
                                     <td>
                                         <div class="doc-actions">
-                                            <button class="btn btn-sm btn-outline-secondary doc-preview" type="button" data-doc-id="<?= $doc['id'] ?>" data-doc-name="<?= esc($doc['original_name']) ?>">
+                                            <button class="inline-flex items-center gap-2 px-3 py-1 border rounded text-sm text-gray-700 bg-white hover:bg-gray-50 doc-preview" type="button" data-doc-id="<?= $doc['id'] ?>" data-doc-name="<?= esc($doc['original_name']) ?>">
                                                 View
                                             </button>
-                                            <a class="btn btn-sm btn-outline-primary" href="<?= base_url('/documents/download/' . $doc['id']) ?>">
+                                            <a class="inline-flex items-center gap-2 px-3 py-1 border border-blue-200 rounded text-sm text-blue-700 hover:bg-blue-50" href="<?= base_url('/documents/download/' . $doc['id']) ?>">Download</a>
                                                 Download
                                             </a>
                                         </div>
@@ -511,15 +510,15 @@
         </div>
         <div class="preview-footer">
             <div class="doc-actions">
-                <a class="btn btn-sm btn-outline-primary" id="previewDownload" href="#">Download</a>
+                <a class="inline-flex items-center gap-2 px-3 py-1 border border-blue-200 rounded text-sm text-blue-700 hover:bg-blue-50" id="previewDownload" href="#">Download</a>
             </div>
             <?php if ($canReview): ?>
                 <div class="doc-actions">
                     <form method="post" id="previewApproveForm" action="#">
-                        <button class="btn btn-sm btn-success" type="submit">Approve</button>
+                        <button class="inline-flex items-center gap-2 px-3 py-1 bg-green-600 text-white rounded text-sm" type="submit">Approve</button>
                     </form>
                     <form method="post" id="previewRejectForm" action="#">
-                        <button class="btn btn-sm btn-danger" type="submit">Reject</button>
+                        <button class="inline-flex items-center gap-2 px-3 py-1 bg-red-600 text-white rounded text-sm" type="submit">Reject</button>
                     </form>
                 </div>
             <?php endif; ?>

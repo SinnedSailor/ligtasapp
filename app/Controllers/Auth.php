@@ -27,7 +27,7 @@ class Auth extends BaseController
 
         // Validate inputs
         if (empty($emailOrUsername) || empty($password)) {
-            return redirect()->back()->with('error', 'Please provide email/username and password');
+            return redirect()->back()->withInput()->with('error', 'Please provide email/username and password');
         }
 
         // Check user in database by email (hashed) or username
@@ -53,12 +53,12 @@ class Auth extends BaseController
         }
 
         if (!$user) {
-            return redirect()->back()->with('error', 'Invalid email/username or password');
+            return redirect()->back()->withInput()->with('error', 'Invalid email/username or password');
         }
 
         // Verify password
         if (!password_verify($password, $user['password'])) {
-            return redirect()->back()->with('error', 'Invalid email/username or password');
+            return redirect()->back()->withInput()->with('error', 'Invalid email/username or password');
         }
 
         // Decrypt user fields for session display

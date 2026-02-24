@@ -4,129 +4,53 @@ $hideSidebar = true;
 $hideFooter = true;
 ?>
 
-<?= $this->extend('layouts/staradmin') ?>
+<?= $this->extend('layouts/main_tailwind') ?>
 
 <?= $this->section('pageStyles') ?>
-<style>
-    .admin-setup {
-        min-height: calc(100vh - 40px);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 30px 15px;
-    }
-
-    .admin-card {
-        width: 100%;
-        max-width: 520px;
-        border: none;
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-        border-radius: 12px;
-        overflow: hidden;
-    }
-
-    .admin-card .card-header {
-        background-color: #09637E;
-        color: #fff;
-        border: none;
-        padding: 2rem;
-    }
-
-    .admin-card .card-header h3 {
-        margin: 0;
-        font-weight: 600;
-    }
-
-    .admin-card .card-body {
-        padding: 2rem;
-    }
-
-    .admin-card .btn-primary {
-        background-color: #09637E;
-        border: none;
-    }
-
-    .admin-card .btn-primary:hover {
-        background-color: #075267;
-    }
-
-    .admin-card .form-label {
-        font-weight: 500;
-        color: #333;
-    }
-
-    .admin-card .form-control:focus {
-        border-color: #09637E;
-        box-shadow: 0 0 0 0.2rem rgba(9, 99, 126, 0.25);
-    }
-
-    .password-requirements {
-        font-size: 0.875rem;
-        line-height: 1.6;
-        margin-top: 1rem;
-        padding: 1rem;
-        background-color: #f8f9fa;
-        border-radius: 0.25rem;
-    }
-
-    .password-requirements strong {
-        display: block;
-        margin-bottom: 0.5rem;
-    }
-
-    .requirement {
-        display: flex;
-        align-items: center;
-        margin-bottom: 0.25rem;
-    }
-
-    .requirement-icon {
-        margin-right: 0.5rem;
-        display: inline-block;
-        width: 20px;
-    }
-</style>
+<!-- inline styles removed — replaced with Tailwind utilities in markup -->
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-<div class="admin-setup">
-    <div class="card admin-card">
-        <div class="card-header">
-            <h3>Create Administrator Account</h3>
-            <p class="mb-0 text-white-50">Set up the first admin user for your system</p>
+<div class="min-h-screen flex items-center justify-center py-12 px-4 bg-gray-50">
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-lg overflow-hidden">
+        <div class="px-6 py-8 bg-gradient-to-r from-blue-900 to-blue-700 text-white">
+            <h3 class="text-xl font-semibold">Create Administrator Account</h3>
+            <p class="text-sm text-blue-100/80 mt-1">Set up the first admin user for your system</p>
         </div>
-        <div class="card-body">
+        <div class="px-6 py-6">
             <?php if (session()->getFlashdata('error')): ?>
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <?= session()->getFlashdata('error') ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <div class="mb-4">
+                    <div class="flex items-start justify-between gap-4 bg-red-50 border border-red-200 text-red-800 rounded-md p-3">
+                        <div><?= session()->getFlashdata('error') ?></div>
+                        <button type="button" class="text-red-800 font-bold" onclick="this.closest('.mb-4').remove()">&times;</button>
+                    </div>
                 </div>
             <?php endif; ?>
 
             <form method="POST" action="<?= base_url('admin/storeFirstAdmin') ?>" id="adminForm">
-                <div class="mb-3">
-                    <label for="firstName" class="form-label">First Name *</label>
-                    <input type="text" class="form-control" id="firstName" name="first_name" required value="<?= old('first_name') ?>" placeholder="Enter first name">
+                <div class="mb-4">
+                    <label for="firstName" class="block text-sm font-medium text-gray-700 mb-2">First Name *</label>
+                    <input type="text" id="firstName" name="first_name" required value="<?= old('first_name') ?>" placeholder="Enter first name" class="block w-full rounded-md border-gray-200 bg-white py-2 px-3 text-sm shadow-sm focus:ring-2 focus:ring-blue-300" />
                 </div>
 
-                <div class="mb-3">
-                    <label for="lastName" class="form-label">Last Name *</label>
-                    <input type="text" class="form-control" id="lastName" name="last_name" required value="<?= old('last_name') ?>" placeholder="Enter last name">
+                <div class="mb-4">
+                    <label for="lastName" class="block text-sm font-medium text-gray-700 mb-2">Last Name *</label>
+                    <input type="text" id="lastName" name="last_name" required value="<?= old('last_name') ?>" placeholder="Enter last name" class="block w-full rounded-md border-gray-200 bg-white py-2 px-3 text-sm shadow-sm focus:ring-2 focus:ring-blue-300" />
                 </div>
 
-                <div class="mb-3">
-                    <label for="username" class="form-label">Username *</label>
-                    <input type="text" class="form-control" id="username" name="username" required value="<?= old('username') ?>" placeholder="Enter username">
+                <div class="mb-4">
+                    <label for="username" class="block text-sm font-medium text-gray-700 mb-2">Username *</label>
+                    <input type="text" id="username" name="username" required value="<?= old('username') ?>" placeholder="Enter username" class="block w-full rounded-md border-gray-200 bg-white py-2 px-3 text-sm shadow-sm focus:ring-2 focus:ring-blue-300" />
                 </div>
 
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email Address *</label>
-                    <input type="email" class="form-control" id="email" name="email" required value="<?= old('email') ?>" placeholder="Enter email address">
+                <div class="mb-4">
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
+                    <input type="email" id="email" name="email" required value="<?= old('email') ?>" placeholder="Enter email address" class="block w-full rounded-md border-gray-200 bg-white py-2 px-3 text-sm shadow-sm focus:ring-2 focus:ring-blue-300" />
                 </div>
 
-                <div class="mb-3">
-                    <label for="province" class="form-label">Province</label>
-                    <select class="form-control" id="province" name="province" required>
+                <div class="mb-4">
+                    <label for="province" class="block text-sm font-medium text-gray-700 mb-2">Province</label>
+                    <select id="province" name="province" required class="block w-full rounded-md border-gray-200 bg-white py-2 px-3 text-sm shadow-sm focus:ring-2 focus:ring-blue-300">
                         <option value="">Select province</option>
                         <?php foreach (($provinces ?? []) as $province): ?>
                             <option value="<?= esc($province) ?>" <?= (old('province') === $province) ? 'selected' : '' ?>><?= esc($province) ?></option>
@@ -134,52 +58,37 @@ $hideFooter = true;
                     </select>
                 </div>
 
-                <div class="mb-3">
-                    <label for="municipality" class="form-label">Municipality</label>
-                    <select class="form-control" id="municipality" name="municipality" required>
+                <div class="mb-4">
+                    <label for="municipality" class="block text-sm font-medium text-gray-700 mb-2">Municipality</label>
+                    <select id="municipality" name="municipality" required class="block w-full rounded-md border-gray-200 bg-white py-2 px-3 text-sm shadow-sm focus:ring-2 focus:ring-blue-300">
                         <option value="">Select municipality</option>
                     </select>
                 </div>
 
-                <div class="mb-3">
-                    <label for="password" class="form-label">Password *</label>
-                    <input type="password" class="form-control" id="password" name="password" required placeholder="Enter a strong password">
+                <div class="mb-4">
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Password *</label>
+                    <input type="password" id="password" name="password" required placeholder="Enter a strong password" class="block w-full rounded-md border-gray-200 bg-white py-2 px-3 text-sm shadow-sm focus:ring-2 focus:ring-blue-300" />
                 </div>
 
-                <div class="mb-3">
-                    <label for="passwordConfirm" class="form-label">Confirm Password *</label>
-                    <input type="password" class="form-control" id="passwordConfirm" name="password_confirm" required placeholder="Confirm your password">
+                <div class="mb-4">
+                    <label for="passwordConfirm" class="block text-sm font-medium text-gray-700 mb-2">Confirm Password *</label>
+                    <input type="password" id="passwordConfirm" name="password_confirm" required placeholder="Confirm your password" class="block w-full rounded-md border-gray-200 bg-white py-2 px-3 text-sm shadow-sm focus:ring-2 focus:ring-blue-300" />
                 </div>
 
-                <div class="password-requirements">
-                    <strong>Password Requirements:</strong>
-                    <div class="requirement">
-                        <span class="requirement-icon">✓</span>
-                        <span>At least 8 characters</span>
-                    </div>
-                    <div class="requirement">
-                        <span class="requirement-icon">✓</span>
-                        <span>One uppercase letter (A-Z)</span>
-                    </div>
-                    <div class="requirement">
-                        <span class="requirement-icon">✓</span>
-                        <span>One lowercase letter (a-z)</span>
-                    </div>
-                    <div class="requirement">
-                        <span class="requirement-icon">✓</span>
-                        <span>One number (0-9)</span>
-                    </div>
-                    <div class="requirement">
-                        <span class="requirement-icon">✓</span>
-                        <span>One special character (!@#$%^&* etc.)</span>
-                    </div>
+                <div class="bg-gray-50 rounded-md p-4 text-sm text-gray-700 mb-4">
+                    <strong class="block mb-2">Password Requirements:</strong>
+                    <div class="flex items-center gap-2 mb-1"><span class="text-green-600">✓</span><span>At least 8 characters</span></div>
+                    <div class="flex items-center gap-2 mb-1"><span class="text-green-600">✓</span><span>One uppercase letter (A-Z)</span></div>
+                    <div class="flex items-center gap-2 mb-1"><span class="text-green-600">✓</span><span>One lowercase letter (a-z)</span></div>
+                    <div class="flex items-center gap-2 mb-1"><span class="text-green-600">✓</span><span>One number (0-9)</span></div>
+                    <div class="flex items-center gap-2"><span class="text-green-600">✓</span><span>One special character (!@#$%^&* etc.)</span></div>
                 </div>
 
-                <button type="submit" class="btn btn-primary w-100 mt-4">Create Admin Account</button>
+                <button type="submit" class="w-full mt-4 inline-flex justify-center px-4 py-2 bg-indigo-600 text-white rounded-md shadow-sm hover:bg-indigo-700">Create Admin Account</button>
 
                 <div class="text-center mt-3">
-                    <p class="text-muted">
-                        Already have an account? <a href="<?= base_url('login') ?>" class="text-primary text-decoration-none">Login here</a>
+                    <p class="text-gray-500 text-sm">
+                        Already have an account? <a href="<?= base_url('login') ?>" class="text-blue-700 underline">Login here</a>
                     </p>
                 </div>
             </form>

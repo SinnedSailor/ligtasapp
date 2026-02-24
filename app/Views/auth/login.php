@@ -4,182 +4,65 @@ $hideSidebar = true;
 $hideFooter = true;
 ?>
 
-<?= $this->extend('layouts/staradmin') ?>
+<?= $this->extend('layouts/main_tailwind') ?>
 <?= $this->section('pageStyles') ?>
 <style>
-    .auth-page {
-        min-height: calc(100vh - 40px);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 30px 15px;
-        background: url('<?= base_url('assets/staradmin/images/water.jpg') ?>') no-repeat center center;
-        background-size: cover;
-    }
-    .split-container {
-        display: flex;
-        width: 900px;
-        max-width: 100vw;
-        min-height: 600px;
-        background: #fff;
-        border-radius: 30px;
-        box-shadow: 0 10px 25px rgba(9, 99, 126, 0.15);
-        overflow: hidden;
-        position: relative;
-    }
-    .split-left {
-        flex: 1;
-        background: #F6F5F5;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-top-left-radius: 30px;
-        border-bottom-left-radius: 30px;
-        padding: 40px;
-    }
-    .split-right {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 40px;
-        border-top-right-radius: 30px;
-        border-bottom-right-radius: 30px;
-        background: #fff;
-    }
-    .login-form-wrapper {
-        width: 100%;
-        max-width: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-    .iwas-header {
-        text-align: center;
-        margin-bottom: 2rem;
-        padding-bottom: 1.5rem;
-        border-bottom: 2px solid #002C76;
-    }
-    .iwas-header h1 {
-        color: #002C76;
-        font-weight: 700;
-        margin: 0.5rem 0;
-    }
-    .iwas-header p {
-        color: #002C76;
-        font-size: 13px;
-        letter-spacing: 0.5px;
-        margin: 0;
-    }
-    .form-group input {
-        width: 100%;
-        max-width: 100%;
-        border: 1.5px solid #e8e8e8;
-        font-size: 14px;
-        padding: 0.75rem 1rem;
-        transition: all 0.3s ease;
-    }
-    .form-group input:focus {
-        border-color: #09637E;
-        box-shadow: 0 0 0 3px rgba(9, 99, 111, 0.1);
-        background-color: #f8fafb;
-    }
-    .form-group input::placeholder {
-        color: #999;
-    }
-    .auth-form-btn {
-        background: linear-gradient(135deg, #002C76 0%, #001F4D 100%);
-        border: none;
-        color: #fff;
-        font-weight: 600;
-        padding: 0.75rem 1rem;
-        transition: all 0.3s ease;
-        box-shadow: 0 0 15px rgba(9, 99, 126, 0.2);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        font-size: 13px;
-        display: block;
-        margin: 0 auto;
-    }
-    .auth-form-btn:hover {
-        background: linear-gradient(135deg, #0246bb  0%, #0B4F63 100%);
-        box-shadow: 0 6px 20px rgba(9, 99, 126, 0.3);
-        color: #fff;
-        transform: translateY(-2px);
-    }
-    .text-center.mt-4 {
-        color: #666;
-        font-size: 13px;
-    }
-    .text-center.mt-4 a {
-        color: #002C76;
-        font-weight: 600;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        border-bottom: 2px solid transparent;
-    }
-    .text-center.mt-4 a:hover {
-        color: #002C76;
-        border-bottom-color: #000C76;
-    }
-    .alert-danger {
-        background-color: rgba(201, 74, 74, 0.1);
-        border: 1px solid #C94A4A;
-        color: #8B2D2D;
-        border-radius: 6px;
-    }
-    .welcome-text {
-        color: #002C76;
-        font-weight: 600;
-        margin-bottom: 0.25rem;
-    }
-    .subtitle-text {
-        color: #999;
-        font-size: 11px;
-        font-weight: 400;
-    }
-    .split-left img {
-        width: 100%;
-        max-width: 500px;
-        border-radius: 20px;
+    /* page background image (Tailwind compiled CSS provides utilities) */
+    .auth-bg {
+        background: linear-gradient(135deg,#002C76 0%, #001F5C 60%);
     }
 </style>
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-<div class="auth-page">
-    <div class="split-container">
-        <div class="split-left">
-            <img src="<?= base_url('assets/staradmin/images/lifeguards_blue.png') ?>" alt="login-illustration" />
+<div class="auth-page auth-bg min-h-screen flex items-center justify-center py-12 px-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 md:divide-x md:divide-gray-100 overflow-hidden items-stretch">
+        <div class="hidden md:flex items-center justify-center bg-gray-50 p-10">
+            <div class="w-full max-w-lg rounded-xl overflow-hidden bg-gradient-to-br from-blue-200 to-teal-100 h-64 flex items-center justify-center shadow-sm">
+                <!-- Illustration -->
+                <img src="<?= base_url('assets/images/ligtas-logo.png') ?>" alt="LIGTAS illustration" class="max-w-full max-h-full object-contain block" loading="lazy" />
+            </div>
         </div>
-        <div class="split-right">
-            <div class="login-form-wrapper">
-                <div class="iwas-header">
-                    <h1><b>LIGTAS</b></h1>
+        <div class="p-8 md:p-12 flex items-center justify-center">
+            <div class="w-full max-w-md">
+                <div class="text-center md:text-left border-b md:border-b-0 pb-6 mb-6 md:pb-0 md:mb-6">
+                    <h1 class="text-3xl font-extrabold text-indigo-700">LIGTAS</h1>
+                    <p class="text-sm text-indigo-600 mt-1">Local Incident Gathering and Tracking for Aquatic Safety</p>
+                </div>
+                <h4 class="text-lg font-semibold text-gray-700 mb-6">Welcome!</h4>
 
-                    <p>Local Incident Gathering and Tracking for Aquatic Safety</p>
-                </div>
-                <div class="mb-4">
-                    <h4 class="welcome-text">Welcome!</h4>
-                </div>
-                <?php if (session()->has('error')): ?>
-                    <div class="alert alert-danger mt-3">
-                        <i class="ti-alert mr-2"></i><?= session()->getFlashdata('error') ?>
+                <?php if (session()->getFlashdata('success')): ?>
+                    <div role="alert" class="mb-4 rounded-md bg-green-50 border border-green-200 text-green-700 px-4 py-3">
+                        <span class="mr-2">/</span><?= session()->getFlashdata('success') ?>
                     </div>
                 <?php endif; ?>
-                <form class="pt-2" action="<?= base_url('/authenticate') ?>" method="POST">
+
+                <?php if (session()->getFlashdata('error')): ?>
+                    <div role="alert" class="mb-4 rounded-md bg-red-50 border border-red-200 text-red-700 px-4 py-3">
+                        <span class="mr-2">X</span><?= session()->getFlashdata('error') ?>
+                    </div>
+                <?php endif; ?>
+
+                <form action="<?= base_url('/authenticate') ?>" method="POST" class="space-y-4">
                     <?= csrf_field() ?>
-                    <div class="form-group">
-                        <input type="text" class="form-control form-control-lg" name="email" id="email" placeholder="Email or Username" required>
+                    <div>
+                        <label for="email" class="sr-only">Email or Username</label>
+                        <input id="email" name="email" type="text" required placeholder="Email or Username"
+                            value="<?= esc(old('email') ?? '') ?>"
+                            autocomplete="username" autofocus
+                            class="w-full rounded-lg border border-gray-200 px-4 py-4 text-base text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent" />
                     </div>
-                    <div class="form-group">
-                        <input type="password" class="form-control form-control-lg" name="password" id="password" placeholder="Password" required>
+                    <div>
+                        <label for="password" class="sr-only">Password</label>
+                        <input id="password" name="password" type="password" required placeholder="Password"
+                            autocomplete="current-password"
+                            class="w-full rounded-lg border border-gray-200 px-4 py-4 text-base text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent" />
                     </div>
-                    <div class="mt-4">
-                        <button type="submit" class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn">Sign In</button>
+                    <div>
+                        <button type="submit" class="w-full bg-blue-800 hover:bg-blue-900 text-white font-semibold py-4 rounded-lg shadow transition transform hover:-translate-y-0.5 uppercase text-base">Sign In</button>
                     </div>
-                    <div class="text-center mt-4">
-                        Don't have an account? <a href="<?= base_url('/register') ?>">Register here</a>
+                    <div class="text-center text-sm text-slate-500 mt-3">
+                        Don't have an account? <a href="<?= base_url('/register') ?>" class="text-indigo-600 font-medium hover:underline">Register here</a>
                     </div>
                 </form>
             </div>

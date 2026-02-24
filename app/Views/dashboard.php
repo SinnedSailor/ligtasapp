@@ -1,426 +1,222 @@
-<?= $this->extend('layouts/staradmin') ?>
+<?= $this->extend('layouts/main_tailwind') ?>
 
-<?= $this->section('pageStyles') ?>
-<style>
-    .chart-container {
-        position: relative;
-        height: 280px;
-        width: 100%;
-    }
 
-    .stat-card h4 {
-        font-size: 0.9rem;
-        margin-bottom: 8px;
-        color: #6c757d;
-    }
-
-    .stat-card {
-        background: #FFFCFB;
-        border: 1px solid #FFFCFB;
-    }
-
-    .stat-number {
-        font-size: 1.6rem;
-        font-weight: 700;
-        color: #09637E;
-    }
-
-    .section-title {
-        font-size: 1rem;
-        font-weight: 600;
-        margin-bottom: 15px;
-        color: #343a40;
-    }
-
-    .page-header {
-        background: #002C76;
-        color: #fff;
-        border-radius: 8px;
-        padding: 16px 20px;
-    }
-
-    .page-header .page-title,
-    .page-header .text-muted {
-        color: #fff !important;
-    }
-
-    .content-wrapper {
-        background: #E8F9FF !important;
-    }
-</style>
-<?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-<div class="page-header">
-    <h3 class="page-title">Dashboard</h3>
-    <div class="text-muted">Welcome, <?= esc(session()->get('username') ?? 'User') ?></div>
-</div>
 
-<div class="row">
-    <div class="col-md-3 grid-margin">
-        <div class="card stat-card">
-            <div class="card-body">
-                <h4>Total Incidents</h4>
-                <div class="stat-number">2,847</div>
-                <div class="text-muted">All Provinces (2020-2024)</div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 grid-margin">
-        <div class="card stat-card">
-            <div class="card-body">
-                <h4>Total Fatalities</h4>
-                <div class="stat-number">1,256</div>
-                <div class="text-muted">Death Rate: 44.1%</div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 grid-margin">
-        <div class="card stat-card">
-            <div class="card-body">
-                <h4>Highest Risk Province</h4>
-                <div class="stat-number">Pangasinan</div>
-                <div class="text-muted">612 incidents (21.5%)</div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 grid-margin">
-        <div class="card stat-card">
-            <div class="card-body">
-                <h4>Most Affected Age Group</h4>
-                <div class="stat-number">0-14 Years</div>
-                <div class="text-muted">38.2% of incidents</div>
-            </div>
-        </div>
-    </div>
-</div>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 md:pt-10 pb-10">
+  
+  <!-- stat cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
 
-<div class="row">
-    <div class="col-md-6 grid-margin">
-        <div class="card">
-            <div class="card-body">
-                <div class="section-title">Incidents per Province</div>
-                <div class="chart-container">
-                    <canvas id="provinceChart"></canvas>
-                </div>
-            </div>
-        </div>
+    <div class="relative rounded-2xl p-4 shadow-sm overflow-hidden bg-gradient-to-br from-sky-50 to-sky-100">
+      <div class="absolute top-4 right-4 h-9 w-9 rounded-lg bg-white/70 flex items-center justify-center text-sky-600"><?= svg_icon('files','w-5 h-5') ?></div>
+      <div class="h-36 flex flex-col justify-center">
+        <div class="text-xs font-medium text-slate-600">Total Incidents (all provinces)</div>
+        <div class="mt-2 text-3xl font-bold text-slate-900">1,234</div>
+        <div class="text-xs text-sky-600 mt-2">124 this month</div>
+      </div>
     </div>
-    <div class="col-md-6 grid-margin">
-        <div class="card">
-            <div class="card-body">
-                <div class="section-title">Remarks Status</div>
-                <div class="chart-container">
-                    <canvas id="remarksChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
-<div class="row">
-    <div class="col-md-6 grid-margin">
-        <div class="card">
-            <div class="card-body">
-                <div class="section-title">Incidents by Sex</div>
-                <div class="chart-container">
-                    <canvas id="sexChart"></canvas>
-                </div>
-            </div>
-        </div>
+    <div class="relative rounded-2xl p-4 shadow-sm overflow-hidden bg-gradient-to-br from-red-50 to-red-100">
+      <div class="absolute top-4 right-4 h-9 w-9 rounded-lg bg-white/70 flex items-center justify-center text-red-600"><?= svg_icon('alert','w-5 h-5') ?></div>
+      <div class="h-36 flex flex-col justify-center">
+        <div class="text-xs font-medium text-slate-600">Total fatalities</div>
+        <div class="mt-2 text-3xl font-bold text-slate-900">27</div>
+        <div class="text-xs text-red-600 mt-2">2.2% death rate</div>
+      </div>
     </div>
-    <div class="col-md-6 grid-margin">
-        <div class="card">
-            <div class="card-body">
-                <div class="section-title">Incidents by Age Group</div>
-                <div class="chart-container">
-                    <canvas id="ageChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
-<div class="row">
-    <div class="col-md-6 grid-margin">
-        <div class="card">
-            <div class="card-body">
-                <div class="section-title">Incidents by Year</div>
-                <div class="chart-container">
-                    <canvas id="yearChart"></canvas>
-                </div>
-            </div>
-        </div>
+    <div class="relative rounded-2xl p-4 shadow-sm overflow-hidden bg-gradient-to-br from-amber-50 to-amber-100">
+      <div class="absolute top-4 right-4 h-9 w-9 rounded-lg bg-white/70 flex items-center justify-center text-amber-600"><?= svg_icon('home','w-5 h-5') ?></div>
+      <div class="h-36 flex flex-col justify-center">
+        <div class="text-xs font-medium text-slate-600">Highest Risk Province (Region 1)</div>
+        <div class="mt-2 text-3xl font-bold text-slate-900">Province A</div>
+        <div class="text-xs text-amber-600 mt-2">risk score: 18% (sample)</div>
+      </div>
     </div>
-    <div class="col-md-6 grid-margin">
-        <div class="card">
-            <div class="card-body">
-                <div class="section-title">Incidents by Holiday</div>
-                <div class="chart-container">
-                    <canvas id="occasionChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
-<div class="row">
-    <div class="col-md-6 grid-margin">
-        <div class="card">
-            <div class="card-body">
-                <div class="section-title">Incidents by Residence</div>
-                <div class="d-flex align-items-center gap-2 mb-2">
-                    <label for="residenceFilter" class="text-muted mb-0">Filter by:</label>
-                    <select id="residenceFilter" onchange="updateResidenceChart()" class="form-control form-control-sm" style="max-width: 180px;">
-                        <option value="province">Province</option>
-                        <option value="municipality">Municipality</option>
-                    </select>
-                </div>
-                <div class="chart-container">
-                    <canvas id="residenceChart"></canvas>
-                </div>
-            </div>
-        </div>
+    <div class="relative rounded-2xl p-4 shadow-sm overflow-hidden custom-orange-card">
+      <div class="absolute top-4 right-4 h-9 w-9 rounded-lg bg-white/70 flex items-center justify-center icon"><?= svg_icon('users','w-5 h-5') ?></div>
+      <div class="h-36 flex flex-col justify-center">
+        <div class="text-xs font-medium text-slate-600">Most affected age group</div>
+        <div class="mt-2 text-3xl font-bold text-slate-900">25–34</div>
+        <div class="text-xs text-orange-600 mt-2">28% affected (sample)</div>
+      </div>
     </div>
-    <div class="col-md-6 grid-margin">
-        <div class="card">
-            <div class="card-body">
-                <div class="section-title">Contributing Factors</div>
-                <div class="chart-container">
-                    <canvas id="factorsChart"></canvas>
-                </div>
-            </div>
-        </div>
 
-        <!-- Incidents by Location Category (added) -->
-        <div class="card mt-4">
-            <div class="card-body">
-                <div class="section-title">Incidents by Location Category</div>
-                <div class="chart-container">
-                    <canvas id="locationChart"></canvas>
-                </div>
-            </div>
-        </div>
+  </div>
+
+  <!-- ROW 1  -->
+  <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+      <h4 class="text-sm font-semibold text-slate-900 mb-3">Incidents by year</h4>
+      <div id="chart-incidents-year" class="h-72"></div>
     </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+      <h4 class="text-sm font-semibold text-slate-900 mb-3">Incidents per province (Region 1)</h4>
+      <div id="chart-incidents-province" class="h-72"></div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+      <h4 class="text-sm font-semibold text-slate-900 mb-3">Incidents by residence (top 10)</h4>
+      <div id="chart-incidents-residence" class="h-72"></div>
+    </div>
+
+  </div>
+
+  <!-- ROW 2  -->
+  <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+      <h4 class="text-sm font-semibold text-slate-900 mb-3">Contributing factors</h4>
+      <div id="chart-contributing-factors" class="h-56"></div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+      <h4 class="text-sm font-semibold text-slate-900 mb-3">Incidents by location category</h4>
+      <div id="chart-incidents-location" class="h-56"></div>
+    </div>
+
+  </div>
+
+  <!-- ROW 3  -->
+  <div class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+      <h4 class="text-sm font-semibold text-slate-900 mb-3">Incidents by holiday</h4>
+      <div id="chart-incidents-holiday" class="h-56"></div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+      <h4 class="text-sm font-semibold text-slate-900 mb-3">Incidents by sex</h4>
+      <div id="chart-incidents-sex" class="h-56"></div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+      <h4 class="text-sm font-semibold text-slate-900 mb-3">Incidents by age group</h4>
+      <div id="chart-incidents-age" class="h-56"></div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+      <h4 class="text-sm font-semibold text-slate-900 mb-3">Remarks status</h4>
+      <div id="chart-remarks-status" class="h-56"></div>
+    </div>
+
+  </div>
+
 </div>
 <?= $this->endSection() ?>
 
 <?= $this->section('pageScripts') ?>
-<script src="<?= base_url('assets/staradmin/vendors/chart.js/chart.umd.js') ?>"></script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
-    const chartColors = ['#09637E', '#0E7EA0', '#0B4F63', '#5FA8B3', '#C94A4A', '#D6B443', '#3FAF7B', '#94C7CF'];
-    const accentRed = '#C94A4A';
-    const accentYellow = '#D6B443';
-    const accentGreen = '#3FAF7B';
+// ApexCharts — (replace nalang ng real data afterwards)
+document.addEventListener('DOMContentLoaded', function () {
+  // Incidents per province 
+  var optionsProvince = {
+    chart: { type: 'bar', height: 288, toolbar: { show: false } },
+    series: [{ name: 'Incidents', data: [120, 95, 80, 210] }],
+    colors: ['#002C76'],
+    plotOptions: { bar: { borderRadius: 6, columnWidth: '48%' } },
+    dataLabels: { enabled: false },
+    xaxis: { categories: ['Ilocos Norte','Ilocos Sur','La Union','Pangasinan'] },
+    tooltip: { y: { formatter: function (val) { return val + ' incidents'; } } },
+    grid: { strokeDashArray: 4 }
+  };
+  new ApexCharts(document.querySelector('#chart-incidents-province'), optionsProvince).render();
 
-    new Chart(document.getElementById('provinceChart'), {
-        type: 'bar',
-        data: {
-            labels: ['Ilocos Norte', 'Ilocos Sur', 'La Union', 'Pangasinan'],
-            datasets: [{
-                label: 'Number of Incidents',
-                data: [456, 523, 378, 612],
-                backgroundColor: chartColors.slice(0, 4),
-                borderColor: chartColors.slice(0, 4),
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: true } },
-            scales: { y: { beginAtZero: true } }
-        }
-    });
+  // Remarks status (Alive / Deceased / Missing)
+  var optionsRemarks = {
+    chart: { type: 'donut', height: '100%' },
+    series: [520, 27, 5],
+    labels: ['Alive','Deceased','Missing'],
+    colors: ['#10b981','#C9282D','#FFDE15'],
+    legend: { position: 'bottom' },
+    dataLabels: { enabled: false }
+  };
+  new ApexCharts(document.querySelector('#chart-remarks-status'), optionsRemarks).render();
 
-    new Chart(document.getElementById('remarksChart'), {
-        type: 'pie',
-        data: {
-            labels: ['Saved', 'Deceased', 'Missing'],
-            datasets: [{
-                data: [892, 1256, 118],
-                backgroundColor: [accentGreen, accentRed, accentYellow],
-                borderColor: '#fff',
-                borderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { position: 'bottom' } }
-        }
-    });
+  // Incidents by sex (Male / Female)
+  var optionsSex = {
+    chart: { type: 'pie', height: '100%' },
+    series: [520, 360],
+    labels: ['Male','Female'],
+    colors: ['#1581BF','#F875AA'],
+    dataLabels: { enabled: false },
+    legend: { position: 'bottom' }
+  };
+  new ApexCharts(document.querySelector('#chart-incidents-sex'), optionsSex).render();
 
-    new Chart(document.getElementById('sexChart'), {
-        type: 'pie',
-        data: {
-            labels: ['Male', 'Female'],
-            datasets: [{
-                data: [72.5, 27.5],
-                backgroundColor: ['#09637E', accentRed],
-                borderColor: '#fff',
-                borderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { position: 'bottom' } }
-        }
-    });
+  // Incidents by age group
+  var optionsAge = {
+    chart: { type: 'bar', height: '100%' },
+    series: [{ name: 'Incidents', data: [8, 34, 120, 234, 165, 90, 30] }],
+    xaxis: { categories: ['0-4','5-14','15-24','25-34','35-44','45-64','65+'] },
+    colors: ['#2C4E80'],
+    plotOptions: { bar: { borderRadius: 6, columnWidth: '48%' } },
+    dataLabels: { enabled: false }
+  };
+  new ApexCharts(document.querySelector('#chart-incidents-age'), optionsAge).render();
 
-    new Chart(document.getElementById('ageChart'), {
-        type: 'bar',
-        data: {
-            labels: [
-                'Preschool (0-4)',
-                'Gradeschool (5-12)',
-                'High School (13-17)',
-                'College (18-22)',
-                'Young Adult (23-35)',
-                'Middle Age (36-59)',
-                'Senior Citizen (60+)'
-            ],
-            datasets: [{
-                label: 'Percentage (%)',
-                data: [8.2, 15.7, 12.3, 14.1, 18.4, 19.2, 12.1], // Example data, adjust as needed
-                backgroundColor: accentRed,
-                borderColor: accentRed,
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            indexAxis: 'y',
-            plugins: { legend: { display: true } },
-            scales: { x: { beginAtZero: true } }
-        }
-    });
+  // Contributing factors 
+  var optionsFactors = {
+    chart: { type: 'bar', height: '100%' },
+    series: [{ name: 'Count', data: [210, 150, 90, 60, 30] }],
+    plotOptions: { bar: { horizontal: true, barHeight: '48%', borderRadius: 6 } },
+    xaxis: { categories: ['Unable to swim','Lack of supervision','Alcohol','Hazardous conditions','Overcrowding'] },
+    colors: ['#002C76'],
+    dataLabels: { enabled: false }
+  };
+  new ApexCharts(document.querySelector('#chart-contributing-factors'), optionsFactors).render();
 
-    new Chart(document.getElementById('yearChart'), {
-        type: 'line',
-        data: {
-            labels: ['2020', '2021', '2022', '2023', '2024'],
-            datasets: [{
-                label: 'Total Incidents',
-                data: [512, 598, 625, 702, 410],
-                borderColor: accentYellow,
-                backgroundColor: 'rgba(214, 180, 67, 0.15)',
-                tension: 0.4,
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: true } },
-            scales: { y: { beginAtZero: true } }
-        }
-    });
+  // Incidents by year 
+  var optionsYear = {
+    chart: { type: 'line', height: 288, toolbar: { show: false } },
+    series: [{ name: 'Incidents', data: [320, 280, 360, 400, 450, 420] }],
+    stroke: { curve: 'smooth', width: 3 },
+    markers: { size: 4 },
+    colors: ['#002C76'],
+    xaxis: { categories: ['2019','2020','2021','2022','2023','2024'] },
+    grid: { strokeDashArray: 4 }
+  };
+  new ApexCharts(document.querySelector('#chart-incidents-year'), optionsYear).render();
 
-    new Chart(document.getElementById('occasionChart'), {
-        type: 'bar',
-        data: {
-            labels: ['Christmas', 'New Year', 'Holy Week', 'All Saints Day', 'Independence Day', 'Halloween', 'Summer Break', 'Other Holidays'],
-            datasets: [{
-                label: 'Number of Incidents',
-                data: [523, 487, 412, 298, 234, 189, 645, 159],
-                backgroundColor: chartColors,
-                borderColor: chartColors,
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: true } },
-            scales: { y: { beginAtZero: true } }
-        }
-    });
+  // Incidents by holiday 
+  var optionsHoliday = {
+    chart: { type: 'bar', height: '100%', toolbar: { show: false } },
+    series: [{ name: 'Incidents', data: [150, 110, 95, 160, 80, 70] }],
+    plotOptions: { bar: { borderRadius: 6, columnWidth: '48%' } },
+    xaxis: { categories: ['Holy Week','Christmas','Summer Vacation','New Year','All Saints Day','Others'] },
+    colors: ['#C9282D'],
+    dataLabels: { enabled: false }
+  };
+  new ApexCharts(document.querySelector('#chart-incidents-holiday'), optionsHoliday).render();
 
-    let residenceChartInstance;
+  // Incidents by residence (palitan nalang ulit pag meron na - filter top 10 only)
+  var optionsResidence = {
+    chart: { type: 'bar', height: 288 },
+    series: [{ name: 'Incidents', data: [85,80,72,65,60,55,50,45,40,35] }],
+    plotOptions: { bar: { horizontal: true, barHeight: '44%', borderRadius: 6 } },
+    xaxis: { categories: ['Dagupan','San Carlos','Alaminos','Urdaneta','Laoag','Vigan','Candon','San Fernando (LU)','Agoo','Bacnotan'] },
+    colors: ['#06b6d4'],
+    dataLabels: { enabled: false }
+  };
+  new ApexCharts(document.querySelector('#chart-incidents-residence'), optionsResidence).render();
 
-    const residenceDataByProvince = {
-        labels: ['Ilocos Norte', 'Ilocos Sur', 'La Union', 'Pangasinan'],
-        data: [456, 523, 378, 612],
-        backgroundColor: chartColors.slice(0, 4)
-    };
+  // Incidents by location category 
+  var optionsLocation = {
+    chart: { type: 'donut', height: '100%' },
+    series: [210,30,120,50,15,40],
+    labels: ['Beach','Lake','River','Pool','Swamp','Other'],
+    colors: ['#06b6d4','#60a5fa','#3b82f6','#60a5fa','#f97316','#9ca3af'],
+    legend: { position: 'bottom' },
+    dataLabels: { enabled: false }
+  };
+  new ApexCharts(document.querySelector('#chart-incidents-location'), optionsLocation).render();
 
-    const residenceDataByMunicipality = {
-        labels: ['San Fernando', 'Dagupan', 'Laoag', 'Vigan', 'Alaminos', 'Candon', 'Batac', 'San Juan'],
-        data: [234, 198, 167, 189, 145, 123, 156, 134],
-        backgroundColor: chartColors
-    };
-
-    function updateResidenceChart() {
-        const filterValue = document.getElementById('residenceFilter').value;
-        const data = filterValue === 'province' ? residenceDataByProvince : residenceDataByMunicipality;
-
-        if (residenceChartInstance) {
-            residenceChartInstance.destroy();
-        }
-
-        residenceChartInstance = new Chart(document.getElementById('residenceChart'), {
-            type: 'doughnut',
-            data: {
-                labels: data.labels,
-                datasets: [{
-                    data: data.data,
-                    backgroundColor: data.backgroundColor,
-                    borderColor: '#fff',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { position: 'bottom' } }
-            }
-        });
-    }
-
-    updateResidenceChart();
-
-    new Chart(document.getElementById('factorsChart'), {
-        type: 'bar',
-        data: {
-            labels: ['Unable to Swim', 'Lack of Supervision', 'Intoxication', 'Sudden Illness', 'Water Hazards', 'No Life Jacket'],
-            datasets: [{
-                label: 'Percentage (%)',
-                data: [52.3, 31.2, 18.5, 14.7, 22.1, 28.4],
-                backgroundColor: [accentRed, '#09637E', accentYellow, accentGreen, '#0E7EA0', '#0B4F63'],
-                borderColor: [accentRed, '#09637E', accentYellow, accentGreen, '#0E7EA0', '#0B4F63'],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            indexAxis: 'y',
-            plugins: { legend: { display: true } },
-            scales: { x: { beginAtZero: true } }
-        }
-    });
-
-    // Incidents by Location Category
-    new Chart(document.getElementById('locationChart'), {
-        type: 'doughnut',
-        data: {
-            labels: ['Resort', 'Tourist Spot', 'Beach', 'River', 'Lake', 'Pier/Port', 'Other'],
-            datasets: [{
-                label: 'Number of Incidents',
-                data: [124, 89, 312, 67, 42, 25, 48], // sample data — replace with real numbers from backend when available
-                backgroundColor: chartColors.slice(0, 7),
-                borderColor: '#fff',
-                borderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { position: 'bottom' } }
-        }
-    });
+});
 </script>
 <?= $this->endSection() ?>
