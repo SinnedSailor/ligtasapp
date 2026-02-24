@@ -72,10 +72,9 @@ class Documents extends BaseController
             'budget' => $this->request->getFileMultiple('budget_files'),
         ];
 
+        // only PDF files permitted per requirement
         $allowedTypes = [
             'application/pdf',
-            'application/msword',
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         ];
 
         $maxSize = 10 * 1024 * 1024;

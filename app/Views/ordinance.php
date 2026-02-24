@@ -328,19 +328,19 @@
             <div class="document-card">
                 <h5> Ordinance</h5>
                 <p class="text-muted">Local ordinance documents related to water safety regulations.</p>
-                <input type="file" name="ordinance_files[]" class="w-full rounded-md border border-gray-200 p-2 text-sm text-gray-700" multiple accept=".pdf,.doc,.docx">
+                <input type="file" name="ordinance_files[]" class="w-full rounded-md border border-gray-200 p-2 text-sm text-gray-700" multiple accept=".pdf">
             </div>
 
             <div class="document-card">
                 <h5> POPS Plan</h5>
                 <p class="text-muted">Peace and Order and Public Safety Plan documents.</p>
-                <input type="file" name="pops_files[]" class="w-full rounded-md border border-gray-200 p-2 text-sm text-gray-700" multiple accept=".pdf,.doc,.docx">
+                <input type="file" name="pops_files[]" class="w-full rounded-md border border-gray-200 p-2 text-sm text-gray-700" multiple accept=".pdf">
             </div>
 
             <div class="document-card">
                 <h5> Annual Budget Report</h5>
                 <p class="text-muted">Annual budget reports for LIGTAS (Local Incident Gathering and Tracking for Aquatic Safety).</p>
-                <input type="file" name="budget_files[]" class="w-full rounded-md border border-gray-200 p-2 text-sm text-gray-700" multiple accept=".pdf,.doc,.docx">
+                <input type="file" name="budget_files[]" class="w-full rounded-md border border-gray-200 p-2 text-sm text-gray-700" multiple accept=".pdf">
             </div>
         </div>
 
