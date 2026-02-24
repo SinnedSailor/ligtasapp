@@ -162,6 +162,12 @@
         height: 100%;
         overflow: hidden;
     }
+
+    /* ensure modal inner content can scroll when it becomes too tall */
+    #incidentModal > div {
+        max-height: 90vh;
+        overflow-y: auto;
+    }
 </style>
     <!-- CSRF token for AJAX -->
     <meta name="csrf-token" content="<?= csrf_hash() ?>">
@@ -213,7 +219,9 @@
             </button>
         </div>
 
-        <div class="overflow-x-auto">
+        <!-- use our custom .table-responsive class which includes overflow handling and word-wrap rules
+             plus tailwind's overflow-x-auto for additional horizontal scrolling when needed -->
+        <div class="overflow-x-auto table-responsive">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
@@ -225,7 +233,7 @@
                         <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 col-primary">Name of Victim</th>
                         <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 col-secondary">Location Category</th>
                         <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 col-secondary">Age of the Person</th>
-                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 col-secondary">Sex</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 col-secondary">Gender</th>
                         <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 col-secondary">Occasion</th>
                         <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 col-tertiary">Other Factors</th>
                         <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 col-tertiary">Person's Residence</th>
@@ -330,8 +338,8 @@
   </div>
 </div>
 
-<div id="incidentModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/40 w-screen h-screen" aria-hidden="true">
-  <div class="bg-white rounded-2xl shadow-lg max-w-4xl w-full p-6 mx-4">
+<div id="incidentModal" class="modal-overlay fixed inset-0 z-50 hidden flex items-center justify-center bg-black/40 w-screen h-screen" aria-hidden="true">
+  <div class="bg-white rounded-2xl shadow-lg max-w-4xl w-full p-6 mx-4 max-h-[90vh] overflow-y-auto">
     <div class="flex items-start justify-between mb-4">
       <h3 class="text-lg font-semibold">Add Incident</h3>
       <button type="button" class="text-slate-400 hover:text-slate-600" onclick="hideModal('incidentModal')" aria-label="Close">&times;</button>
@@ -431,17 +439,30 @@
           <div class="flex flex-wrap gap-4 mt-2 items-end">
             <div class="flex flex-col w-full md:w-auto">
                 <label for="incidentPicturesInput" class="text-sm text-slate-600 mb-1">Photos</label>
-                <input type="file" id="incidentPicturesInput" class="block w-full text-sm text-slate-700" accept=".jpg,.jpeg,.png" multiple />
+                <!-- only button area clickable: inline-block + max width -->
+                <input type="file" id="incidentPicturesInput" class="inline-block w-auto max-w-xs text-sm text-slate-700" accept=".jpg,.jpeg,.png" multiple />
+                <!-- list for queued pictures -->
+                <div id="incidentUploadFileListPictures" class="mt-1"></div>
             </div>
             <div class="flex flex-col w-full md:w-auto">
                 <label for="incidentDocumentsInput" class="text-sm text-slate-600 mb-1">Documents</label>
-                <input type="file" id="incidentDocumentsInput" class="block w-full text-sm text-slate-700" accept=".pdf,.doc,.docx" multiple />
+                <input type="file" id="incidentDocumentsInput" class="inline-block w-auto max-w-xs text-sm text-slate-700" accept=".pdf,.doc,.docx" multiple />
+                <div id="incidentUploadFileListDocuments" class="mt-1"></div>
             </div>
             <button type="button" id="incidentUploadButton" class="px-3 py-1.5 border border-indigo-600 text-indigo-600 rounded-md text-sm hover:bg-indigo-600 hover:text-white active:bg-indigo-700" onclick="uploadIncidentAttachments()">Upload Attachments</button>
           </div>
         </div>
       <?php endif; ?>
 
+      <!-- modal footer with save/cancel -->
+      <div class="mt-4 flex justify-end gap-2">
+        <!-- start disabled; JS will enable when form is valid -->
+        <button type="button" id="incidentSaveButton" disabled
+                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 opacity-50 cursor-not-allowed">
+          Add Incident
+        </button>
+        <button type="button" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400" onclick="hideModal('incidentModal')">Cancel</button>
+      </div>
     </form>
   </div>
 </div> 
@@ -683,7 +704,13 @@
     let scrollLocked = false;
 
     function isInOpenModal(target) {
-        return !!(target && target.closest && target.closest('.modal.show'));
+        if (!(target && target.closest)) return false;
+        // our custom modals use .modal-overlay (or could also target specific IDs)
+        // consider any element within a visible overlay as inside a modal
+        if (target.closest('.modal.show') || target.closest('.modal-overlay.active') || target.closest('#incidentModal')) {
+            return true;
+        }
+        return false;
     }
 
     function preventScroll(event) {
@@ -806,31 +833,19 @@
 
     // Render the per-file upload list UI grouped by type (pictures / documents)
     function renderUploadFileList() {
-        const container = document.getElementById('incidentUploadFileList');
         const picsContainer = document.getElementById('incidentUploadFileListPictures');
         const docsContainer = document.getElementById('incidentUploadFileListDocuments');
-        if (!container || !picsContainer || !docsContainer) return;
+        if (!picsContainer || !docsContainer) return;
 
         if (!currentUploadFiles || currentUploadFiles.length === 0) {
-            container.innerHTML = '';
             picsContainer.innerHTML = '';
             docsContainer.innerHTML = '';
             return;
         }
 
-        const uploadingCount = currentUploadFiles.filter(f => f.status === 'uploading' || f.status === 'queued').length;
-        const globalHeader = `
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <div class="small text-muted">${currentUploadFiles.length} file(s) queued</div>
-                <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-sm btn-outline-danger" id="incidentUploadCancelAllBtn" onclick="cancelAllUploads()" ${uploadingCount === 0 ? 'disabled' : ''}>Cancel all</button>
-                </div>
-            </div>
-        `;
-
         function renderListFor(filterFn) {
             const list = currentUploadFiles.filter(filterFn);
-            if (!list.length) return '<div class="empty-message">No files</div>';
+            if (!list.length) return '<div class="empty-message text-xs text-gray-500">No files</div>';
 
             return list.map(f => {
                 const progress = Math.max(0, Math.min(100, Math.round(f.progress || 0)));
@@ -839,19 +854,12 @@
                 const showRetry = (f.status === 'error' || f.status === 'cancelled');
 
                 return `
-                    <div class="upload-file-item d-flex align-items-center justify-content-between mb-2" data-file-id="${f.id}">
-                        <div style="flex:1; min-width:0;">
-                            <div class="fw-semibold small text-truncate">${escapeHtml(f.file.name)} <small class="text-muted">(${formatBytes(f.file.size)})</small></div>
-                            <div class="progress mt-1" style="height:8px;">
-                                <div class="progress-bar" role="progressbar" style="width:${progress}%" aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="100" data-file-progress-id="${f.id}">${progress}%</div>
-                            </div>
+                    <div class="upload-file-item d-flex items-center justify-between mb-1" data-file-id="${f.id}">
+                        <div class="flex-1 min-w-0">
+                            <div class="text-xs font-medium truncate">${escapeHtml(f.file.name)}</div>
                         </div>
-                        <div class="ms-3 text-end" style="min-width:140px;">
-                            <div class="small" data-file-status-id="${f.id}">${statusLabel}</div>
-                            <div class="btn-group btn-group-sm mt-1">
-                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="cancelSingleUpload('${f.id}')" ${showCancel ? '' : 'style="display:none;"'}>Cancel</button>
-                                <button type="button" class="btn btn-outline-primary btn-sm" onclick="retrySingleUpload('${f.id}')" ${showRetry ? '' : 'style="display:none;"'}>Retry</button>
-                            </div>
+                        <div class="ml-2 flex-shrink-0 space-x-1">
+                            <button type="button" class="text-gray-400 hover:text-gray-600 text-xs" onclick="cancelSingleUpload('${f.id}')" ${showCancel ? '' : 'style="display:none;"'}>✕</button>
                         </div>
                     </div>
                 `;
@@ -860,8 +868,6 @@
 
         picsContainer.innerHTML = renderListFor(f => f.type === 'photo');
         docsContainer.innerHTML = renderListFor(f => f.type === 'document');
-        // Render only a minimal header in the combined container to avoid duplicating per-type lists
-        container.innerHTML = globalHeader;
     }
 
     function updateFileUploadUI(id) {
@@ -1014,6 +1020,7 @@
         if (entry.status === 'queued') {
             entry.status = 'cancelled';
             updateFileUploadUI(entry.id);
+            updateSaveButtonState();
             return;
         }
 
@@ -1031,6 +1038,7 @@
             entry.status = 'queued';
             entry.progress = 0;
             updateFileUploadUI(entry.id);
+            updateSaveButtonState();
             return startFileUploadEntry(entry, tableData[currentIncidentIndex] ? tableData[currentIncidentIndex].N : null);
         }
         return Promise.reject(new Error('Cannot retry in current state'));
@@ -1074,6 +1082,7 @@
         if (incidentDocumentsInput) incidentDocumentsInput.value = '';
         renderUploadFileList();
         hideUploadProgress();
+        updateSaveButtonState();
     }
 
     // Add selected files (from inputs) to the client-side upload queue. type is 'photo' or 'document'
@@ -1093,22 +1102,68 @@
         currentUploadFiles = currentUploadFiles.concat(entries);
         renderUploadFileList();
         updateOverallProgress();
+        // make sure the hint updates when files are queued
+        const row = (currentIncidentIndex !== null) ? tableData[currentIncidentIndex] : null;
+        updateIncidentAttachmentSection(row);
     }
 
     function updateOverallProgress() {
         if (!currentUploadFiles || currentUploadFiles.length === 0) {
             hideUploadProgress();
+            updateSaveButtonState();
             return;
         }
         const total = currentUploadFiles.length;
         const sum = currentUploadFiles.reduce((acc, f) => acc + (f.progress || (f.status === 'success' ? 100 : 0)), 0);
         const avg = Math.round(sum / total);
         showUploadProgress(avg);
+        updateSaveButtonState();
     }
 
     // small helpers
     function escapeHtml(s) { return String(s).replace(/[&<>\"'`]/g, function (m) { return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;' })[m]; }); }
     function formatBytes(bytes) { if (bytes === 0) return '0 B'; const sizes = ['B','KB','MB','GB','TB']; const i = Math.floor(Math.log(bytes)/Math.log(1024)); return (bytes/Math.pow(1024,i)).toFixed(1) + ' ' + sizes[i]; }
+
+    // validate save button enablement based on required fields & upload state
+    function canSaveIncident() {
+        if (!incidentSaveButton) return false;
+        // IDs of fields we consider required for a "complete" incident
+        const required = [
+            'incidentMonth',
+            'incidentYear',
+            'incidentProvince',
+            'incidentMunicipality',
+            'incidentVictim',
+            'incidentLocation',
+            'incidentAge',
+            'incidentGender'
+        ];
+        for (const id of required) {
+            const val = document.getElementById(id)?.value || '';
+            if (!val.trim()) {
+                return false;
+            }
+        }
+        // attachments continue to be optional
+        return true;
+    }
+
+    function updateSaveButtonState() {
+        if (!incidentSaveButton) return;
+        const ok = canSaveIncident();
+        incidentSaveButton.disabled = !ok;
+        incidentSaveButton.classList.toggle('opacity-50', !ok);
+        incidentSaveButton.classList.toggle('cursor-not-allowed', !ok);
+        if (ok) {
+            // blue primary styling
+            incidentSaveButton.classList.remove('bg-gray-400','hover:bg-gray-400');
+            incidentSaveButton.classList.add('bg-blue-600','hover:bg-blue-700');
+        } else {
+            // greyed-out background, no hover change
+            incidentSaveButton.classList.remove('bg-blue-600','hover:bg-blue-700');
+            incidentSaveButton.classList.add('bg-gray-400','hover:bg-gray-400');
+        }
+    }
 
     document.addEventListener('DOMContentLoaded', function() {
         // move modals out of the scrolling panel so fixed positioning works
@@ -1151,8 +1206,14 @@
         incidentFieldMap.forEach(field => {
             const el = document.getElementById(field.id);
             if (el) {
-                el.addEventListener('input', hideIncidentFormMessage);
-                el.addEventListener('change', hideIncidentFormMessage);
+                el.addEventListener('input', () => {
+                    hideIncidentFormMessage();
+                    updateSaveButtonState();
+                });
+                el.addEventListener('change', () => {
+                    hideIncidentFormMessage();
+                    updateSaveButtonState();
+                });
             }
         });
 
@@ -1179,6 +1240,12 @@
         }
         setImportSaveState(false);
         updateIncidentMunicipalities();
+
+        // wire save button once DOM ready
+        if (incidentSaveButton) {
+            incidentSaveButton.addEventListener('click', saveIncidentFromModal);
+            updateSaveButtonState();
+        }
 
         const fileInput = document.getElementById('excelFile');
         if (fileInput) {
@@ -1356,6 +1423,12 @@
         currentIncidentIndex = (index === 0 || index) ? index : null;
         const isEdit = currentIncidentIndex !== null;
         const row = isEdit ? tableData[currentIncidentIndex] : null;
+        // temporarily disable save button until state calculated
+        if (incidentSaveButton) {
+            incidentSaveButton.disabled = true;
+            incidentSaveButton.classList.add('opacity-50','cursor-not-allowed','bg-gray-400','hover:bg-gray-400');
+            incidentSaveButton.classList.remove('bg-blue-600','hover:bg-blue-700');
+        }
 
         incidentFieldMap.forEach(field => {
             const input = document.getElementById(field.id);
@@ -1367,8 +1440,12 @@
 
         // Ensure the currently stored year (if any) exists as an option in the select
         const yearValue = row ? (row['Year of Incident'] || '') : '';
+        // only attempt to add an option when the field is a <select>
         if (yearValue) {
-            ensureYearOption(yearValue);
+            const yearEl = document.getElementById('incidentYear');
+            if (yearEl && yearEl.tagName && yearEl.tagName.toLowerCase() === 'select') {
+                ensureYearOption(yearValue);
+            }
         }
 
         const provinceInput = document.getElementById('incidentProvince');
@@ -1410,6 +1487,7 @@
         }
 
         updateIncidentAttachmentSection(row);
+        updateSaveButtonState();
 
         showModal('incidentModal');
     }
@@ -1428,10 +1506,18 @@
         const isLocal = !!(row && row._local);
         const canUpload = hasIncident && !isLocal;
 
+        const queuedCount = currentUploadFiles ? currentUploadFiles.length : 0;
+        // display only a brief summary; names appear adjacent to each input via the queue lists
+        if (queuedCount > 0) {
+            incidentAttachmentHint.textContent = `${queuedCount} file(s) selected.` +
+                (canUpload ? ' They will be uploaded when you save the incident (or click the upload button).' : ' Click "Upload Attachments" to upload them.');
+            return;
+        }
+
         // Show hint for saved incidents, or indicate pre-saved uploaded files when adding
         if (canUpload) {
             incidentAttachmentHint.textContent = 'Upload photos or documents for this incident.';
-        } else if (currentAttachmentSession && currentUploadFiles && currentUploadFiles.length > 0) {
+        } else if (currentAttachmentSession && queuedCount > 0) {
             const uploadedPhotos = currentUploadFiles.filter(f => f.type === 'photo' && f.status === 'success').length;
             const uploadedDocs = currentUploadFiles.filter(f => f.type === 'document' && f.status === 'success').length;
             incidentAttachmentHint.textContent = `${uploadedPhotos} photo(s), ${uploadedDocs} document(s) uploaded (will be attached when you save the incident).`;
@@ -1451,6 +1537,8 @@
         if (incidentUploadButton) {
             incidentUploadButton.disabled = false;
         }
+        // ensure save button is up to date when attachments change
+        updateSaveButtonState();
     }
 
     async function saveIncidentFromModal() {
@@ -1531,6 +1619,12 @@
 
         if (isEdit && row['N']) {
             try {
+                // if the user queued files but didn't manually click "Upload",
+                // make sure they get uploaded before we submit the update.
+                if (currentUploadFiles && currentUploadFiles.length > 0) {
+                    await uploadIncidentAttachments();
+                }
+
                 // Get CSRF token from meta tag
                 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
                 const mappedData = mapIncidentFields(row);
@@ -1546,6 +1640,12 @@
                 if (!response.ok) {
                     showIncidentFormMessage(result.message || 'Update failed.', 'danger');
                     return;
+                }
+
+                // after a successful update, if there are still queued files (maybe upload errored)
+                // try again so attachments are never lost
+                if (currentUploadFiles && currentUploadFiles.length > 0) {
+                    await uploadIncidentAttachments();
                 }
             } catch (error) {
                 showIncidentFormMessage('Update failed: ' + error.message, 'danger');
@@ -1647,18 +1747,28 @@
     }
 
     function ensureYearOption(value) {
+        // Historically the year field was a <select>, so we would add an
+        // option if the stored value wasn't present.  The input has since been
+        // changed to a plain text field, so calling this helper unguarded
+        // resulted in a TypeError (`yearInput.options` undefined) and broke the
+        // modal when editing an existing row.  Only manipulate options if the
+        // element actually supports them.
         const yearInput = document.getElementById('incidentYear');
         if (!yearInput || !value) {
             return;
         }
 
-        const options = Array.from(yearInput.options).map(option => option.value);
-        if (!options.includes(String(value))) {
-            const option = document.createElement('option');
-            option.value = String(value);
-            option.textContent = String(value);
-            // append so it becomes selectable; we keep existing order as-is
-            yearInput.appendChild(option);
+        // if it's a <select> we may need to add the value as an option so it
+        // remains selectable; otherwise for an <input> there's nothing to do
+        if (yearInput.tagName && yearInput.tagName.toLowerCase() === 'select') {
+            const options = Array.from(yearInput.options).map(option => option.value);
+            if (!options.includes(String(value))) {
+                const option = document.createElement('option');
+                option.value = String(value);
+                option.textContent = String(value);
+                // append so it becomes selectable; we keep existing order as-is
+                yearInput.appendChild(option);
+            }
         }
     }
 
@@ -2291,14 +2401,20 @@
 
         const anySuccess = results.some(r => r.status === 'fulfilled');
         if (anySuccess) {
-            if (!isPreSave && row) {
+            // regardless of whether this was a pre-save upload or not, refresh the hint
+            if (row) {
                 row.review_status = 'pending';
                 renderTable();
-                updateIncidentAttachmentSection(row);
             }
+            updateIncidentAttachmentSection(row);
+
             showAttachmentModal('Attachments uploaded.');
             showIncidentFormMessage('Attachments uploaded.', 'success');
             setTimeout(hideIncidentFormMessage, 2000);
+        } else {
+            // all uploads failed
+            showAttachmentModal('Failed to upload attachments.');
+            showIncidentFormMessage('Failed to upload attachments.', 'danger');
         }
 
         // Keep queue visible so user can retry failed ones; clear native inputs
