@@ -344,11 +344,19 @@ class Admin extends BaseController
      */
     public function getUsers()
     {
-        $accessCheck = $this->checkAdminAccess();
-        if ($accessCheck) {
+        // API-specific access check
+        if (!session()->get('logged_in')) {
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'Unauthorized'
+                'message' => 'Unauthorized: not logged in'
+            ])->setStatusCode(403);
+        }
+        $userId = session()->get('user_id');
+        $user = $this->userModel->find($userId);
+        if (!$user || !$user['is_admin']) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Unauthorized: not admin'
             ])->setStatusCode(403);
         }
 

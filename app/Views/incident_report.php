@@ -1,4 +1,3 @@
-
 <?= $this->extend('layouts/main_tailwind') ?>
 <?php $hasInitialRows = !empty($initialRows); ?>
 
@@ -139,6 +138,7 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
+<div class="content-wrapper" style="margin: 24px;">
 <?php
     $roleName = $roleName ?? (session()->get('role_name') ?? '');
     $isLgu = strtoupper(trim((string) $roleName)) === 'LGU';
@@ -152,86 +152,104 @@
 </div>
 
 <div class="px-4">
-    <div class="max-w-6xl mx-auto bg-white rounded-2xl shadow p-6">
-        <h4 class="text-lg font-semibold">Data Management</h4>
-        <div class="flex flex-wrap items-center gap-3 mt-4 mb-4">
-            <div class="flex items-center gap-3">
-                <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" class="hidden" />
-                <button id="importButton" class="px-3 py-1.5 border border-blue-600 text-blue-600 rounded-md text-sm hover:bg-blue-600 hover:text-white active:bg-blue-700" onclick="document.getElementById('excelFile').click()" style="<?= $hasInitialRows ? 'display:none;' : '' ?>">
-                    📥 Import Excel File
-                </button>
-                <span class="text-gray-500 text-sm file-name" id="fileName" style="<?= $hasInitialRows ? 'display:none;' : '' ?>">No file selected</span>
+    <div class="max-w-6xl mx-auto mb-8">
+        <!-- Upload Container -->
+        <div class="bg-white rounded-2xl shadow p-6 mb-6">
+            <h4 class="text-lg font-semibold">Data Management</h4>
+            <div class="flex flex-wrap items-center gap-3 mt-4 mb-4">
+                <div class="flex items-center gap-3">
+                    <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" class="hidden" />
+                    <button id="importButton" class="px-3 py-1.5 border border-blue-600 text-blue-600 rounded-md text-sm hover:bg-blue-600 hover:text-white active:bg-blue-700" onclick="document.getElementById('excelFile').click()" style="<?= $hasInitialRows ? 'display:none;' : '' ?>">
+                        <?= svg_icon('cloud-upload', 'w-4 h-4') ?> Import Excel File
+                    </button>
+                    <span class="text-gray-500 text-sm file-name" id="fileName" style="<?= $hasInitialRows ? 'display:none;' : '' ?>">No file selected</span>
+                </div>
             </div>
-        </div>
-
-        <?php if ($isLgu): ?>
-            <div class="mb-4">
-                <div class="bg-blue-50 border border-blue-200 text-blue-800 rounded-md p-3 text-sm">Upload at least one photo or document per incident. Attachments are reviewed by Province users.</div>
-            </div>
-        <?php endif; ?>
-
-        <div class="flex flex-wrap gap-2 mb-4">
-            <?php if ($isLgu || $isAdmin): ?>
-                <button class="px-3 py-1.5 border border-blue-600 text-blue-600 rounded-md text-sm hover:bg-blue-600 hover:text-white active:bg-blue-700" onclick="openIncidentModal()">
-                    ➕ Add Incident
-                </button>
+            <?php if ($isLgu): ?>
+                <div class="mb-4">
+                    <div class="bg-blue-50 border border-blue-200 text-blue-800 rounded-md p-3 text-sm">Upload at least one photo or document per incident. Attachments are reviewed by Province users.</div>
+                </div>
             <?php endif; ?>
-            <button id="saveButton" class="px-3 py-1.5 border border-green-600 text-green-600 rounded-md text-sm hover:bg-green-600 hover:text-white active:bg-green-700" onclick="openSaveModal()" style="<?= $hasInitialRows ? 'display:none;' : '' ?>">
-                💾 Save to Database
-            </button>
-            <button id="generateReportButton" class="px-3 py-1.5 border border-sky-500 text-sky-500 rounded-md text-sm hover:bg-sky-500 hover:text-white active:bg-sky-600" onclick="downloadIncidentReport()">
-                📊 Generate Report
-            </button>
+            <div class="flex flex-wrap gap-2 mb-4">
+                <?php if ($isLgu || $isAdmin): ?>
+                    <button class="px-3 py-1.5 border border-blue-600 text-blue-600 rounded-md text-sm hover:bg-blue-600 hover:text-white active:bg-blue-700" onclick="openIncidentModal()">
+                        <?= svg_icon('plus','w-4 h-4') ?> Add Incident
+                    </button>
+                <?php endif; ?>
+                <button id="saveButton" class="px-3 py-1.5 border border-green-600 text-green-600 rounded-md text-sm hover:bg-green-600 hover:text-white active:bg-green-700" onclick="openSaveModal()" style="<?= $hasInitialRows ? 'display:none;' : '' ?>">
+                    <?= svg_icon('check','w-4 h-4') ?> Save to Database
+                </button>
+                <button id="generateReportButton" class="px-3 py-1.5 border border-sky-500 text-sky-500 rounded-md text-sm hover:bg-sky-500 hover:text-white active:bg-sky-600" onclick="downloadIncidentReport()">
+                    <?= svg_icon('chart','w-4 h-4') ?> Generate Report
+                </button>
+            </div>
         </div>
-
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-600">N</th>
-                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-600">Month of Incident</th>
-                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-600">Year of Incident</th>
-                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-600">Province</th>
-                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-600">Municipality/City where Incidence Occurred</th>
-                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 col-primary">Name of Victim</th>
-                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 col-secondary">Location Category</th>
-                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 col-secondary">Age of the Person</th>
-                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 col-secondary">Sex</th>
-                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 col-secondary">Occasion</th>
-                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 col-tertiary">Other Factors</th>
-                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 col-tertiary">Person's Residence</th>
-                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 col-tertiary">Occupation of the Victim</th>
-                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 col-tertiary">Remarks</th>
-                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-600">Attachments</th>
-                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-600">Review</th>
-                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-600">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody" class="bg-white divide-y divide-gray-100">
-                    <tr>
-                        <td colspan="16" class="px-4 py-6 text-center text-sm text-gray-400 empty-message">No data yet. Upload an Excel file or click "Add Incident" to add data.</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <div class="pagination-controls mt-4 hidden" id="paginationControls">
-            <button id="prevPage" type="button" class="px-3 py-1.5 border border-gray-300 rounded-md text-sm">Prev</button>
-                    <button id="nextPage" type="button" class="px-3 py-1.5 border border-gray-300 rounded-md text-sm">Next</button>
-                    <span class="page-info" id="pageInfo"></span>
-                    <div class="ml-auto flex items-center gap-2">
-                        <label class="page-info" for="pageSize">Rows per page</label>
-                        <select id="pageSize" class="border border-gray-300 rounded-md text-sm px-2 py-1 bg-white" style="width:auto;">
-                            <option value="5">5</option>
-                            <option value="10" selected>10</option>
-                            <option value="20">20</option>
-                            <option value="50">50</option>
-                        </select>
-                    </div>
+        <!-- Table Container -->
+        <div class="bg-white rounded-2xl shadow p-6">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 rounded-2xl overflow-hidden">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium rounded-tl-2xl" style="background:#002c76;color:#fff;min-width:60px;white-space:normal;word-break:break-word;">N</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium" style="background:#002c76;color:#fff;min-width:120px;white-space:normal;word-break:break-word;">Month of Incident</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium" style="background:#002c76;color:#fff;min-width:120px;white-space:normal;word-break:break-word;">Year of Incident</th>
+                            
+                            <th class="px-6 py-3 text-left text-xs font-medium" style="background:#002c76;color:#fff;min-width:160px;white-space:normal;word-break:break-word;">Name of Victim</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium" style="background:#002c76;color:#fff;min-width:120px;white-space:normal;word-break:break-word;">Location Category</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium" style="background:#002c76;color:#fff;min-width:100px;white-space:normal;word-break:break-word;">Age of the Person</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium" style="background:#002c76;color:#fff;min-width:80px;white-space:normal;word-break:break-word;">Sex</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium" style="background:#002c76;color:#fff;min-width:180px;white-space:normal;word-break:break-word;">Occasion</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium" style="background:#002c76;color:#fff;min-width:140px;white-space:normal;word-break:break-word;">Other Factors</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium" style="background:#002c76;color:#fff;min-width:140px;white-space:normal;word-break:break-word;">Person's Residence</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium" style="background:#002c76;color:#fff;min-width:140px;white-space:normal;word-break:break-word;">Occupation of the Victim</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium" style="background:#002c76;color:#fff;min-width:100px;white-space:normal;word-break:break-word;">Remarks</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium" style="background:#002c76;color:#fff;min-width:100px;white-space:normal;word-break:break-word;">Attachments</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium" style="background:#002c76;color:#fff;min-width:100px;white-space:normal;word-break:break-word;">Review</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium rounded-tr-2xl" style="background:#002c76;color:#fff;min-width:100px;white-space:normal;word-break:break-word;">Actions</th>
+                        </tr>
+                        <tr>
+                            <th class="px-3 py-2 text-left text-xs text-gray-400">&nbsp;</th>
+                            <th class="px-3 py-2 text-left text-xs text-gray-400">(Use numerical representation, e.g.: 1 for January, 12 for December)</th>
+                            <th class="px-3 py-2 text-left text-xs text-gray-400">(Input full year, e.g.: 2025)</th>
+                            <th class="px-3 py-2 text-left text-xs text-gray-400">(Input full year, e.g.: 2025)</th>
+                            
+                            <th class="px-3 py-2 text-left text-xs text-gray-400">Last Name<br>First Name<br>Middle Name</th>
+                            <th class="px-3 py-2 text-left text-xs text-gray-400">(e.g.: Resort, Tourist Spot, Beach, River)</th>
+                            <th class="px-3 py-2 text-left text-xs text-gray-400">(Input whole number, e.g.: 25)</th>
+                            <th class="px-3 py-2 text-left text-xs text-gray-400">(Sex assigned at birth)</th>
+                            <th class="px-3 py-2 text-left text-xs text-gray-400">Choose between Summer Vacation, Holy Week, Halloween, Holiday Season, Disaster-Related,<br><span style='color:red'>Regular Days (Family Gathering, Outing/Picnic, etc), Work-Related</span></th>
+                            <th class="px-3 py-2 text-left text-xs text-gray-400">(e.g.: Accident, Alcohol Intoxication, <span style='color:red'>Medical Condition</span>)</th>
+                            <th class="px-3 py-2 text-left text-xs text-gray-400">(From what part does the case belong to? e.g.: Bakun, Benguet)<br>Region</th>
+                            <th class="px-3 py-2 text-left text-xs text-gray-400">(e.g.: Student, Fisherfolk, Farmer, etc.)</th>
+                            <th class="px-3 py-2 text-left text-xs text-gray-400">&nbsp;</th>
+                            <th class="px-3 py-2 text-left text-xs text-gray-400">&nbsp;</th>
+                            <th class="px-3 py-2 text-left text-xs text-gray-400">&nbsp;</th>
+                            <th class="px-3 py-2 text-left text-xs text-gray-400">&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="bg-white divide-y divide-gray-100">
+                        <tr>
+                            <td colspan="16" class="px-4 py-6 text-center text-sm text-gray-400 empty-message rounded-b-2xl">No data yet. Upload an Excel file or click "Add Incident" to add data.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination-controls mt-4 hidden" id="paginationControls">
+                <button id="prevPage" type="button" class="px-3 py-1.5 border border-gray-300 rounded-md text-sm">Prev</button>
+                <button id="nextPage" type="button" class="px-3 py-1.5 border border-gray-300 rounded-md text-sm">Next</button>
+                <span class="page-info" id="pageInfo"></span>
+                <div class="ml-auto flex items-center gap-2">
+                    <label class="page-info" for="pageSize">Rows per page</label>
+                    <select id="pageSize" class="border border-gray-300 rounded-md text-sm px-2 py-1 bg-white" style="width:auto;">
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="20" selected>20</option>
+                        <option value="50">50</option>
+                    </select>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
 <div id="saveConfirmModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40" aria-hidden="true">
   <div class="bg-white rounded-2xl shadow-lg max-w-md w-full p-6 mx-4">
@@ -271,7 +289,6 @@
       <button type="button" class="px-3 py-1.5 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-600 hover:text-white active:bg-blue-700" onclick="hideModal('saveResultModal')">OK</button>
     </div>
   </div>
-</div>
 </div>
 
 <!-- Attachment notice modal (Tailwind) -->
@@ -325,22 +342,7 @@
           <input type="text" id="incidentYear" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
         </div>
 
-        <div class="col-span-1">
-          <label for="incidentProvince" class="text-sm text-slate-600 block mb-1">Province</label>
-          <select id="incidentProvince" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
-            <option value="" disabled selected class="text-slate-400">Select province</option>
-            <?php foreach ($provinceList as $province): ?>
-              <option value="<?= esc($province) ?>"><?= esc($province) ?></option>
-            <?php endforeach; ?>
-          </select>
-        </div>
-
-        <div class="md:col-span-2">
-          <label for="incidentMunicipality" class="text-sm text-slate-600 block mb-1">Municipality / City where Incident Occurred</label>
-          <select id="incidentMunicipality" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
-            <option value="" disabled selected class="text-slate-400">Select municipality</option>
-          </select>
-        </div>
+                <!-- Province and Municipality/City fields removed from modal -->
 
         <div class="md:col-span-1">
           <label for="incidentVictim" class="text-sm text-slate-600 block mb-1">Name of Victim</label>
@@ -432,6 +434,21 @@
   </div>
 </div>
 
+<!-- Excel Error Modal -->
+<div id="excelErrorModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40" aria-hidden="true">
+  <div class="bg-white rounded-2xl shadow-lg max-w-md w-full p-6 mx-4">
+    <div class="flex items-start justify-between mb-4">
+      <h3 class="text-lg font-semibold">Excel Import Error</h3>
+      <button type="button" class="text-slate-400 hover:text-slate-600" onclick="hideModal('excelErrorModal')" aria-label="Close">&times;</button>
+    </div>
+    <div class="text-sm text-slate-700 mb-6"><div id="excelErrorMessage">Error reading file.</div></div>
+    <div class="flex justify-end">
+      <button type="button" class="px-3 py-1.5 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-600 hover:text-white active:bg-blue-700" onclick="hideModal('excelErrorModal')">OK</button>
+    </div>
+  </div>
+</div>
+
+</div>
 <?= $this->endSection() ?>
 
 <?= $this->section('pageScripts') ?>
@@ -452,8 +469,8 @@
         'N',
         'Month of Incident',
         'Year of Incident',
-        'Province',
-        'Municipality/City where Incidence Occurred',
+        // 'Province',
+        // 'Municipality/City where Incidence Occurred',
         'Name of Victim',
         'Location Category',
         'Age of the Person',
@@ -497,14 +514,14 @@
     const incidentAttachmentsInput = document.getElementById('incidentAttachments');
     const incidentUploadButton = document.getElementById('incidentUploadButton');
     let currentPage = 1;
-    let pageSize = 10;
+    let pageSize = 20;
     let currentIncidentIndex = null;
 
     const incidentFieldMap = [
         { id: 'incidentMonth', column: 'Month of Incident' },
         { id: 'incidentYear', column: 'Year of Incident' },
-        { id: 'incidentProvince', column: 'Province' },
-        { id: 'incidentMunicipality', column: 'Municipality/City where Incidence Occurred' },
+        // { id: 'incidentProvince', column: 'Province' },
+        // { id: 'incidentMunicipality', column: 'Municipality/City where Incidence Occurred' },
         { id: 'incidentVictim', column: 'Name of Victim' },
         { id: 'incidentLocation', column: 'Location Category' },
         { id: 'incidentAge', column: 'Age of the Person' },
@@ -682,7 +699,14 @@
                             // Auto-refresh after import and save
                             setTimeout(() => { window.location.reload(); }, 1500);
                     } catch (error) {
-                        alert('Error reading file: ' + error.message);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Excel Import Error',
+                            html: 'Error reading file: ' + error.message,
+                            confirmButtonText: 'OK',
+                            allowOutsideClick: false,
+                            allowEscapeKey: false
+                        });
                         document.getElementById('fileName').textContent = 'No file selected';
                     } finally {
                         setButtonLoading(importButton, false);
@@ -692,7 +716,14 @@
                 reader.onerror = function() {
                     setButtonLoading(importButton, false);
                     setButtonLoading(saveButton, false);
-                    alert('Error reading file. Please try again.');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Excel Import Error',
+                        html: 'Error reading file. Please try again.',
+                        confirmButtonText: 'OK',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false
+                    });
                 };
                 reader.readAsArrayBuffer(file);
             });
@@ -833,17 +864,7 @@
             input.value = row ? (row[field.column] || '') : '';
         });
 
-        const provinceInput = document.getElementById('incidentProvince');
-        const municipalityInput = document.getElementById('incidentMunicipality');
-        const provinceValue = row ? (row['Province'] || '') : '';
-        const municipalityValue = row ? (row['Municipality/City where Incidence Occurred'] || '') : '';
-        if (provinceInput) {
-            ensureProvinceOption(provinceValue);
-            provinceInput.value = provinceValue;
-        }
-        if (municipalityInput) {
-            updateIncidentMunicipalities(municipalityValue);
-        }
+        // Province and Municipality/City logic removed
 
         if (incidentModalLabel) {
             incidentModalLabel.textContent = isEdit ? `Edit Incident ${row && row['N'] ? '#' + row['N'] : ''}` : 'Add Incident';

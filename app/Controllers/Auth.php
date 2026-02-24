@@ -165,7 +165,8 @@ class Auth extends BaseController
             return redirect()->to('/login');
         }
 
-        return view('ordinance');
+        // legacy access point; forward to documents page
+        return redirect()->to('/documents');
     }
 
     public function incident_report()
@@ -198,7 +199,8 @@ class Auth extends BaseController
             return redirect()->to('/login');
         }
 
-        return view('pops');
+        // POPS is now part of the documents workflow
+        return redirect()->to('/documents');
     }
 
     public function user_profile()

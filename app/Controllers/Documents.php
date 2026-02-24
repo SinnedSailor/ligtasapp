@@ -52,7 +52,7 @@ class Documents extends BaseController
             $data['approvedDocuments'] = $this->documentModel->getDocumentsByStatus('approved');
         }
 
-        return view('ordinance', $data);
+        return view('documents', $data);
     }
 
     public function upload()
@@ -63,7 +63,7 @@ class Documents extends BaseController
 
         $roleName = $this->getNormalizedRoleName();
         if ($roleName !== 'LGU') {
-            return redirect()->to('/ordinance')->with('error', 'Only LGU users can upload documents.');
+            return redirect()->to('/documents')->with('error', 'Only LGU users can upload documents.');
         }
 
         $filesByType = [
@@ -176,18 +176,18 @@ class Documents extends BaseController
         }
 
         if ($uploadedCount === 0 && $duplicateCount > 0) {
-            return redirect()->to('/ordinance')->with('error', 'Duplicate upload detected. No new documents were added.');
+            return redirect()->to('/documents')->with('error', 'Duplicate upload detected. No new documents were added.');
         }
 
         if ($uploadedCount === 0) {
-            return redirect()->to('/ordinance')->with('error', 'No valid documents were uploaded.');
+            return redirect()->to('/documents')->with('error', 'No valid documents were uploaded.');
         }
 
         if ($duplicateCount > 0) {
-            return redirect()->to('/ordinance')->with('success', 'Documents submitted successfully. Duplicate files were skipped.');
+            return redirect()->to('/documents')->with('success', 'Documents submitted successfully. Duplicate files were skipped.');
         }
 
-        return redirect()->to('/ordinance')->with('success', 'Documents submitted successfully and are pending review.');
+        return redirect()->to('/documents')->with('success', 'Documents submitted successfully and are pending review.');
     }
 
     public function approve(int $documentId)
@@ -209,16 +209,16 @@ class Documents extends BaseController
         $roleName = $this->getNormalizedRoleName();
         $isAdmin = (bool) session()->get('is_admin');
         if ($roleName !== 'PROVINCE' && !$isAdmin) {
-            return redirect()->to('/ordinance')->with('error', 'You do not have permission to review documents.');
+            return redirect()->to('/documents')->with('error', 'You do not have permission to review documents.');
         }
 
         $document = $this->documentModel->find($documentId);
         if (!$document) {
-            return redirect()->to('/ordinance')->with('error', 'Document not found.');
+            return redirect()->to('/documents')->with('error', 'Document not found.');
         }
 
         if ($document['status'] !== 'pending') {
-            return redirect()->to('/ordinance')->with('error', 'Only pending documents can be reviewed.');
+            return redirect()->to('/documents')->with('error', 'Only pending documents can be reviewed.');
         }
 
         $this->documentModel->update($documentId, [
@@ -228,7 +228,7 @@ class Documents extends BaseController
         ]);
 
         $message = $status === 'approved' ? 'Document approved.' : 'Document rejected.';
-        return redirect()->to('/ordinance')->with('success', $message);
+        return redirect()->to('/documents')->with('success', $message);
     }
 
     public function download(int $documentId)
@@ -239,7 +239,7 @@ class Documents extends BaseController
 
         $document = $this->documentModel->find($documentId);
         if (!$document) {
-            return redirect()->to('/ordinance')->with('error', 'Document not found.');
+            return redirect()->to('/documents')->with('error', 'Document not found.');
         }
 
         $roleName = $this->getNormalizedRoleName();
@@ -259,12 +259,12 @@ class Documents extends BaseController
         }
 
         if (!$canDownload) {
-            return redirect()->to('/ordinance')->with('error', 'You do not have permission to access this file.');
+            return redirect()->to('/documents')->with('error', 'You do not have permission to access this file.');
         }
 
         $fullPath = WRITEPATH . 'uploads/' . $document['stored_path'];
         if (!is_file($fullPath)) {
-            return redirect()->to('/ordinance')->with('error', 'File not found on server.');
+            return redirect()->to('/documents')->with('error', 'File not found on server.');
         }
 
         return $this->response->download($fullPath, null)->setFileName($document['original_name']);
@@ -278,7 +278,7 @@ class Documents extends BaseController
 
         $document = $this->documentModel->find($documentId);
         if (!$document) {
-            return redirect()->to('/ordinance')->with('error', 'Document not found.');
+            return redirect()->to('/documents')->with('error', 'Document not found.');
         }
 
         $roleName = $this->getNormalizedRoleName();
@@ -299,7 +299,7 @@ class Documents extends BaseController
         }
 
         if (!$canView) {
-            return redirect()->to('/ordinance')->with('error', 'You do not have permission to access this file.');
+            return redirect()->to('/documents')->with('error', 'You do not have permission to access this file.');
         }
 
         $previewPath = $document['preview_path'] ?? null;
@@ -340,7 +340,7 @@ class Documents extends BaseController
                     ->setBody('<div style="padding:16px;font-family:Arial,sans-serif;">Preview is not available for this file type. Please use Download.</div>');
             }
 
-            return redirect()->to('/ordinance')->with('error', 'File not found on server.');
+            return redirect()->to('/documents')->with('error', 'File not found on server.');
         }
 
         $contents = file_get_contents($filePath);

@@ -42,10 +42,17 @@
         #sidebar a[aria-current="page"],
         #sidebar a[aria-current="page"] svg,
         #sidebar a[aria-current="page"] .menu-title {
-            color: #002C76 !important;
-        }
-        #sidebar a[aria-current="page"] {
-            background-color: rgba(0,44,118,0.1) !important;
+                color: #fff !important;
+            }
+            #sidebar a[aria-current="page"] {
+                background-color: #002c76 !important;
+            }
+            #sidebar a[aria-current="page"] .menu-title {
+                background-color: #002c76 !important;
+                color: #fff !important;
+                border-radius: 0.375rem;
+                padding: 0.25rem 0.5rem;
+            }
         }
     </style>
 
@@ -90,11 +97,12 @@
                     <p class="hidden md:block text-sm text-slate-500 mt-0.5">Local Incident Gathering &amp; Tracking for Aquatic Safety</p>
                 </div>
 
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-1">
                     <a href="<?= base_url('/logout') ?>" title="Logout" class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-slate-50 hover:bg-slate-100 text-slate-600">
                         <?= svg_icon('logout', 'w-5 h-5') ?>
                         <span class="sr-only">Logout</span>
                     </a>
+                    <span class="ml-2 text-slate-500 text-sm font-normal flex items-center">Logout</span>
                 </div>
 
 
@@ -107,8 +115,12 @@
             <nav id="sidebar" class="fixed left-0 top-0 z-30 w-72 lg:w-64 h-screen flex-shrink-0 flex flex-col bg-white border-r border-slate-100 p-4 <?= $hideNavbar ? '' : 'pt-16' ?>">
                 <!-- Brand -->
                 <div class="flex items-center gap-3 px-2 py-3 mb-4">
-                    <div class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold">L</div>
-                    <a href="<?= base_url('/dashboard') ?>" class="text-lg font-semibold text-slate-900">LIGTAS</a>
+                <div class="flex flex-col items-center justify-start pt-6 pb-4 mb-4 w-full">
+                    <div class="w-28 h-28 rounded-full bg-indigo-600 flex items-center justify-center overflow-hidden">
+                        <!-- Logo placeholder: replace src when logo is uploaded -->
+                        <img src="<?= base_url('assets/img/logo-placeholder.png') ?>" alt="Logo" class="w-28 h-28 object-cover rounded-full" />
+                    </div>
+                </div>
                     <button class="ml-auto inline-flex items-center justify-center p-2 rounded-md text-slate-400 hover:bg-slate-50" aria-label="Toggle sidebar"><?= svg_icon('menu', 'w-5 h-5') ?></button>
                 </div>
 
@@ -131,7 +143,7 @@
                         </li>
 
                         <li>
-                            <a href="<?= base_url('/ordinance') ?>" class="flex items-center gap-3 px-3 py-2 text-sm rounded-md <?= $root === 'ordinance' ? 'bg-slate-100 text-indigo-600' : 'text-slate-600 hover:bg-slate-50 hover:text-blue-600' ?>" <?= $root === 'ordinance' ? 'aria-current="page"' : '' ?>>
+                            <a href="<?= base_url('/documents') ?>" class="flex items-center gap-3 px-3 py-2 text-sm rounded-md <?= $root === 'documents' ? 'bg-slate-100 text-indigo-600' : 'text-slate-600 hover:bg-slate-50 hover:text-blue-600' ?>" <?= $root === 'documents' ? 'aria-current="page"' : '' ?>>
                                 <?= svg_icon('file', 'w-5 h-5') ?>
                                 <span class="menu-title">Documents</span>
                             </a>
@@ -171,5 +183,31 @@
 </div>
 
 <?= $this->renderSection('pageScripts') ?>
+<?php include(APPPATH . 'Views/layouts/sweetalert_script.php'); ?>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var logoutBtn = document.querySelector('a[title="Logout"]');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            Swal.fire({
+                title: 'Are you sure you want to logout?',
+                showCancelButton: true,
+                confirmButtonText: 'Logout',
+                cancelButtonText: 'Cancel',
+                cancelButtonColor: '#9db4dd',
+                icon: undefined,
+                confirmButtonColor: '#002c76',
+                showClass: { popup: 'swal2-noanimation' },
+                hideClass: { popup: '' }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = logoutBtn.href;
+                }
+            });
+        });
+    }
+});
+</script>
 </body>
 </html>

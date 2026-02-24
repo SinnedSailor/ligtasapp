@@ -17,7 +17,10 @@ $routes->get('/dashboard', 'Auth::dashboard');
 $routes->get('/logout', 'Auth::logout');
 
 // Navigation routes
-$routes->get('/ordinance', 'Documents::index');
+$routes->get('/documents', 'Documents::index');
+// legacy paths now redirect so URL updates (keeps nav highlighting correct)
+$routes->get('/ordinance', static fn() => redirect()->to('/documents'));
+
 $routes->get('/incident-report', 'Auth::incident_report');
 $routes->post('/incident-report/import', 'IncidentReport::import');
 $routes->post('/incident-report/update/(:num)', 'IncidentReport::updateIncident/$1');
@@ -28,7 +31,8 @@ $routes->get('/incident-report/attachments/download/(:num)', 'IncidentReport::do
 $routes->post('/incident-report/approve/(:num)', 'IncidentReport::approve/$1');
 $routes->post('/incident-report/reject/(:num)', 'IncidentReport::reject/$1');
 $routes->get('/incident-report/generateReport', 'IncidentReport::generateReport');
-$routes->get('/pops', 'Documents::index');
+// legacy '/pops' route now redirects
+$routes->get('/pops', static fn() => redirect()->to('/documents'));
 $routes->get('/user-profile', 'Auth::user_profile');
 $routes->post('/user-profile/update', 'Auth::update_profile');
 

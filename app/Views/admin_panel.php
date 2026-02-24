@@ -196,14 +196,14 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-<div class="page-header flex flex-wrap justify-between items-center mb-4">
+<div class="page-header flex flex-wrap justify-between items-center mb-4 mx-auto" style="max-width:1200px; margin-left:auto; margin-right:auto; padding-left:24px; padding-right:24px;">
     <div>
         <h3 class="page-title mb-1"><?= svg_icon('shield', 'w-5 h-5 mr-3 text-blue-900') ?><span class="text-xl font-semibold">User Management</span></h3>
         <div class="text-gray-500">Manage users, roles, and administrative access.</div>
     </div>
 </div>
 
-<div id="user-management-section" class="bg-white rounded-2xl shadow admin-card">
+<div id="user-management-section" class="bg-white rounded-2xl shadow admin-card mx-auto" style="max-width:1200px; margin-left:auto; margin-right:auto; padding-left:24px; padding-right:24px;">
     <div class="p-6">
         <h4 class="text-lg font-semibold mb-4">User Management</h4>
 
@@ -229,9 +229,9 @@
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600">Username</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-600">Name</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-600">Email</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600">Username</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-600">Role</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-600">Actions</th>
                     </tr>
@@ -264,8 +264,10 @@
             </div>
         </div>
         <div class="modal-footer">
-            <button class="modal-btn modal-btn-secondary" onclick="closeRoleModal()">Cancel</button>
-            <button class="modal-btn modal-btn-primary" onclick="submitRoleAssignment()">Assign Role</button>
+            <div class="mt-6 flex gap-2">
+                <button class="modal-btn modal-btn-secondary" onclick="closeRoleModal()">Cancel</button>
+                <button class="modal-btn modal-btn-primary" onclick="submitRoleAssignment()">Assign Role</button>
+            </div>
         </div>
     </div>
 </div>
@@ -369,9 +371,9 @@
                         // Only show edit and disable icons for actions
                         return `
                             <tr>
-                                <td class="px-4 py-4"><strong>${user.first_name} ${user.last_name}</strong></td>
+                                <td class="px-4 py-4 font-semibold">${user.username}</td>
+                                <td class="px-4 py-4">${user.first_name} ${user.last_name}</td>
                                 <td class="px-4 py-4">${user.email}</td>
-                                <td class="px-4 py-4">${user.username}</td>
                                 <td class="px-4 py-4">${roleBadge}</td>
                                 <td class="px-4 py-4 flex flex-wrap gap-2">
                                     <button class="px-2.5 py-1.5 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-100" title="Edit User" onclick="editUser(${user.id})">
@@ -420,8 +422,30 @@
         }
 
         errorDiv.classList.remove('show');
-        assignRole(currentUserId, roleId);
+
         closeRoleModal();
+        Swal.fire({
+            title: 'Editing role is crucial',
+            text: 'Are you sure you want to change the user\'s role?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, change role',
+            cancelButtonText: 'No',
+            confirmButtonColor: '#002c76',
+            cancelButtonColor: '#9db4dd',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                assignRole(currentUserId, roleId);
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Role has been updated.',
+                    icon: 'success',
+                    confirmButtonColor: '#002c76',
+                });
+            } else {
+                openRoleModal(currentUserId, document.getElementById('modalUserName').textContent);
+            }
+        });
     }
 
     document.getElementById('assignRoleModal').addEventListener('click', function(event) {
@@ -639,7 +663,7 @@
     function disableUser(userId) {
         // Find the user row and get the role
         const row = Array.from(document.getElementById('user-tbody').getElementsByTagName('tr')).find(tr => {
-            const disableBtn = tr.querySelector('button[onclick^="disableUser("]');
+            const disableBtn = tr.querySelector('button[onclick^="disableUser(")');
             return disableBtn && disableBtn.getAttribute('onclick') === `disableUser(${userId})`;
         });
         if (!row) return;
@@ -648,19 +672,39 @@
             showSuccessModal('Cannot disable admin account!', 'Admin accounts cannot be disabled.');
             return;
         }
-        if (!confirm('Are you sure you want to disable this user account?')) return;
-        // Call backend to disable
-        const formData = new FormData();
-        formData.append('user_id', userId);
-        fetch('<?= base_url('admin/disableUser') ?>', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showSuccessModal('User disabled!', 'The user account has been disabled.');
-            } else {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'Do you want to disable this user account?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, disable',
+            cancelButtonText: 'No',
+            confirmButtonColor: '#002c76',
+            cancelButtonColor: '#9db4dd',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Call backend to disable
+                const formData = new FormData();
+                formData.append('user_id', userId);
+                fetch('<?= base_url('admin/disableUser') ?>', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'User disabled!',
+                            text: 'The user account has been disabled.',
+                            icon: 'success',
+                            confirmButtonColor: '#002c76',
+                        });
+                    } else {
+                        showSuccessModal('Error', data.message || 'Failed to disable user.');
+                    }
+                });
+            }
+        });
                 alert('Error: ' + data.message);
             }
         })
