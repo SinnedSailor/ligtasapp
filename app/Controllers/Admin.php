@@ -62,13 +62,13 @@ class Admin extends BaseController
             ->join('roles', 'roles.id = users.role_id', 'left')
             ->findAll();
 
-        // Decrypt user fields for display. For admin UI/API show plaintext email
+        // Decrypt user fields for display.  Admin panel may show plaintext
+        // email so request it explicitly from the model.
         foreach ($users as &$u) {
-            $u = $this->userModel->decryptUserRow($u);
-            // If we have an encrypted email, decrypt it for display (admin-only)
-            $plainEmail = $this->userModel->decryptValue($u['email_enc'] ?? '');
-            if ($plainEmail) {
-                $u['email'] = $plainEmail;
+            $u = $this->userModel->decryptUserRow($u, true);
+            // sanitize: if decryptUserRow returned a hash by mistake clear it
+            if (isset($u['email']) && preg_match('/^[0-9a-f]{64}$/i', (string) $u['email'])) {
+                $u['email'] = '';
             }
         }
         unset($u);
@@ -403,10 +403,9 @@ class Admin extends BaseController
 
         // Decrypt before returning JSON and include plaintext email for admin consumers
         foreach ($users as &$u) {
-            $u = $this->userModel->decryptUserRow($u);
-            $plainEmail = $this->userModel->decryptValue($u['email_enc'] ?? '');
-            if ($plainEmail) {
-                $u['email'] = $plainEmail;
+            $u = $this->userModel->decryptUserRow($u, true);
+            if (isset($u['email']) && preg_match('/^[0-9a-f]{64}$/i', (string) $u['email'])) {
+                $u['email'] = '';
             }
         }
         unset($u);
@@ -452,7 +451,7 @@ class Admin extends BaseController
             return $this->response->setJSON(['found' => false])->setStatusCode(404);
         }
 
-        $decrypted = $this->userModel->decryptUserRow($user);
+        $decrypted = $this->userModel->decryptUserRow($user, true);
 
         // Additional raw decryption attempts for debugging
         $encrypter = \Config\Services::encrypter();

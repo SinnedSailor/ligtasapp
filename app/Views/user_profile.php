@@ -213,7 +213,13 @@
                     </div>
                     <div class="form-group">
                         <label for="email">Email Address *</label>
-                        <input type="email" class="form-control" id="email" value="<?= esc($profile['email'] ?? session()->get('email') ?? '') ?>" disabled>
+                        <input type="email" class="form-control" id="email" name="email"
+                            value="<?= esc($profile['display_email'] ?? session()->get('email') ?? '') ?>" required>
+                        <small class="form-text text-muted">
+                            <?php if (empty($profile['display_email'] ?? '') && isset($profile['email']) && preg_match('/^[0-9a-f]{64}$/i', (string) $profile['email'])): ?>
+                                Your address is no longer stored in plaintext. Please enter your current email above to update it.
+                            <?php endif; ?>
+                        </small>
                     </div>
                 </div>
 

@@ -174,7 +174,16 @@ class UserModel extends Model
      * Decrypt user fields in-place for display/use. Leaves fields unchanged
      * if they cannot be decrypted.
      */
-    public function decryptUserRow(array $user): array
+    /**
+     * Decrypt user fields in-place for display/use. Leaves fields unchanged
+     * if they cannot be decrypted.
+     *
+     * @param array $user
+     * @param bool  $revealEmail  when true, attempt to expose the decrypted
+     *                            email plaintext instead of always returning a
+     *                            hash.  Defaults to false for safety.
+     */
+    public function decryptUserRow(array $user, bool $revealEmail = false): array
     {
         // Prefer the new encrypted columns when available
         if (isset($user['first_name_enc']) && $user['first_name_enc']) {
@@ -189,13 +198,17 @@ class UserModel extends Model
             $user['last_name'] = $this->decryptValue((string) $user['last_name']);
         }
 
-        // Ensure `email` field in the returned user array contains the deterministic hash (do not expose plaintext)
+        // Email handling: default behaviour is to return the deterministic hash
+        // (either stored or computed) so plaintext isn't leaked.  If callers
+        // explicitly request the plaintext, we decrypt the encrypted column.
         if (isset($user['email_enc']) && $user['email_enc']) {
-            // compute hash from decrypted encrypted email but do not expose plaintext
             $plain = $this->decryptValue((string) $user['email_enc']);
-            $user['email'] = $plain ? $this->hashValue($plain) : ($user['email_hash'] ?? ($user['email'] ?? null));
+            if ($revealEmail && $plain) {
+                $user['email'] = $plain;
+            } else {
+                $user['email'] = $plain ? $this->hashValue($plain) : ($user['email_hash'] ?? ($user['email'] ?? null));
+            }
         } elseif (isset($user['email_hash'])) {
-            // use stored email_hash value
             $user['email'] = $user['email_hash'];
         } elseif (isset($user['email'])) {
             // legacy fallback: if `email` field exists but contains plaintext, replace with hash

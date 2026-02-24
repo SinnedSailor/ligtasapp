@@ -265,7 +265,27 @@ class Auth extends BaseController
         $userId = (int) session()->get('user_id');
         $profile = $userModel->find($userId) ?? [];
         if (!empty($profile)) {
-            $profile = $userModel->decryptUserRow($profile);
+            // ask for plaintext email this time; controller will still apply
+            // further fallback logic below based on session values.
+            $profile = $userModel->decryptUserRow($profile, true);
+
+            // compute a safe value we can show in the form.  decryptUserRow with
+            // revealEmail=true will already have placed plaintext into
+            // $profile['email'] when possible; if it contains a hash we clear it
+            // so the form shows an empty field and forces the user to re-enter.
+            if (isset($profile['email']) && preg_match('/^[0-9a-f]{64}$/i', (string) $profile['email'])) {
+                $profile['display_email'] = '';
+            } else {
+                $profile['display_email'] = $profile['email'] ?? '';
+            }
+        }
+
+        // if still empty, try session value (e.g. freshly logged in)
+        if (empty($profile['display_email'])) {
+            $sessionEmail = session()->get('email') ?? '';
+            if ($sessionEmail && !preg_match('/^[0-9a-f]{64}$/i', (string) $sessionEmail)) {
+                $profile['display_email'] = $sessionEmail;
+            }
         }
 
         return view('user_profile', [
@@ -291,12 +311,27 @@ class Auth extends BaseController
             'municipality' => trim((string) $this->request->getPost('municipality')),
         ];
 
+        // allow email address to be updated as well; user may need to re-enter if
+        // the stored value was replaced by a hash earlier.
+        $emailInput = trim((string) $this->request->getPost('email'));
+        if ($emailInput !== '') {
+            $data['email'] = $emailInput;
+        }
+
+        // basic required-checks
         if ($data['first_name'] === '' || $data['last_name'] === '' || $data['username'] === '') {
             return redirect()->back()->with('error', 'Please complete all required fields.')->withInput();
         }
 
         if ($data['contact_number'] !== '' && !preg_match('/^[0-9]{11}$/', $data['contact_number'])) {
             return redirect()->back()->with('error', 'Please enter a valid 11-digit contact number.')->withInput();
+        }
+
+        // validate email if supplied (field is required on form)
+        if (isset($data['email'])) {
+            if ($data['email'] === '' || !filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+                return redirect()->back()->with('error', 'Please provide a valid email address.')->withInput();
+            }
         }
 
         if (!$this->isValidRegion1Location($data['province'], $data['municipality'])) {
@@ -313,6 +348,14 @@ class Auth extends BaseController
             return redirect()->back()->with('error', 'This username is already taken.')->withInput();
         }
 
+        // if email is being updated, ensure uniqueness as well
+        if (isset($data['email'])) {
+            $existingEmail = $userModel->getUserByEmail($data['email']);
+            if ($existingEmail && (int) $existingEmail['id'] !== $userId) {
+                return redirect()->back()->with('error', 'This email is already registered.')->withInput();
+            }
+        }
+
         // Ensure encrypted PII columns are set when users update their profile.
         $data = $userModel->prepareForInsert($data);
 
@@ -327,6 +370,9 @@ class Auth extends BaseController
         $profile = $userModel->find($userId);
         $profile = $userModel->decryptUserRow($profile);
 
+        // put plaintext email into session if possible, otherwise keep existing value
+        $emailPlain = $userModel->decryptValue($profile['email_enc'] ?? ($profile['email'] ?? ''));
+
         session()->set([
             'first_name' => $profile['first_name'] ?? '',
             'last_name' => $profile['last_name'] ?? '',
@@ -334,6 +380,7 @@ class Auth extends BaseController
             'province' => $profile['province'] ?? '',
             'municipality' => $profile['municipality'] ?? '',
             'contact_number' => $profile['contact_number'] ?? '',
+            'email' => $emailPlain ?: session()->get('email'),
         ]);
 
         return redirect()->to('/user-profile')->with('profile_success', 'Profile updated successfully!');
