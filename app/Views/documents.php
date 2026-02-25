@@ -262,12 +262,7 @@
     ];
 ?>
 
-    <div class="page-header docs-header">
-        <h3 class="page-title">
-            <?= $isFocal ? 'View Documents' : ($isProvince ? 'Review Documents' : 'Upload Documents') ?>
-        </h3>
-        <p class="text-muted">Ordinance, POPS Plan, and Annual Budget Report workflow.</p>
-    </div>
+    
 
     <?php if (session()->getFlashdata('success')): ?>
         <div class="mb-4 rounded-md bg-green-50 border border-green-200 text-green-700 px-4 py-3">
@@ -284,82 +279,37 @@
 
 
     <?php if ($isLgu || $canReview || $canViewApproved): ?>
-        <div class="doc-filter-card">
-            <div class="section-title">Browse Documents</div>
-            <div class="filter-row">
-                <div class="filter-group">
-                    <div class="filter-label">Province</div>
-                    <div>
-                        <select id="provinceDropdown" class="rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
-                            <option value="">All</option>
-                            <?php foreach (($provinces ?? []) as $province): ?>
-                                <option value="<?= esc($province) ?>"><?= esc($province) ?></option>
-                            <?php endforeach; ?>
-                        </select>
+        <div class="doc-upload-card mt-6">
+            <div class="section-title">Upload Documents</div>
+            <form action="<?= base_url('/documents/upload') ?>" method="post" enctype="multipart/form-data" id="documentUploadForm">
+                <div class="documents-grid">
+                    <div class="document-card">
+                        <h5> Ordinance</h5>
+                        <p class="text-muted">Local ordinance documents related to water safety regulations.</p>
+                        <input type="file" name="ordinance_files[]" class="w-full rounded-md border border-gray-200 p-2 text-sm text-gray-700" multiple accept=".pdf,.doc,.docx">
                     </div>
-                </div>
-                <div class="filter-group">
-                    <div class="filter-label">Province</div>
-                    <div>
-                        <select id="provinceDropdown" class="rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
-                            <option value="">All</option>
-                            <!-- Options will be populated dynamically -->
-                        </select>
+
+                    <div class="document-card">
+                        <h5> POPS Plan</h5>
+                        <p class="text-muted">Peace and Order and Public Safety Plan documents.</p>
+                        <input type="file" name="pops_files[]" class="w-full rounded-md border border-gray-200 p-2 text-sm text-gray-700" multiple accept=".pdf,.doc,.docx">
                     </div>
-                </div>
-                <div class="filter-group">
-                    <div class="filter-label">Municipality</div>
-                    <div>
-                        <select id="municipalityDropdown" class="rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
-                            <option value="">All</option>
-                            <!-- Options will be populated dynamically -->
-                        </select>
+
+                    <div class="document-card">
+                        <h5> Annual Budget Report</h5>
+                        <p class="text-muted">Annual budget reports for LIGTAS (Local Incident Gathering and Tracking for Aquatic Safety).</p>
+                        <input type="file" name="budget_files[]" class="w-full rounded-md border border-gray-200 p-2 text-sm text-gray-700" multiple accept=".pdf,.doc,.docx">
                     </div>
-                </div>
-                <div class="filter-group">
-                    <div class="filter-label">Date Uploaded</div>
-                    <div>
-                        <input type="date" id="dateUploadedDropdown" class="rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300" />
-                    </div>
-                </div>
-                <div class="filter-group">
-                    <div class="filter-label">Status</div>
-                    <div>
-                        <select id="statusDropdown" class="rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
-                            <option value="">All</option>
-                            <option value="approved">Approved</option>
-                            <option value="pending">Pending</option>
-                        </select>
-                    </div>
-                </div>
-        <form action="<?= base_url('/documents/upload') ?>" method="post" enctype="multipart/form-data" id="documentUploadForm">
-            <div class="documents-grid">
-                <div class="document-card">
-                    <h5> Ordinance</h5>
-                    <p class="text-muted">Local ordinance documents related to water safety regulations.</p>
-                    <input type="file" name="ordinance_files[]" class="w-full rounded-md border border-gray-200 p-2 text-sm text-gray-700" multiple accept=".pdf,.doc,.docx">
                 </div>
 
-                <div class="document-card">
-                    <h5> POPS Plan</h5>
-                    <p class="text-muted">Peace and Order and Public Safety Plan documents.</p>
-                    <input type="file" name="pops_files[]" class="w-full rounded-md border border-gray-200 p-2 text-sm text-gray-700" multiple accept=".pdf,.doc,.docx">
+                <div class="submit-section">
+                    <button class="submit-btn" type="submit" id="submitDocumentsButton">
+                        Submit Documents
+                    </button>
                 </div>
+            </form>
+        </div>
 
-                <div class="document-card">
-                    <h5> Annual Budget Report</h5>
-                    <p class="text-muted">Annual budget reports for LIGTAS (Local Incident Gathering and Tracking for Aquatic Safety).</p>
-                    <input type="file" name="budget_files[]" class="w-full rounded-md border border-gray-200 p-2 text-sm text-gray-700" multiple accept=".pdf,.doc,.docx">
-                </div>
-            </div>
-
-            <div class="submit-section">
-                <button class="submit-btn" type="submit" id="submitDocumentsButton">
-                    ✔️
-                    Submit Documents
-                </button>
-            </div>
-        </form>
     <?php elseif ($canReview || $canViewApproved): ?>
         <div class="mb-4 rounded-md bg-blue-50 border border-blue-100 text-blue-700 px-4 py-3">
             Documents are managed by role-based review. Only approved documents are visible to FOCAL users.
@@ -376,6 +326,16 @@
             <?php if (!empty($myDocuments)): ?>
                 <div class="table-responsive">
                     <table class="w-full table-docs">
+                        <div class="table-filter-card mb-2 p-2 bg-slate-50 rounded-md flex flex-wrap gap-2">
+                            <select class="filter-input-my filter-doc-type rounded-md border border-gray-200 px-2 py-1 text-sm">
+                                <option value="">All Types</option>
+                                <option value="ordinance">Ordinance</option>
+                                <option value="pops">POPS</option>
+                                <option value="budget">Budget</option>
+                            </select>
+                            
+                            <input type="date" class="filter-input-my filter-date rounded-md border border-gray-200 px-2 py-1 text-sm" />
+                        </div>
                         <thead>
                             <tr>
                                 <th>Document Type</th>
@@ -383,29 +343,6 @@
                                 <th>Status</th>
                                 <th>Uploaded</th>
                                 <th>Action</th>
-                            </tr>
-                            <tr>
-                                <th>
-                                    <select class="filter-input-my filter-doc-type rounded-md border border-gray-200 px-2 py-1 text-sm" style="width:100%">
-                                        <option value="">All</option>
-                                        <option value="ordinance">Ordinance</option>
-                                        <option value="pops">POPS</option>
-                                        <option value="budget">Budget</option>
-                                    </select>
-                                </th>
-                                <th></th>
-                                <th>
-                                    <select class="filter-input-my filter-status rounded-md border border-gray-200 px-2 py-1 text-sm" style="width:100%">
-                                        <option value="">All</option>
-                                        <option value="approved">Approved</option>
-                                        <option value="pending">Pending</option>
-                                        <option value="rejected">Rejected</option>
-                                    </select>
-                                </th>
-                                <th>
-                                    <input type="date" class="filter-input-my filter-date rounded-md border border-gray-200 px-2 py-1 text-sm" style="width:100%" />
-                                </th>
-                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -446,6 +383,25 @@
             <?php if (!empty($pendingDocuments)): ?>
                 <div class="table-responsive">
                     <table class="w-full table-docs">
+                        <div class="table-filter-card mb-2 p-2 bg-slate-50 rounded-md flex flex-wrap gap-2">
+                            <select class="filter-input-pending filter-doc-type rounded-md border border-gray-200 px-2 py-1 text-sm">
+                                <option value="">All Types</option>
+                                <option value="ordinance">Ordinance</option>
+                                <option value="pops">POPS</option>
+                                <option value="budget">Budget</option>
+                            </select>
+                            <select class="filter-input-pending filter-province rounded-md border border-gray-200 px-2 py-1 text-sm">
+                                <option value="">All Provinces</option>
+                                <?php foreach (($provinces ?? []) as $province): ?>
+                                    <option value="<?= esc($province) ?>"><?= esc($province) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <select class="filter-input-pending filter-municipality rounded-md border border-gray-200 px-2 py-1 text-sm">
+                                <option value="">All Municipalities</option>
+                            </select>
+                            <input type="date" class="filter-input-pending filter-date rounded-md border border-gray-200 px-2 py-1 text-sm" />
+                            // ...existing code...
+                        </div>
                         <thead>
                             <tr>
                                 <th>Document Type</th>
@@ -454,40 +410,6 @@
                                 <th>Location</th>
                                 <th>Uploaded</th>
                                 <th>Actions</th>
-                            </tr>
-                            <tr>
-                                <th>
-                                    <select class="filter-input-pending filter-doc-type rounded-md border border-gray-200 px-2 py-1 text-sm" style="width:100%">
-                                        <option value="">All</option>
-                                        <option value="ordinance">Ordinance</option>
-                                        <option value="pops">POPS</option>
-                                        <option value="budget">Budget</option>
-                                    </select>
-                                </th>
-                                <th></th>
-                                <th></th>
-                                <th>
-                                    <select class="filter-input-pending filter-province rounded-md border border-gray-200 px-2 py-1 text-sm" style="width:49%">
-                                        <option value="">All Provinces</option>
-                                        <?php foreach (($provinces ?? []) as $province): ?>
-                                            <option value="<?= esc($province) ?>"><?= esc($province) ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                    <select class="filter-input-pending filter-municipality rounded-md border border-gray-200 px-2 py-1 text-sm" style="width:49%">
-                                        <option value="">All Municipalities</option>
-                                    </select>
-                                </th>
-                                <th>
-                                    <input type="date" class="filter-input-pending filter-date rounded-md border border-gray-200 px-2 py-1 text-sm" style="width:100%" />
-                                </th>
-                                <th>
-                                    <select class="filter-input-pending filter-status rounded-md border border-gray-200 px-2 py-1 text-sm" style="width:100%">
-                                        <option value="">All</option>
-                                        <option value="approved">Approved</option>
-                                        <option value="pending">Pending</option>
-                                        <option value="rejected">Rejected</option>
-                                    </select>
-                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -523,6 +445,25 @@
             <?php if (!empty($approvedDocuments)): ?>
                 <div class="table-responsive">
                     <table class="w-full table-docs">
+                        <div class="table-filter-card mb-2 p-2 bg-slate-50 rounded-md flex flex-wrap gap-2">
+                            <select class="filter-input-approved filter-doc-type rounded-md border border-gray-200 px-2 py-1 text-sm">
+                                <option value="">All Types</option>
+                                <option value="ordinance">Ordinance</option>
+                                <option value="pops">POPS</option>
+                                <option value="budget">Budget</option>
+                            </select>
+                            <select class="filter-input-approved filter-province rounded-md border border-gray-200 px-2 py-1 text-sm">
+                                <option value="">All Provinces</option>
+                                <?php foreach (($provinces ?? []) as $province): ?>
+                                    <option value="<?= esc($province) ?>"><?= esc($province) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <select class="filter-input-approved filter-municipality rounded-md border border-gray-200 px-2 py-1 text-sm">
+                                <option value="">All Municipalities</option>
+                            </select>
+                            <input type="date" class="filter-input-approved filter-date rounded-md border border-gray-200 px-2 py-1 text-sm" />
+                            // ...existing code...
+                        </div>
                         <thead>
                             <tr>
                                 <th>Document Type</th>
@@ -531,40 +472,6 @@
                                 <th>Location</th>
                                 <th>Approved</th>
                                 <th>Action</th>
-                            </tr>
-                            <tr>
-                                <th>
-                                    <select class="filter-input-approved filter-doc-type rounded-md border border-gray-200 px-2 py-1 text-sm" style="width:100%">
-                                        <option value="">All</option>
-                                        <option value="ordinance">Ordinance</option>
-                                        <option value="pops">POPS</option>
-                                        <option value="budget">Budget</option>
-                                    </select>
-                                </th>
-                                <th></th>
-                                <th></th>
-                                <th>
-                                    <select class="filter-input-approved filter-province rounded-md border border-gray-200 px-2 py-1 text-sm" style="width:49%">
-                                        <option value="">All Provinces</option>
-                                        <?php foreach (($provinces ?? []) as $province): ?>
-                                            <option value="<?= esc($province) ?>"><?= esc($province) ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                    <select class="filter-input-approved filter-municipality rounded-md border border-gray-200 px-2 py-1 text-sm" style="width:49%">
-                                        <option value="">All Municipalities</option>
-                                    </select>
-                                </th>
-                                <th>
-                                    <input type="date" class="filter-input-approved filter-date rounded-md border border-gray-200 px-2 py-1 text-sm" style="width:100%" />
-                                </th>
-                                <th>
-                                    <select class="filter-input-approved filter-status rounded-md border border-gray-200 px-2 py-1 text-sm" style="width:100%">
-                                        <option value="">All</option>
-                                        <option value="approved">Approved</option>
-                                        <option value="pending">Pending</option>
-                                        <option value="rejected">Rejected</option>
-                                    </select>
-                                </th>
                             </tr>
                         </thead>
                         <tbody>
