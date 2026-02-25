@@ -5,7 +5,12 @@
 <?= $this->section('content') ?>
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 md:pt-10 pb-10">
-  
+  <!-- Greeting -->
+    <div class="mb-6">
+      <div class="bg-white border border-slate-200 rounded-xl shadow-sm px-6 py-4 flex items-center">
+        <h2 class="text-2xl font-semibold text-slate-900">Hello, <?= esc(session('username')) ?>!</h2>
+      </div>
+    </div>
   <!-- stat cards -->
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
 
@@ -130,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Remarks status (Alive / Deceased / Missing)
   var optionsRemarks = {
-    chart: { type: 'donut', height: '100%' },
+     chart: { type: 'donut', height: 224 },
     series: [520, 27, 5],
     labels: ['Alive','Deceased','Missing'],
     colors: ['#10b981','#C9282D','#FFDE15'],
@@ -141,7 +146,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Incidents by sex (Male / Female)
   var optionsSex = {
-    chart: { type: 'pie', height: '100%' },
+     chart: { type: 'pie', height: 224 },
     series: [520, 360],
     labels: ['Male','Female'],
     colors: ['#1581BF','#F875AA'],
@@ -152,9 +157,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Incidents by age group
   var optionsAge = {
-    chart: { type: 'bar', height: '100%' },
+     chart: { type: 'bar', height: 224 },
     series: [{ name: 'Incidents', data: [8, 34, 120, 234, 165, 90, 30] }],
-    xaxis: { categories: ['0-4','5-14','15-24','25-34','35-44','45-64','65+'] },
+    xaxis: { categories: ['0-4 (Preschool)','5-12 (Gradeschool)','13-17 (Highschool)','18-24 (College/Early Adult)','25-34 (Adult)','35-44 (Adult)','45-64 (Middle Age)','65+ (Elderly)'] },
     colors: ['#2C4E80'],
     plotOptions: { bar: { borderRadius: 6, columnWidth: '48%' } },
     dataLabels: { enabled: false }
@@ -163,10 +168,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Contributing factors 
   var optionsFactors = {
-    chart: { type: 'bar', height: '100%' },
-    series: [{ name: 'Count', data: [210, 150, 90, 60, 30] }],
+     chart: { type: 'bar', height: 224 },
+    series: [{ name: 'Count', data: [210, 150, 90, 60, 30, 45, 22] }],
     plotOptions: { bar: { horizontal: true, barHeight: '48%', borderRadius: 6 } },
-    xaxis: { categories: ['Unable to swim','Lack of supervision','Alcohol','Hazardous conditions','Overcrowding'] },
+    xaxis: { categories: ['Unable to swim','Lack of supervision','Alcohol','Hazardous conditions','Overcrowding','No life jacket','Sudden illness'] },
     colors: ['#002C76'],
     dataLabels: { enabled: false }
   };
@@ -186,7 +191,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Incidents by holiday 
   var optionsHoliday = {
-    chart: { type: 'bar', height: '100%', toolbar: { show: false } },
+     chart: { type: 'bar', height: 224, toolbar: { show: false } },
     series: [{ name: 'Incidents', data: [150, 110, 95, 160, 80, 70] }],
     plotOptions: { bar: { borderRadius: 6, columnWidth: '48%' } },
     xaxis: { categories: ['Holy Week','Christmas','Summer Vacation','New Year','All Saints Day','Others'] },
@@ -208,10 +213,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Incidents by location category 
   var optionsLocation = {
-    chart: { type: 'donut', height: '100%' },
-    series: [210,30,120,50,15,40],
-    labels: ['Beach','Lake','River','Pool','Swamp','Other'],
-    colors: ['#06b6d4','#60a5fa','#3b82f6','#60a5fa','#f97316','#9ca3af'],
+     chart: { type: 'donut', height: 224 },
+    series: [210,30,120,50,15,40,25,18],
+    labels: ['Beach','Lake','River','Pool','Swamp','Other','Resort','Pier'],
+    colors: ['#06b6d4','#60a5fa','#3b82f6','#60a5fa','#f97316','#9ca3af','#a3e635','#fbbf24'],
     legend: { position: 'bottom' },
     dataLabels: { enabled: false }
   };

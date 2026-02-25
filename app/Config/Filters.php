@@ -111,9 +111,12 @@ class Filters extends BaseFilters
         'auth' => [
             'before' => [
                 'dashboard',
+                'documents',
+                // legacy support
                 'ordinance',
                 'incident-report',
                 'incident-report/*',
+                // old POPS-only route
                 'pops',
                 'user-profile',
             ],
@@ -121,9 +124,12 @@ class Filters extends BaseFilters
         'nocache' => [
             'after' => [
                 'dashboard',
+                'documents',
+                // legacy support
                 'ordinance',
                 'incident-report',
                 'incident-report/*',
+                // old POPS-only route
                 'pops',
                 'user-profile',
             ],

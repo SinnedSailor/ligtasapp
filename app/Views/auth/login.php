@@ -7,7 +7,7 @@ $hideFooter = true;
 <?= $this->extend('layouts/main_tailwind') ?>
 <?= $this->section('pageStyles') ?>
 <style>
-    /* page background image (Tailwind compiled CSS provides utilities) */
+    /* page background image */
     .auth-bg {
         background: linear-gradient(135deg,#002C76 0%, #001F5C 60%);
     }
@@ -18,7 +18,7 @@ $hideFooter = true;
 <div class="auth-page auth-bg min-h-screen flex items-center justify-center py-12 px-4">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 md:divide-x md:divide-gray-100 overflow-hidden items-stretch">
         <div class="hidden md:flex items-center justify-center bg-gray-50 p-10">
-            <div class="w-full max-w-lg rounded-xl overflow-hidden bg-gradient-to-br from-blue-200 to-teal-100 h-64 flex items-center justify-center shadow-sm">
+            <div>
                 <!-- Illustration -->
                 <img src="<?= base_url('assets/images/ligtas-logo.png') ?>" alt="LIGTAS illustration" class="max-w-full max-h-full object-contain block" loading="lazy" />
             </div>

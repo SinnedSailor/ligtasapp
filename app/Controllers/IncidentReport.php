@@ -401,12 +401,9 @@ class IncidentReport extends BaseController
             }
 
             $mapped = $this->mapRow($row, $index);
-            if ($mapped['n'] === null) {
-                $mapped['n'] = $nextN;
-                $nextN++;
-            } elseif ($mapped['n'] >= $nextN) {
-                $nextN = $mapped['n'] + 1;
-            }
+            // Always disregard 'n' from Excel and assign incrementally
+            $mapped['n'] = $nextN;
+            $nextN++;
             $mapped['row_hash'] = $this->hashRow($mapped);
 
             $monthValue = $this->toInt($mapped['month_of_incident'] ?? null);
@@ -431,17 +428,32 @@ class IncidentReport extends BaseController
             }
 
             $existingRow = $this->incidentReportModel
-                ->where('n', $mapped['n'])
-                ->orWhere('row_hash', $mapped['row_hash'])
+                ->where('row_hash', $mapped['row_hash'])
                 ->first();
 
             if ($existingRow) {
+                // Check if all columns match exactly; if so, we can skip the row
+                $allMatch = true;
+                foreach ($mapped as $col => $val) {
+                    if (isset($existingRow[$col]) && $existingRow[$col] !== $val) {
+                        $allMatch = false;
+                        break;
+                    }
+                }
+                if ($allMatch) {
+                    // Skip duplicate
+                    $skipped++;
+                    continue;
+                }
+
+                // Not an exact duplicate – update the existing row
                 $mapped = $this->incidentReportModel->prepareForInsert($mapped);
                 $this->incidentReportModel->update($existingRow['id'], $mapped);
                 $updated++;
                 continue;
             }
 
+            // New row, prepare and insert
             $mapped = $this->incidentReportModel->prepareForInsert($mapped);
             $this->incidentReportModel->insert($mapped);
             $inserted++;
@@ -974,6 +986,10 @@ class IncidentReport extends BaseController
             'Occupation of the Victim' => 'occupation',
             'Occupation' => 'occupation',
             'Remarks' => 'remarks',
+            // Disregard Actions, Review, Attachments columns
+            // 'Actions' => null,
+            // 'Review' => null,
+            // 'Attachments' => null,
         ];
 
         $data = [];
