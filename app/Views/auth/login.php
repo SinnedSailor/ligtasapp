@@ -20,7 +20,7 @@ $hideFooter = true;
         <div class="hidden md:flex items-center justify-center bg-gray-50 p-10">
             <div>
                 <!-- Illustration -->
-                <img src="<?= base_url('assets/images/ligtas-logo.png') ?>" alt="LIGTAS illustration" class="max-w-full max-h-full object-contain block" loading="lazy" />
+                <img src="<?= base_url('assets/images/ligtas.png') ?>" alt="LIGTAS illustration" class="max-w-full max-h-full object-contain block" loading="lazy" />
             </div>
         </div>
         <div class="p-8 md:p-12 flex items-center justify-center">
