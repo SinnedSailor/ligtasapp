@@ -305,11 +305,22 @@
 
     const municipalities = <?= json_encode($municipalities ?? []) ?>;
 
-    function updateMunicipalities() {
+    function updateMunicipalities(preferredValue) {
         const provinceInput = document.getElementById('province');
         const municipalityInput = document.getElementById('municipality');
         const province = provinceInput.value;
-        const previousValue = municipalityInput.value || '<?= addslashes($selectedMunicipality) ?>';
+
+        let selectedValue;
+        if (preferredValue !== undefined) {
+            selectedValue = preferredValue;
+        } else {
+            const current = municipalityInput.value || '<?= addslashes($selectedMunicipality) ?>';
+            if (province && municipalities[province] && municipalities[province].includes(current)) {
+                selectedValue = current;
+            } else {
+                selectedValue = '';
+            }
+        }
 
         municipalityInput.innerHTML = '<option value="">Select municipality</option>';
 
@@ -318,17 +329,18 @@
                 const option = document.createElement('option');
                 option.value = mun;
                 option.textContent = mun;
-                if (mun === previousValue) {
+                if (mun === selectedValue) {
                     option.selected = true;
                 }
                 municipalityInput.appendChild(option);
             });
         }
 
-        if (previousValue && (!municipalities[province] || !municipalities[province].includes(previousValue))) {
+        if (preferredValue !== undefined && selectedValue &&
+            (!municipalities[province] || !municipalities[province].includes(selectedValue))) {
             const option = document.createElement('option');
-            option.value = previousValue;
-            option.textContent = previousValue;
+            option.value = selectedValue;
+            option.textContent = selectedValue;
             option.selected = true;
             municipalityInput.appendChild(option);
         }

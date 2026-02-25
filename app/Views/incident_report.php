@@ -182,10 +182,6 @@
     $canReview = $isProvince || $isAdmin;
     $provinceList = $provinces ?? [];
 ?>
-<div class="page-header">
-    <h1 class="page-title">Incident Report</h1>
-</div>
-
 <div class="px-4">
     <div class="max-w-6xl mx-auto bg-white rounded-2xl shadow p-6">
         <h4 class="text-lg font-semibold">Data Management</h4>
@@ -1780,7 +1776,22 @@
         }
 
         const province = provinceInput.value;
-        const selectedValue = preferredValue !== undefined ? preferredValue : municipalityInput.value;
+        let selectedValue;
+
+        if (preferredValue !== undefined) {
+            // explicit value provided (e.g. when loading/editing a row)
+            selectedValue = preferredValue;
+        } else {
+            // if the current municipality does not belong to the selected province,
+            // we clear it so that changing province resets the municipality field
+            const current = municipalityInput.value;
+            if (province && municipalities[province] && municipalities[province].includes(current)) {
+                selectedValue = current;
+            } else {
+                selectedValue = '';
+            }
+        }
+
         municipalityInput.innerHTML = '<option value="">Select municipality</option>';
 
         if (province && municipalities[province]) {
@@ -1795,7 +1806,12 @@
             });
         }
 
-        if (selectedValue && (!municipalities[province] || !municipalities[province].includes(selectedValue))) {
+        // keep any explicitly-supplied value even if it isn't part of the
+        // standard list for the selected province.  This covers the case where
+        // we are populating the form for an existing incident row and the data
+        // contains an unexpected municipality name.
+        if (preferredValue !== undefined && selectedValue &&
+            (!municipalities[province] || !municipalities[province].includes(selectedValue))) {
             const option = document.createElement('option');
             option.value = selectedValue;
             option.textContent = selectedValue;
@@ -1806,6 +1822,7 @@
 
     const incidentProvinceSelect = document.getElementById('incidentProvince');
     if (incidentProvinceSelect) {
+        // reset municipality whenever the province changes
         incidentProvinceSelect.addEventListener('change', () => updateIncidentMunicipalities());
         incidentProvinceSelect.addEventListener('input', () => updateIncidentMunicipalities());
     }
