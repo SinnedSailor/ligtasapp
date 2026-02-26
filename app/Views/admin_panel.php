@@ -756,15 +756,12 @@
                     } else {
                         showSuccessModal('Error', data.message || 'Failed to disable user.');
                     }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred');
                 });
             }
-        });
-                alert('Error: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred');
         });
     }
 </script>
