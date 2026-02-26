@@ -259,12 +259,21 @@ class Auth extends BaseController
         $incidentCtrl = new \App\Controllers\IncidentReport();
         $rows = $incidentCtrl->filterRowsForRole($rows, $roleName);
 
+        // gather known location categories, occasions, and occupations for autocomplete suggestions
+        $locationModel = new \App\Models\IncidentReportModel();
+        $locationCategories = $locationModel->getDistinctLocationCategories();
+        $occasions = $locationModel->getDistinctOccasions();
+        $occupations = $locationModel->getDistinctOccupations();
+
         return view('incident_report', [
             'initialRows' => $rows,
             'roleName' => strtoupper(trim((string) session()->get('role_name'))),
             'isAdmin' => (bool) session()->get('is_admin'),
             'provinces' => $this->getRegion1Provinces(),
             'municipalities' => $this->getRegion1Municipalities(),
+            'locationCategories' => $locationCategories,
+            'occasions' => $occasions,
+            'occupations' => $occupations,
         ]);
     }
 

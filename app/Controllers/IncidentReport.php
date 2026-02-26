@@ -87,6 +87,10 @@ class IncidentReport extends BaseController
                 ]);
             }
         }
+        // sanitize optional location_name when updating
+        if (isset($data['location_name'])) {
+            $data['location_name'] = $this->toString($data['location_name']);
+        }
 
         // Remove fields that should not be updated
         unset($data['n']);
@@ -175,6 +179,7 @@ class IncidentReport extends BaseController
         $mapped['municipality'] = $this->toString($data['municipality'] ?? '');
         $mapped['name_of_victim'] = $this->toString($data['name_of_victim'] ?? '');
         $mapped['location_category'] = $this->toString($data['location_category'] ?? '');
+        $mapped['location_name'] = $this->toString($data['location_name'] ?? '');
         $mapped['age'] = $this->toInt($data['age'] ?? null);
         $mapped['gender'] = $this->normalizeGender($data['gender'] ?? '');
         $mapped['occasion'] = $this->toString($data['occasion'] ?? '');

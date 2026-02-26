@@ -27,6 +27,23 @@ final class IncidentReportControllerTest extends CIUnitTestCase
         $this->assertSame('', $ref->invoke($ctrl, null));
     }
 
+    public function testModelNormalisesLocationAndOccasion(): void
+    {
+        $model = new \App\Models\IncidentReportModel();
+        $ref = new \ReflectionMethod($model, 'normaliseLocationCategory');
+        $ref->setAccessible(true);
+
+        $data = ['data' => ['location_category' => '  dam ', 'occasion' => 'summer vacation   ', 'occupation' => ' farmer  ']];
+        $result = $ref->invoke($model, $data);
+
+        $this->assertSame('Dam', $result['data']['location_category']);
+        $this->assertSame('Summer Vacation', $result['data']['occasion']);
+        $this->assertSame('Farmer', $result['data']['occupation']);
+
+        // ensure missing keys don't break anything
+        $this->assertSame(['data' => []], $ref->invoke($model, ['data' => []]));
+    }
+
     public function testMapRowHandlesSexColumn(): void
     {
         $ctrl = new IncidentReport();
@@ -63,6 +80,14 @@ final class IncidentReportControllerTest extends CIUnitTestCase
         }
     }
 
+    public function testMapRowHandlesLocationName(): void
+    {
+        $ctrl = new IncidentReport();
+        $ref = new ReflectionMethod($ctrl, 'mapRow');
+        $ref->setAccessible(true);
+
+    }
+
     public function testDefaultSortIsN(): void
     {
         // render the view with no initial rows and ensure the JS sets the initial
@@ -72,6 +97,17 @@ final class IncidentReportControllerTest extends CIUnitTestCase
         // province/municipality columns should be present in the table header
         $this->assertStringContainsString('>Province<', $output);
         $this->assertStringContainsString('>Municipality/City<', $output);
+        // JS variable for initial categories should exist (even if empty)
+        $this->assertStringContainsString('initialLocationCategories', $output);
+        // JS variable for occasions should also be defined now
+        $this->assertStringContainsString('initialOccasions', $output);
+        // JS variable for occupations should also be provided
+        $this->assertStringContainsString('initialOccupations', $output);
+        // the form should include datalist elements for all three fields
+        $this->assertStringContainsString('datalist', $output);
+        $this->assertStringContainsString('locationCategoryList', $output);
+        $this->assertStringContainsString('occasionList', $output);
+        $this->assertStringContainsString('occupationList', $output);
     }
 
     public function testFocalViewHidesReviewAndActions(): void

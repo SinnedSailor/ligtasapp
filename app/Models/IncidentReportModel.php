@@ -22,6 +22,7 @@ class IncidentReportModel extends Model
         'name_of_victim_enc',
         'name_of_victim_hash',
         'location_category',
+        'location_name',
         'age',
         'gender',
         'occasion',
@@ -65,8 +66,9 @@ class IncidentReportModel extends Model
     }
 
     protected $allowCallbacks = true;
-    protected $beforeInsert = ['encryptVictimName'];
-    protected $beforeUpdate = ['encryptVictimName'];
+    // callbacks run before insert/update operations
+    protected $beforeInsert = ['encryptVictimName', 'normaliseLocationCategory'];
+    protected $beforeUpdate = ['encryptVictimName', 'normaliseLocationCategory'];
 
     public function decryptValue(?string $value): ?string
     {
@@ -100,6 +102,40 @@ class IncidentReportModel extends Model
     }
 
     /**
+     * Ensure location categories are stored in a normalized form.  This keeps the
+     * datalist suggestions tidy without requiring manual cleanup later.
+     */
+    /**
+     * Clean up user-provided string fields so the stored values are consistent.
+     *
+     * Previously this only applied to `location_category`; expand it to also
+     * normalise `occasion` when present.  Both values are trimmed and converted
+     * to Title Case.
+     */
+    protected function normaliseLocationCategory(array $data)
+    {
+        if (! empty($data['data']['location_category'])) {
+            $data['data']['location_category'] = trim(
+                mb_convert_case($data['data']['location_category'], MB_CASE_TITLE, 'UTF-8')
+            );
+        }
+
+        if (! empty($data['data']['occasion'])) {
+            $data['data']['occasion'] = trim(
+                mb_convert_case($data['data']['occasion'], MB_CASE_TITLE, 'UTF-8')
+            );
+        }
+
+        if (! empty($data['data']['occupation'])) {
+            $data['data']['occupation'] = trim(
+                mb_convert_case($data['data']['occupation'], MB_CASE_TITLE, 'UTF-8')
+            );
+        }
+
+        return $data;
+    }
+
+    /**
      * Prepare incident data for save when callers provide plaintext `name_of_victim`.
      * This runs the same encryption/hash logic used by callbacks and removes the
      * plaintext key so the DB only receives `name_of_victim_enc`/`name_of_victim_hash`.
@@ -114,5 +150,57 @@ class IncidentReportModel extends Model
         unset($data['name_of_victim']);
 
         return $data;
+    }
+
+    /**
+     * Return a sorted list of non-empty distinct location_category values stored
+     * in the database.  Used for populating suggestion lists on the client side.
+     *
+     * @return string[]
+     */
+    public function getDistinctLocationCategories(): array
+    {
+        $builder = $this->builder();
+        $builder->select('location_category')
+                ->distinct()
+                ->where('location_category IS NOT NULL', null, false)
+                ->where('location_category !=', '')
+                ->orderBy('location_category', 'asc');
+
+        $result = $builder->get()->getResultArray();
+        return array_map(fn($r) => $r['location_category'], $result);
+    }
+
+    /**
+     * Like getDistinctLocationCategories but for the `occasion` column.  Used to
+     * preload suggestions for the form.
+     */
+    public function getDistinctOccasions(): array
+    {
+        $builder = $this->builder();
+        $builder->select('occasion')
+                ->distinct()
+                ->where('occasion IS NOT NULL', null, false)
+                ->where('occasion !=', '')
+                ->orderBy('occasion', 'asc');
+
+        $result = $builder->get()->getResultArray();
+        return array_map(fn($r) => $r['occasion'], $result);
+    }
+
+    /**
+     * Return sorted non-empty distinct occupation values stored in database.
+     */
+    public function getDistinctOccupations(): array
+    {
+        $builder = $this->builder();
+        $builder->select('occupation')
+                ->distinct()
+                ->where('occupation IS NOT NULL', null, false)
+                ->where('occupation !=', '')
+                ->orderBy('occupation', 'asc');
+
+        $result = $builder->get()->getResultArray();
+        return array_map(fn($r) => $r['occupation'], $result);
     }
 }

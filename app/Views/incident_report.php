@@ -420,7 +420,9 @@ table th,
 
         <div class="col-span-1">
           <label for="incidentLocation" class="text-sm text-slate-600 block mb-1">Location Category</label>
-          <input type="text" id="incidentLocation" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+          <!-- using datalist combo: suggestions from existing data, but free text allowed -->
+          <input list="locationCategoryList" type="text" id="incidentLocation" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+          <datalist id="locationCategoryList"></datalist>
         </div>
 
         <div class="col-span-1">
@@ -439,7 +441,8 @@ table th,
 
         <div class="md:col-span-1">
           <label for="incidentOccasion" class="text-sm text-slate-600 block mb-1">Occasion</label>
-          <input type="text" id="incidentOccasion" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+          <input list="occasionList" type="text" id="incidentOccasion" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+          <datalist id="occasionList"></datalist>
         </div>
 
         <div class="md:col-span-1">
@@ -454,7 +457,7 @@ table th,
 
         <div class="md:col-span-1">
           <label for="incidentOccupation" class="text-sm text-slate-600 block mb-1">Occupation of the Victim</label>
-          <input type="text" id="incidentOccupation" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+          <input list="occupationList" type="text" id="incidentOccupation" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
         </div>
 
         <div class="md:col-span-3">
@@ -623,6 +626,10 @@ table th,
     const canReviewIncidents = <?= $canReview ? 'true' : 'false' ?>;
     const isFocal = <?= $isFocal ? 'true' : 'false' ?>;
     const municipalities = <?= json_encode($municipalities ?? []) ?>;
+    // categories loaded from server for initial suggestions
+    const initialLocationCategories = <?= json_encode($locationCategories ?? []) ?>;
+    const initialOccasions = <?= json_encode($occasions ?? []) ?>;
+    const initialOccupations = <?= json_encode($occupations ?? []) ?>;
     const columns = [
         'N',
         'Month of Incident',
@@ -1340,6 +1347,9 @@ table th,
         if (serverRows.length > 0) {
             tableData = serverRows.map(mapServerRow);
             renderTable();
+        } else {
+            // still populate suggestions from any pre-known categories
+            updateLocationCategoryList();
         }
         setImportSaveState(false);
         updateIncidentMunicipalities();
@@ -1420,10 +1430,14 @@ table th,
         const savedScroll = window.scrollY;
 
         if (tableData.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="17" class="empty-message">No data yet. Upload an Excel file or click "Add Incident" to add data.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="18" class="empty-message">No data yet. Upload an Excel file or click "Add Incident" to add data.</td></tr>';
             updatePaginationControls();
             // restore scroll in case the message changed layout
             window.scrollTo(0, savedScroll);
+            // also refresh datalist so it still contains any initial suggestions
+            updateLocationCategoryList();
+            updateOccasionList();
+            updateOccupationList();
             return;
         }
 
@@ -1529,6 +1543,63 @@ table th,
         updatePaginationControls();
         // restore the scroll position after re-render
         window.scrollTo(0, savedScroll);
+        // refresh datalist suggestions whenever table updates
+        updateLocationCategoryList();
+        updateOccasionList();
+        updateOccupationList();
+    }
+
+
+    // helper: rebuild the datalist options used for the location category field
+    function updateLocationCategoryList() {
+        const listEl = document.getElementById('locationCategoryList');
+        if (!listEl) return;
+        // start with initial categories sent from the server
+        const set = new Set(initialLocationCategories || []);
+        // add any categories already present in tableData
+        tableData.forEach(r => {
+            const cat = (r['Location Category'] || '').trim();
+            if (cat) set.add(cat);
+        });
+        // rebuild options
+        listEl.innerHTML = '';
+        Array.from(set).sort().forEach(cat => {
+            const opt = document.createElement('option');
+            opt.value = cat;
+            listEl.appendChild(opt);
+        });
+    }
+
+    function updateOccasionList() {
+        const listEl = document.getElementById('occasionList');
+        if (!listEl) return;
+        const set = new Set(initialOccasions || []);
+        tableData.forEach(r => {
+            const occ = (r['Occasion'] || '').trim();
+            if (occ) set.add(occ);
+        });
+        listEl.innerHTML = '';
+        Array.from(set).sort().forEach(occ => {
+            const opt = document.createElement('option');
+            opt.value = occ;
+            listEl.appendChild(opt);
+        });
+    }
+
+    function updateOccupationList() {
+        const listEl = document.getElementById('occupationList');
+        if (!listEl) return;
+        const set = new Set(initialOccupations || []);
+        tableData.forEach(r => {
+            const occ = (r['Occupation of the Victim'] || '').trim();
+            if (occ) set.add(occ);
+        });
+        listEl.innerHTML = '';
+        Array.from(set).sort().forEach(occ => {
+            const opt = document.createElement('option');
+            opt.value = occ;
+            listEl.appendChild(opt);
+        });
     }
 
     function getColumnClass(col) {
@@ -2052,7 +2123,7 @@ table th,
             'Municipality/City where Incidence Occurred': row.municipality || '',
             'Name of Victim': row.name_of_victim || '',
             'Location Category': row.location_category || '',
-            'Age of the Person': row.age || '',
+                        'Age of the Person': row.age || '',
             'Gender of the Person': genderVal,
             'Occasion': row.occasion || '',
             'Other Factors': row.factors || '',
