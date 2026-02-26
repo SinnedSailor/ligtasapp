@@ -223,13 +223,19 @@ class Auth extends BaseController
         }
 
         $db = \Config\Database::connect();
-        $rows = $db->table('incident_reports ir')
+        $query = $db->table('incident_reports ir')
             ->select('ir.*, COUNT(ira.id) as attachments_count')
             ->join('incident_report_attachments ira', 'ira.incident_n = ir.n', 'left')
             ->groupBy('ir.n')
-            ->orderBy('ir.n', 'asc')
-            ->get()
-            ->getResultArray();
+            ->orderBy('ir.n', 'asc');
+
+        // Focal users should only see incidents that have been approved.
+        $roleName = strtoupper(trim((string) session()->get('role_name')));
+        if ($roleName === 'FOCAL') {
+            $query->where('ir.review_status', 'approved');
+        }
+
+        $rows = $query->get()->getResultArray();
 
         // Decrypt victim names for display when possible
         $incidentModel = new \App\Models\IncidentReportModel();
@@ -247,6 +253,11 @@ class Auth extends BaseController
             }
         }
         unset($r);
+
+        // apply role-based filtering once decryption is done as an extra safety
+        $roleName = strtoupper(trim((string) session()->get('role_name')));
+        $incidentCtrl = new \App\Controllers\IncidentReport();
+        $rows = $incidentCtrl->filterRowsForRole($rows, $roleName);
 
         return view('incident_report', [
             'initialRows' => $rows,
