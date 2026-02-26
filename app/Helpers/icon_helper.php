@@ -17,7 +17,6 @@ if (!function_exists('svg_icon')) {
         $cls = $class ? 'class="' . esc($class) . '"' : 'class="w-5 h-5 inline-block"';
 
         // Prefer official Heroicons (installed via npm). Only keep mappings for
-        // icons that are actually used in the codebase — unused fallbacks removed.
         $heroMap = [
             'plus'         => 'plus',
             'cloud-upload' => 'cloud-arrow-up',
@@ -35,8 +34,9 @@ if (!function_exists('svg_icon')) {
             'check'        => 'check',
             'x'            => 'x-mark',
             'x-circle'     => 'x-circle',
-            // logout icon
             'logout'       => 'arrow-right-on-rectangle',
+            // backup/restore page icon
+            'archive'      => 'archive-box',
         ];
 
         $heroName = $heroMap[$name] ?? null;

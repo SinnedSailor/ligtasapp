@@ -521,5 +521,85 @@ class Admin extends BaseController
 
         return $this->response->setJSON(['success' => true, 'message' => 'Re-encrypted user data']);
     }
+
+    /**
+     * Show the backup/restore page.
+     */
+    public function backup()
+    {
+        $accessCheck = $this->checkAdminAccess();
+        if ($accessCheck) {
+            return $accessCheck;
+        }
+
+        return view('admin/backup');
+    }
+
+    /**
+     * Export a JSON backup of the administrator record.
+     *
+     * The download is triggered directly, the file contains the raw row as
+     * returned by the `users` table (encrypted fields already present).
+     */
+    public function exportBackup()
+    {
+        $accessCheck = $this->checkAdminAccess();
+        if ($accessCheck) {
+            return $accessCheck;
+        }
+
+        $admin = $this->userModel
+            ->where('username', 'admin')
+            ->orWhere('id', 1)
+            ->first();
+
+        if (! $admin) {
+            return redirect()->to('/admin/backup')->with('error', 'Administrator record not found');
+        }
+
+        $json = json_encode($admin, JSON_PRETTY_PRINT);
+        return $this->response
+            ->setHeader('Content-Type', 'application/json')
+            ->setHeader('Content-Disposition', 'attachment; filename="admin-backup-'.date('Ymd-His').'.json"')
+            ->setBody($json);
+    }
+
+    /**
+     * Restore an administrator record from an uploaded JSON file.
+     */
+    public function restoreBackup()
+    {
+        $accessCheck = $this->checkAdminAccess();
+        if ($accessCheck) {
+            return $accessCheck;
+        }
+
+        $file = $this->request->getFile('backup_file');
+        if (! $file || ! $file->isValid()) {
+            return redirect()->back()->with('error', 'No valid file uploaded');
+        }
+
+        $contents = file_get_contents($file->getTempName());
+        $data = json_decode($contents, true);
+        if (! is_array($data)) {
+            return redirect()->back()->with('error', 'Invalid JSON file');
+        }
+
+        // Ensure we are importing an admin (simple sanity check)
+        if (empty($data['username']) || $data['username'] !== 'admin') {
+            return redirect()->back()->with('error', 'Backup does not appear to contain an admin account');
+        }
+
+        try {
+            // Use table builder replace to bypass model callbacks/validation, since
+            // the row already contains hashed/encrypted values.
+            $builder = $this->userModel->builder();
+            $builder->replace($data);
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', 'Failed to restore backup: ' . $e->getMessage());
+        }
+
+        return redirect()->to('/admin/backup')->with('success', 'Administrator record restored from backup');
+    }
 }
 

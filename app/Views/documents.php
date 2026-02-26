@@ -400,7 +400,7 @@
                                 <option value="">All Municipalities</option>
                             </select>
                             <input type="date" class="filter-input-pending filter-date rounded-md border border-gray-200 px-2 py-1 text-sm" />
-                            // ...existing code...
+                            
                         </div>
                         <thead>
                             <tr>
@@ -462,7 +462,7 @@
                                 <option value="">All Municipalities</option>
                             </select>
                             <input type="date" class="filter-input-approved filter-date rounded-md border border-gray-200 px-2 py-1 text-sm" />
-                            // ...existing code...
+                            
                         </div>
                         <thead>
                             <tr>

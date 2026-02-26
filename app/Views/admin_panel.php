@@ -203,6 +203,7 @@
     </div>
 </div>
 
+
 <div id="user-management-section" class="bg-white rounded-2xl shadow admin-card mx-auto" style="max-width:1200px; margin-left:auto; margin-right:auto; padding-left:24px; padding-right:24px;">
     <div class="p-6">
         <h4 class="text-lg font-semibold mb-4">User Management</h4>
