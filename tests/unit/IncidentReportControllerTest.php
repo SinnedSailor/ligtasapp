@@ -69,6 +69,9 @@ final class IncidentReportControllerTest extends CIUnitTestCase
         // sort column to "N" so the table appears ordered by incident number.
         $output = view('incident_report', ['initialRows' => []]);
         $this->assertStringContainsString("setSort('N')", $output);
+        // province/municipality columns should be present in the table header
+        $this->assertStringContainsString('>Province<', $output);
+        $this->assertStringContainsString('>Municipality/City<', $output);
     }
 
     public function testFocalViewHidesReviewAndActions(): void
@@ -84,6 +87,9 @@ final class IncidentReportControllerTest extends CIUnitTestCase
 
         // attachments header should still be there
         $this->assertStringContainsString('>Attachments<', $output);
+        // province/municipality still visible even for focal users
+        $this->assertStringContainsString('>Province<', $output);
+        $this->assertStringContainsString('>Municipality/City<', $output);
 
         // JS side should know the user is focal so it can adjust rendering rules
         $this->assertStringContainsString('const isFocal = true', $output);

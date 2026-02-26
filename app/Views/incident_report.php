@@ -241,7 +241,8 @@ table th,
                             <th class="px-6 py-3 text-center align-middle text-xs font-medium sortable" data-col="N" onclick="setSort('N')" style="background:#002c76;color:#fff;min-width:60px;white-space:normal;word-break:break-word;">N<span class="sort-arrow"></span></th>
                             <th class="px-6 py-3 text-center align-middle text-xs font-medium sortable" data-col="Month of Incident" onclick="setSort('Month of Incident')" style="background:#002c76;color:#fff;min-width:120px;white-space:normal;word-break:break-word;">Month of Incident<span class="sort-arrow"></span></th>
                             <th class="px-6 py-3 text-center align-middle text-xs font-medium sortable" data-col="Year of Incident" onclick="setSort('Year of Incident')" style="background:#002c76;color:#fff;min-width:120px;white-space:normal;word-break:break-word;">Year of Incident<span class="sort-arrow"></span></th>
-                            
+                            <th class="px-6 py-3 text-center align-middle text-xs font-medium sortable" data-col="Province" onclick="setSort('Province')" style="background:#002c76;color:#fff;min-width:120px;white-space:normal;word-break:break-word;">Province<span class="sort-arrow"></span></th>
+                            <th class="px-6 py-3 text-center align-middle text-xs font-medium sortable" data-col="Municipality/City where Incidence Occurred" onclick="setSort('Municipality/City where Incidence Occurred')" style="background:#002c76;color:#fff;min-width:160px;white-space:normal;word-break:break-word;">Municipality/City<span class="sort-arrow"></span></th>
                             <th class="px-6 py-3 text-center align-middle text-xs font-medium sortable" data-col="Name of Victim" onclick="setSort('Name of Victim')" style="background:#002c76;color:#fff;min-width:160px;white-space:normal;word-break:break-word;">Name of Victim<span class="sort-arrow"></span></th>
                             <th class="px-6 py-3 text-center align-middle text-xs font-medium sortable" data-col="Location Category" onclick="setSort('Location Category')" style="background:#002c76;color:#fff;min-width:120px;white-space:normal;word-break:break-word;">Location Category<span class="sort-arrow"></span></th>
                             <th class="px-6 py-3 text-center align-middle text-xs font-medium sortable" data-col="Age of the Person" onclick="setSort('Age of the Person')" style="background:#002c76;color:#fff;min-width:100px;white-space:normal;word-break:break-word;">Age of the Person<span class="sort-arrow"></span></th>
@@ -261,8 +262,8 @@ table th,
                             <th class="px-6 py-3 text-center text-xs text-gray-400">&nbsp;</th>
                             <th class="px-6 py-3 text-center align-middle text-xs text-gray-400">(Use numerical representation, e.g.: 1 for January, 12 for December)</th>
                             <th class="px-6 py-3 text-center align-middle text-xs text-gray-400">(Input full year, e.g.: 2025)</th>
-                            <th class="px-6 py-3 text-center align-middle text-xs text-gray-400">(Input full year, e.g.: 2025)</th>
-                            
+                            <th class="px-6 py-3 text-center align-middle text-xs text-gray-400">Province name</th>
+                            <th class="px-6 py-3 text-center align-middle text-xs text-gray-400">Municipality/City</th>
                             <th class="px-6 py-3 text-center text-xs text-gray-400">Last Name<br>First Name<br>Middle Name</th>
                             <th class="px-6 py-3 text-center text-xs text-gray-400">(e.g.: Resort, Tourist Spot, Beach, River)</th>
                             <th class="px-6 py-3 text-center text-xs text-gray-400">(Input whole number, e.g.: 25)</th>
@@ -394,7 +395,23 @@ table th,
           <input type="text" id="incidentYear" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
         </div>
 
-                <!-- Province and Municipality/City fields removed from modal -->
+        <!-- the province/municipality inputs were previously removed; bring them back -->
+        <div class="col-span-1">
+          <label for="incidentProvince" class="text-sm text-slate-600 block mb-1">Province</label>
+          <select id="incidentProvince" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
+            <option value="" disabled selected class="text-slate-400">Select province</option>
+            <?php foreach ($provinceList as $prov): ?>
+              <option value="<?= esc($prov) ?>"><?= esc($prov) ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+
+        <div class="col-span-1">
+          <label for="incidentMunicipality" class="text-sm text-slate-600 block mb-1">Municipality/City where Incident Occurred</label>
+          <select id="incidentMunicipality" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
+            <option value="" disabled selected class="text-slate-400">Select municipality</option>
+          </select>
+        </div>
 
         <div class="md:col-span-1">
           <label for="incidentVictim" class="text-sm text-slate-600 block mb-1">Name of Victim</label>
@@ -610,8 +627,8 @@ table th,
         'N',
         'Month of Incident',
         'Year of Incident',
-        // 'Province',
-        // 'Municipality/City where Incidence Occurred',
+        'Province',
+        'Municipality/City where Incidence Occurred',
         'Name of Victim',
         'Location Category',
         'Age of the Person',
@@ -744,8 +761,8 @@ table th,
     const incidentFieldMap = [
         { id: 'incidentMonth', column: 'Month of Incident' },
         { id: 'incidentYear', column: 'Year of Incident' },
-        // { id: 'incidentProvince', column: 'Province' },
-        // { id: 'incidentMunicipality', column: 'Municipality/City where Incidence Occurred' },
+        { id: 'incidentProvince', column: 'Province' },
+        { id: 'incidentMunicipality', column: 'Municipality/City where Incidence Occurred' },
         { id: 'incidentVictim', column: 'Name of Victim' },
         { id: 'incidentLocation', column: 'Location Category' },
         { id: 'incidentAge', column: 'Age of the Person' },
@@ -1592,7 +1609,14 @@ table th,
                 ensureYearOption(yearValue);
             }
         }
-        // Province and Municipality/City logic removed
+        // if we're editing, make sure the province select has the current value
+        const provVal = row ? (row['Province'] || '') : '';
+        if (provVal) {
+            ensureProvinceOption(provVal);
+        }
+        // populate municipality dropdown and preserve existing value (if any)
+        const muniVal = row ? (row['Municipality/City where Incidence Occurred'] || '') : '';
+        updateIncidentMunicipalities(muniVal);
 
 
         if (incidentModalLabel) {
