@@ -488,8 +488,6 @@
                                                 View
                                             </button>
                                             <a class="inline-flex items-center gap-2 px-3 py-1 border border-blue-200 rounded text-sm text-blue-700 hover:bg-blue-50" href="<?= base_url('/documents/download/' . $doc['id']) ?>">Download</a>
-                                                Download
-                                            </a>
                                         </div>
                                     </td>
                                 </tr>

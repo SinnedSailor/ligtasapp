@@ -12,16 +12,39 @@
         @media (min-width: 768px) {
             .topbar-shift { left: 18rem !important; width: calc(100% - 18rem) !important; }
 
-            #sidebar + .main-panel { margin-left: 18rem !important; }
+            #sidebar + .main-panel {
+                margin-left: 18rem !important;
+                width: calc(100% - 18rem) !important;
+            }
+        }
+        /* always animate topbar and panel positions */
+        .topbar-shift,
+        .main-panel {
+            transition: left .3s ease, width .3s ease, margin-left .3s ease;
         }
         @media (min-width: 1024px) {
             .topbar-shift { left: 16rem !important; width: calc(100% - 16rem) !important; }
-            #sidebar + .main-panel { margin-left: 16rem !important; }
+            #sidebar + .main-panel {
+                margin-left: 16rem !important;
+                width: calc(100% - 16rem) !important;
+            }
         }
         @media (max-width: 767px) {
-            .main-panel { margin-left: 0 !important; }
+            .main-panel { margin-left: 0 !important; width: 100% !important; }
             .topbar-shift { left: 0 !important; width: 100% !important; }
         }
+
+        /* always animate topbar and panel positions */
+        .topbar-shift,
+        .main-panel {
+            transition: left .3s ease, width .3s ease, margin-left .3s ease;
+        }
+
+        /* collapsed sidebar state only changes sidebar width */
+        #sidebar.sidebar-collapsed { width: 5rem !important; }
+        #sidebar.sidebar-collapsed .menu-title { display: none; }
+        #sidebar.sidebar-collapsed .text-xs.uppercase { display: none; } /* hide "Menu" header */
+        #sidebar.sidebar-collapsed .flex.items-center>div:not(.w-16) { display: none; } /* hide profile text */
 
         /* sidebar link */
         #sidebar a,
@@ -53,7 +76,7 @@
                 border-radius: 0.375rem;
                 padding: 0.25rem 0.5rem;
             }
-        }
+        
     </style>
 
     <?= $this->renderSection('pageStyles') ?>
@@ -152,9 +175,18 @@
 
                         <?php if (session()->get('is_admin')): ?>
                         <li>
-                            <a href="<?= base_url('/admin-panel') ?>" class="flex items-center gap-3 px-3 py-2 text-sm rounded-md <?= $root === 'admin-panel' ? 'bg-slate-100 text-indigo-600' : 'text-slate-600 hover:bg-slate-50 hover:text-blue-600' ?>" <?= $root === 'admin-panel' ? 'aria-current="page"' : '' ?>>
+                            <a href="<?= base_url('/admin-panel') ?>" class="flex items-center gap-3 px-3 py-2 text-sm rounded-md <?= $root === 'admin-panel' ? 'bg-slate-100 text-indigo-600' : 'text-slate-600 hover:bg-slate-50 hover:text-blue-600' ?>" <?= $root === 'admin-panel' ? 'aria-current="page"' : '' ?> >
                                 <?= svg_icon('users', 'w-5 h-5') ?>
                                 <span class="menu-title">Admin Panel</span>
+                            </a>
+                        </li>
+                        <li>
+                            <?php
+                                $isBackupActive = strpos($path, 'admin/backup') === 0;
+                            ?>
+                            <a href="<?= base_url('/admin/backup') ?>" class="flex items-center gap-3 px-3 py-2 text-sm rounded-md <?= $isBackupActive ? 'bg-slate-100 text-indigo-600' : 'text-slate-600 hover:bg-slate-50 hover:text-blue-600' ?>" <?= $isBackupActive ? 'aria-current="page"' : '' ?> >
+                                <?= svg_icon('archive', 'w-5 h-5') ?>
+                                <span class="menu-title">Backup &amp; Restore</span>
                             </a>
                         </li>
                         <?php endif; ?>
@@ -188,6 +220,33 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     var logoutBtn = document.querySelector('a[title="Logout"]');
+
+    // sidebar collapse toggle
+    var sidebar = document.getElementById('sidebar');
+    var toggleBtn = sidebar ? sidebar.querySelector('button[aria-label="Toggle sidebar"]') : null;
+    function setCollapsed(collapsed) {
+        if (collapsed) {
+            sidebar.classList.add('sidebar-collapsed');
+            document.body.classList.add('sidebar-collapsed-main');
+        } else {
+            sidebar.classList.remove('sidebar-collapsed');
+            document.body.classList.remove('sidebar-collapsed-main');
+        }
+        localStorage.setItem('sidebarCollapsed', collapsed ? '1' : '0');
+    }
+    if (sidebar && toggleBtn) {
+        // restore state
+        var stored = localStorage.getItem('sidebarCollapsed');
+        if (stored === '1') {
+            setCollapsed(true);
+        }
+        toggleBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            var isCollapsed = sidebar.classList.contains('sidebar-collapsed');
+            setCollapsed(!isCollapsed);
+        });
+    }
+
     if (logoutBtn) {
         logoutBtn.addEventListener('click', function(e) {
             e.preventDefault();
