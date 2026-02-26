@@ -75,6 +75,8 @@ table th,
     .table-responsive th,
     .table-responsive td {
         border: 1px solid #e3e6ef;
+        /* ensure data cells have same padding as header cells (px-6 py-3) */
+        padding: 0.75rem 1.5rem;
     }
 
     /* Attachment area improvements */
@@ -235,48 +237,50 @@ table th,
         </div>
         <!-- Table Container -->
         <div class="bg-white rounded-2xl shadow p-6">
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 rounded-2xl overflow-hidden">
+            <!-- negative horizontal margins cancel the card padding so the table can reach the rounded corners -->
+        <div class="overflow-x-auto -mx-6 px-6">
+                <!-- ensure table spans its container so the right edge aligns with the scroll wrapper -->
+                <table class="min-w-full w-full table-auto divide-y divide-gray-200 rounded-2xl overflow-hidden">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-3 text-center text-xs font-medium rounded-tl-2xl sortable" data-col="N" onclick="setSort('N')" style="background:#002c76;color:#fff;min-width:60px;white-space:normal;word-break:break-word;">N<span class="sort-arrow"></span></th>
-                            <th class="px-6 py-3 text-center text-xs font-medium sortable" data-col="Month of Incident" onclick="setSort('Month of Incident')" style="background:#002c76;color:#fff;min-width:120px;white-space:normal;word-break:break-word;">Month of Incident<span class="sort-arrow"></span></th>
-                            <th class="px-6 py-3 text-center text-xs font-medium sortable" data-col="Year of Incident" onclick="setSort('Year of Incident')" style="background:#002c76;color:#fff;min-width:120px;white-space:normal;word-break:break-word;">Year of Incident<span class="sort-arrow"></span></th>
+                            <th class="px-6 py-3 text-center align-middle text-xs font-medium sortable" data-col="N" onclick="setSort('N')" style="background:#002c76;color:#fff;min-width:60px;white-space:normal;word-break:break-word;">N<span class="sort-arrow"></span></th>
+                            <th class="px-6 py-3 text-center align-middle text-xs font-medium sortable" data-col="Month of Incident" onclick="setSort('Month of Incident')" style="background:#002c76;color:#fff;min-width:120px;white-space:normal;word-break:break-word;">Month of Incident<span class="sort-arrow"></span></th>
+                            <th class="px-6 py-3 text-center align-middle text-xs font-medium sortable" data-col="Year of Incident" onclick="setSort('Year of Incident')" style="background:#002c76;color:#fff;min-width:120px;white-space:normal;word-break:break-word;">Year of Incident<span class="sort-arrow"></span></th>
                             
-                            <th class="px-6 py-3 text-center text-xs font-medium sortable" data-col="Name of Victim" onclick="setSort('Name of Victim')" style="background:#002c76;color:#fff;min-width:160px;white-space:normal;word-break:break-word;">Name of Victim<span class="sort-arrow"></span></th>
-                            <th class="px-6 py-3 text-center text-xs font-medium sortable" data-col="Location Category" onclick="setSort('Location Category')" style="background:#002c76;color:#fff;min-width:120px;white-space:normal;word-break:break-word;">Location Category<span class="sort-arrow"></span></th>
-                            <th class="px-6 py-3 text-center text-xs font-medium sortable" data-col="Age of the Person" onclick="setSort('Age of the Person')" style="background:#002c76;color:#fff;min-width:100px;white-space:normal;word-break:break-word;">Age of the Person<span class="sort-arrow"></span></th>
-                            <th class="px-6 py-3 text-center text-xs font-medium sortable" data-col="Gender of the Person" onclick="setSort('Gender of the Person')" style="background:#002c76;color:#fff;min-width:80px;white-space:normal;word-break:break-word;">Sex<span class="sort-arrow"></span></th>
-                            <th class="px-6 py-3 text-center text-xs font-medium sortable" data-col="Occasion" onclick="setSort('Occasion')" style="background:#002c76;color:#fff;min-width:180px;white-space:normal;word-break:break-word;">Occasion<span class="sort-arrow"></span></th>
-                            <th class="px-6 py-3 text-center text-xs font-medium sortable" data-col="Other Factors" onclick="setSort('Other Factors')" style="background:#002c76;color:#fff;min-width:140px;white-space:normal;word-break:break-word;">Other Factors<span class="sort-arrow"></span></th>
-                            <th class="px-6 py-3 text-left text-xs font-medium sortable" data-col="Person's Residence" onclick="setSort(\"Person's Residence\")" style="background:#002c76;color:#fff;min-width:140px;white-space:normal;word-break:break-word;">Person's Residence<span class="sort-arrow"></span></th>
-                            <th class="px-6 py-3 text-center text-xs font-medium sortable" data-col="Occupation of the Victim" onclick="setSort('Occupation of the Victim')" style="background:#002c76;color:#fff;min-width:140px;white-space:normal;word-break:break-word;">Occupation of the Victim<span class="sort-arrow"></span></th>
-                            <th class="px-6 py-3 text-center text-xs font-medium sortable" data-col="Remarks" onclick="setSort('Remarks')" style="background:#002c76;color:#fff;min-width:100px;white-space:normal;word-break:break-word;">Remarks<span class="sort-arrow"></span></th>
+                            <th class="px-6 py-3 text-center align-middle text-xs font-medium sortable" data-col="Name of Victim" onclick="setSort('Name of Victim')" style="background:#002c76;color:#fff;min-width:160px;white-space:normal;word-break:break-word;">Name of Victim<span class="sort-arrow"></span></th>
+                            <th class="px-6 py-3 text-center align-middle text-xs font-medium sortable" data-col="Location Category" onclick="setSort('Location Category')" style="background:#002c76;color:#fff;min-width:120px;white-space:normal;word-break:break-word;">Location Category<span class="sort-arrow"></span></th>
+                            <th class="px-6 py-3 text-center align-middle text-xs font-medium sortable" data-col="Age of the Person" onclick="setSort('Age of the Person')" style="background:#002c76;color:#fff;min-width:100px;white-space:normal;word-break:break-word;">Age of the Person<span class="sort-arrow"></span></th>
+                            <th class="px-6 py-3 text-center align-middle text-xs font-medium sortable" data-col="Gender of the Person" onclick="setSort('Gender of the Person')" style="background:#002c76;color:#fff;min-width:80px;white-space:normal;word-break:break-word;">Sex<span class="sort-arrow"></span></th>
+                            <th class="px-6 py-3 text-center align-middle text-xs font-medium sortable" data-col="Occasion" onclick="setSort('Occasion')" style="background:#002c76;color:#fff;min-width:180px;white-space:normal;word-break:break-word;">Occasion<span class="sort-arrow"></span></th>
+                            <th class="px-6 py-3 text-center align-middle text-xs font-medium sortable" data-col="Other Factors" onclick="setSort('Other Factors')" style="background:#002c76;color:#fff;min-width:140px;white-space:normal;word-break:break-word;">Other Factors<span class="sort-arrow"></span></th>
+                            <th class="px-6 py-3 text-left align-middle text-xs font-medium sortable" data-col="Person's Residence" onclick="setSort(\"Person's Residence\")" style="background:#002c76;color:#fff;min-width:140px;white-space:normal;word-break:break-word;">Person's Residence<span class="sort-arrow"></span></th>
+                            <th class="px-6 py-3 text-center align-middle text-xs font-medium sortable" data-col="Occupation of the Victim" onclick="setSort('Occupation of the Victim')" style="background:#002c76;color:#fff;min-width:140px;white-space:normal;word-break:break-word;">Occupation of the Victim<span class="sort-arrow"></span></th>
+                            <th class="px-6 py-3 text-center align-middle text-xs font-medium sortable" data-col="Remarks" onclick="setSort('Remarks')" style="background:#002c76;color:#fff;min-width:100px;white-space:normal;word-break:break-word;">Remarks<span class="sort-arrow"></span></th>
                             <th class="px-6 py-3 text-center text-xs font-medium" style="background:#002c76;color:#fff;min-width:100px;white-space:normal;word-break:break-word;">Attachments</th>
                             <?php if (! $isFocal): ?>
                                 <th class="px-6 py-3 text-center text-xs font-medium" style="background:#002c76;color:#fff;min-width:100px;white-space:normal;word-break:break-word;">Review</th>
-                                <th class="px-6 py-3 text-center text-xs font-medium rounded-tr-2xl" style="background:#002c76;color:#fff;min-width:100px;white-space:normal;word-break:break-word;">Actions</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium" style="background:#002c76;color:#fff;min-width:100px;white-space:normal;word-break:break-word;">Actions</th>
                             <?php endif; ?>
                         </tr>
                         <tr>
-                            <th class="px-3 py-2 text-center text-xs text-gray-400">&nbsp;</th>
-                            <th class="px-3 py-2 text-center text-xs text-gray-400">(Use numerical representation, e.g.: 1 for January, 12 for December)</th>
-                            <th class="px-3 py-2 text-center text-xs text-gray-400">(Input full year, e.g.: 2025)</th>
-                            <th class="px-3 py-2 text-center text-xs text-gray-400">(Input full year, e.g.: 2025)</th>
+                            <th class="px-6 py-3 text-center text-xs text-gray-400">&nbsp;</th>
+                            <th class="px-6 py-3 text-center align-middle text-xs text-gray-400">(Use numerical representation, e.g.: 1 for January, 12 for December)</th>
+                            <th class="px-6 py-3 text-center align-middle text-xs text-gray-400">(Input full year, e.g.: 2025)</th>
+                            <th class="px-6 py-3 text-center align-middle text-xs text-gray-400">(Input full year, e.g.: 2025)</th>
                             
-                            <th class="px-3 py-2 text-center text-xs text-gray-400">Last Name<br>First Name<br>Middle Name</th>
-                            <th class="px-3 py-2 text-center text-xs text-gray-400">(e.g.: Resort, Tourist Spot, Beach, River)</th>
-                            <th class="px-3 py-2 text-center text-xs text-gray-400">(Input whole number, e.g.: 25)</th>
-                            <th class="px-3 py-2 text-center text-xs text-gray-400">(Sex assigned at birth)</th>
-                            <th class="px-3 py-2 text-center text-xs text-gray-400">Choose between Summer Vacation, Holy Week, Halloween, Holiday Season, Disaster-Related,<br><span style='color:red'>Regular Days (Family Gathering, Outing/Picnic, etc), Work-Related</span></th>
-                            <th class="px-3 py-2 text-center text-xs text-gray-400">(e.g.: Accident, Alcohol Intoxication, <span style='color:red'>Medical Condition</span>)</th>
-                            <th class="px-3 py-2 text-center text-xs text-gray-400">(From what part does the case belong to? e.g.: Bakun, Benguet)<br>Region</th>
-                            <th class="px-3 py-2 text-center text-xs text-gray-400">(e.g.: Student, Fisherfolk, Farmer, etc.)</th>
-                            <th class="px-3 py-2 text-center text-xs text-gray-400">&nbsp;</th>
+                            <th class="px-6 py-3 text-center text-xs text-gray-400">Last Name<br>First Name<br>Middle Name</th>
+                            <th class="px-6 py-3 text-center text-xs text-gray-400">(e.g.: Resort, Tourist Spot, Beach, River)</th>
+                            <th class="px-6 py-3 text-center text-xs text-gray-400">(Input whole number, e.g.: 25)</th>
+                            <th class="px-6 py-3 text-center text-xs text-gray-400">(Sex assigned at birth)</th>
+                            <th class="px-6 py-3 text-center text-xs text-gray-400">Choose between Summer Vacation, Holy Week, Halloween, Holiday Season, Disaster-Related,<br><span style='color:red'>Regular Days (Family Gathering, Outing/Picnic, etc), Work-Related</span></th>
+                            <th class="px-6 py-3 text-center text-xs text-gray-400">(e.g.: Accident, Alcohol Intoxication, <span style='color:red'>Medical Condition</span>)</th>
+                            <th class="px-6 py-3 text-center text-xs text-gray-400">(From what part does the case belong to? e.g.: Bakun, Benguet)<br>Region</th>
+                            <th class="px-6 py-3 text-center text-xs text-gray-400">(e.g.: Student, Fisherfolk, Farmer, etc.)</th>
+                            <th class="px-6 py-3 text-center text-xs text-gray-400">&nbsp;</th>
                             <?php if (! $isFocal): ?>
-                                <th class="px-3 py-2 text-center text-xs text-gray-400">&nbsp;</th>
-                                <th class="px-3 py-2 text-center text-xs text-gray-400">&nbsp;</th>
-                                <th class="px-3 py-2 text-center text-xs text-gray-400">&nbsp;</th>
+                                <th class="px-6 py-3 text-center text-xs text-gray-400">&nbsp;</th>
+                                <th class="px-6 py-3 text-center text-xs text-gray-400">&nbsp;</th>
+                                <th class="px-6 py-3 text-center text-xs text-gray-400">&nbsp;</th>
                             <?php endif; ?>
                         </tr>
                     </thead>
