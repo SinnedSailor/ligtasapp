@@ -5,12 +5,12 @@
 <?= $this->section('content') ?>
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 md:pt-10 pb-10">
-  <!-- Greeting -->
-    <div class="mb-6">
-      <div class="bg-white border border-slate-200 rounded-xl shadow-sm px-6 py-4 flex items-center">
-        <h2 class="text-2xl font-semibold text-slate-900">Hello, <?= esc(session('username')) ?>!</h2>
-      </div>
+  <?php $firstName = session()->get('first_name') ?: session()->get('username'); ?>
+  <div class="mb-6">
+    <div class="bg-white rounded-2xl shadow p-6">
+      <h2 class="text-xl font-semibold">Hello, <?= esc($firstName) ?>!</h2>
     </div>
+  </div>
   <!-- stat cards -->
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
 
@@ -36,12 +36,12 @@
       <div class="absolute top-4 right-4 h-9 w-9 rounded-lg bg-white/70 flex items-center justify-center text-amber-600"><?= svg_icon('home','w-5 h-5') ?></div>
       <div class="h-36 flex flex-col justify-center">
         <div class="text-xs font-medium text-slate-600">Highest Risk Province (Region 1)</div>
-        <div class="mt-2 text-3xl font-bold text-slate-900">Province A</div>
+        <div class="mt-2 text-3xl font-bold text-slate-900">La Union</div>
         <div class="text-xs text-amber-600 mt-2">risk score: 18% (sample)</div>
       </div>
     </div>
 
-    <div class="relative rounded-2xl p-4 shadow-sm overflow-hidden custom-orange-card">
+    <div class="relative rounded-2xl p-4 shadow-sm overflow-hidden" style="background: linear-gradient(135deg, #fed7aa 0%, #fca5a5 100%);">
       <div class="absolute top-4 right-4 h-9 w-9 rounded-lg bg-white/70 flex items-center justify-center icon"><?= svg_icon('users','w-5 h-5') ?></div>
       <div class="h-36 flex flex-col justify-center">
         <div class="text-xs font-medium text-slate-600">Most affected age group</div>
@@ -122,7 +122,7 @@
 document.addEventListener('DOMContentLoaded', function () {
   // Incidents per province 
   var optionsProvince = {
-    chart: { type: 'bar', height: 288, toolbar: { show: false } },
+    chart: { type: 'bar', height: 288, width: '100%', toolbar: { show: false } },
     series: [{ name: 'Incidents', data: [120, 95, 80, 210] }],
     colors: ['#002C76'],
     plotOptions: { bar: { borderRadius: 6, columnWidth: '48%' } },
@@ -131,55 +131,60 @@ document.addEventListener('DOMContentLoaded', function () {
     tooltip: { y: { formatter: function (val) { return val + ' incidents'; } } },
     grid: { strokeDashArray: 4 }
   };
-  new ApexCharts(document.querySelector('#chart-incidents-province'), optionsProvince).render();
+  var chartProvince = new ApexCharts(document.querySelector('#chart-incidents-province'), optionsProvince);
+  chartProvince.render();
 
   // Remarks status (Alive / Deceased / Missing)
   var optionsRemarks = {
-     chart: { type: 'donut', height: 224 },
+    chart: { type: 'donut', height: 288, width: '100%' },
     series: [520, 27, 5],
     labels: ['Alive','Deceased','Missing'],
     colors: ['#10b981','#C9282D','#FFDE15'],
     legend: { position: 'bottom' },
     dataLabels: { enabled: false }
   };
-  new ApexCharts(document.querySelector('#chart-remarks-status'), optionsRemarks).render();
+  var chartRemarks = new ApexCharts(document.querySelector('#chart-remarks-status'), optionsRemarks);
+  chartRemarks.render();
 
   // Incidents by sex (Male / Female)
   var optionsSex = {
-     chart: { type: 'pie', height: 224 },
+    chart: { type: 'pie', height: 288, width: '100%' },
     series: [520, 360],
     labels: ['Male','Female'],
     colors: ['#1581BF','#F875AA'],
     dataLabels: { enabled: false },
     legend: { position: 'bottom' }
   };
-  new ApexCharts(document.querySelector('#chart-incidents-sex'), optionsSex).render();
+  var chartSex = new ApexCharts(document.querySelector('#chart-incidents-sex'), optionsSex);
+  chartSex.render();
 
   // Incidents by age group
   var optionsAge = {
-     chart: { type: 'bar', height: 224 },
+    chart: { type: 'bar', height: 288, width: '100%' },
     series: [{ name: 'Incidents', data: [8, 34, 120, 234, 165, 90, 30] }],
-    xaxis: { categories: ['0-4 (Preschool)','5-12 (Gradeschool)','13-17 (Highschool)','18-24 (College/Early Adult)','25-34 (Adult)','35-44 (Adult)','45-64 (Middle Age)','65+ (Elderly)'] },
+    xaxis: { categories: ['0-4','5-14','15-24','25-34','35-44','45-64','65+'] },
     colors: ['#2C4E80'],
     plotOptions: { bar: { borderRadius: 6, columnWidth: '48%' } },
     dataLabels: { enabled: false }
   };
-  new ApexCharts(document.querySelector('#chart-incidents-age'), optionsAge).render();
+  var chartAge = new ApexCharts(document.querySelector('#chart-incidents-age'), optionsAge);
+  chartAge.render();
 
   // Contributing factors 
   var optionsFactors = {
-     chart: { type: 'bar', height: 224 },
-    series: [{ name: 'Count', data: [210, 150, 90, 60, 30, 45, 22] }],
+    chart: { type: 'bar', height: 224, width: '100%' },
+    series: [{ name: 'Count', data: [210, 150, 90, 60, 30] }],
     plotOptions: { bar: { horizontal: true, barHeight: '48%', borderRadius: 6 } },
-    xaxis: { categories: ['Unable to swim','Lack of supervision','Alcohol','Hazardous conditions','Overcrowding','No life jacket','Sudden illness'] },
+    xaxis: { categories: ['Unable to swim','Lack of supervision','Alcohol','Hazardous conditions','Overcrowding'] },
     colors: ['#002C76'],
     dataLabels: { enabled: false }
   };
-  new ApexCharts(document.querySelector('#chart-contributing-factors'), optionsFactors).render();
+  var chartFactors = new ApexCharts(document.querySelector('#chart-contributing-factors'), optionsFactors);
+  chartFactors.render();
 
   // Incidents by year 
   var optionsYear = {
-    chart: { type: 'line', height: 288, toolbar: { show: false } },
+    chart: { type: 'line', height: 288, width: '100%', toolbar: { show: false } },
     series: [{ name: 'Incidents', data: [320, 280, 360, 400, 450, 420] }],
     stroke: { curve: 'smooth', width: 3 },
     markers: { size: 4 },
@@ -187,41 +192,54 @@ document.addEventListener('DOMContentLoaded', function () {
     xaxis: { categories: ['2019','2020','2021','2022','2023','2024'] },
     grid: { strokeDashArray: 4 }
   };
-  new ApexCharts(document.querySelector('#chart-incidents-year'), optionsYear).render();
+  var chartYear = new ApexCharts(document.querySelector('#chart-incidents-year'), optionsYear);
+  chartYear.render();
 
   // Incidents by holiday 
   var optionsHoliday = {
-     chart: { type: 'bar', height: 224, toolbar: { show: false } },
+    chart: { type: 'bar', height: 224, width: '100%', toolbar: { show: false } },
     series: [{ name: 'Incidents', data: [150, 110, 95, 160, 80, 70] }],
     plotOptions: { bar: { borderRadius: 6, columnWidth: '48%' } },
     xaxis: { categories: ['Holy Week','Christmas','Summer Vacation','New Year','All Saints Day','Others'] },
     colors: ['#C9282D'],
     dataLabels: { enabled: false }
   };
-  new ApexCharts(document.querySelector('#chart-incidents-holiday'), optionsHoliday).render();
+  var chartHoliday = new ApexCharts(document.querySelector('#chart-incidents-holiday'), optionsHoliday);
+  chartHoliday.render();
 
   // Incidents by residence (palitan nalang ulit pag meron na - filter top 10 only)
   var optionsResidence = {
-    chart: { type: 'bar', height: 288 },
+    chart: { type: 'bar', height: 288, width: '100%' },
     series: [{ name: 'Incidents', data: [85,80,72,65,60,55,50,45,40,35] }],
     plotOptions: { bar: { horizontal: true, barHeight: '44%', borderRadius: 6 } },
     xaxis: { categories: ['Dagupan','San Carlos','Alaminos','Urdaneta','Laoag','Vigan','Candon','San Fernando (LU)','Agoo','Bacnotan'] },
     colors: ['#06b6d4'],
     dataLabels: { enabled: false }
   };
-  new ApexCharts(document.querySelector('#chart-incidents-residence'), optionsResidence).render();
+  var chartResidence = new ApexCharts(document.querySelector('#chart-incidents-residence'), optionsResidence);
+  chartResidence.render();
 
   // Incidents by location category 
   var optionsLocation = {
-     chart: { type: 'donut', height: 224 },
-    series: [210,30,120,50,15,40,25,18],
-    labels: ['Beach','Lake','River','Pool','Swamp','Other','Resort','Pier'],
-    colors: ['#06b6d4','#60a5fa','#3b82f6','#60a5fa','#f97316','#9ca3af','#a3e635','#fbbf24'],
+    chart: { type: 'donut', height: 224, width: '100%' },
+    series: [210,30,120,50,15,40],
+    labels: ['Beach','Lake','River','Pool','Swamp','Other'],
+    colors: ['#06b6d4','#60a5fa','#3b82f6','#60a5fa','#f97316','#9ca3af'],
     legend: { position: 'bottom' },
     dataLabels: { enabled: false }
   };
-  new ApexCharts(document.querySelector('#chart-incidents-location'), optionsLocation).render();
+  var chartLocation = new ApexCharts(document.querySelector('#chart-incidents-location'), optionsLocation);
+  chartLocation.render();
 
+
+  // on scroll/resize, force a resize for all charts (workaround for rendering issues)
+  window.addEventListener('scroll', function() {
+    [chartProvince, chartRemarks, chartSex, chartAge, chartFactors, chartYear, chartHoliday, chartResidence, chartLocation].forEach(function(c) { if (c) c.resize(); });
+  });
+
+  window.addEventListener('resize', function() {
+    [chartProvince, chartRemarks, chartSex, chartAge, chartFactors, chartYear, chartHoliday, chartResidence, chartLocation].forEach(function(c) { if (c) c.resize(); });
+  });
 });
 </script>
 <?= $this->endSection() ?>

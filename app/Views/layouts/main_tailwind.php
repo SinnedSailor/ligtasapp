@@ -17,7 +17,7 @@
                 width: calc(100% - 18rem) !important;
             }
         }
-        /* always animate topbar and panel positions */
+    
         .topbar-shift,
         .main-panel {
             transition: left .3s ease, width .3s ease, margin-left .3s ease;
@@ -34,7 +34,7 @@
             .topbar-shift { left: 0 !important; width: 100% !important; }
         }
 
-        /* always animate topbar and panel positions */
+    
         .topbar-shift,
         .main-panel {
             transition: left .3s ease, width .3s ease, margin-left .3s ease;

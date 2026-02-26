@@ -157,10 +157,6 @@
     $provinceList = $provinces ?? [];
     $provinceSelectedInList = $selectedProvince !== '' && in_array($selectedProvince, $provinceList, true);
 ?>
-<div class="page-header">
-    <h3 class="page-title">User Profile</h3>
-    <p class="text-muted">Manage your account information and settings.</p>
-</div>
 
 <?php if (!empty($profileError)): ?>
     <div class="mb-4 rounded-md bg-red-50 border border-red-200 text-red-700 px-4 py-3">
@@ -169,106 +165,100 @@
 <?php endif; ?>
 
 <div class="max-w-4xl mx-auto px-4">
-        <div class="profile-card">
-            <div class="profile-picture-section">
-                <div class="profile-picture-upload">
-                    <div class="profile-picture-preview" id="profilePreview">
-                        👤
-                    </div>
-                    <div class="upload-overlay" onclick="document.getElementById('profilePicture').click()">
-                        📷 Change Photo
-                    </div>
-                    <input type="file" id="profilePicture" class="hidden" accept="image/*" onchange="previewImage(event)">
-                </div>
+    <!-- overall container -->
+    <div class="profile-card p-6 space-y-4">
+        <!-- header card -->
+        <div class="bg-gradient-to-br from-blue-100 to-blue-50 rounded-2xl p-6 flex flex-col sm:flex-row items-center gap-6">
+        <div class="profile-picture-upload">
+            <div class="profile-picture-preview" id="profilePreview">
+                👤
             </div>
-
-            <div class="mb-4 rounded-md bg-blue-50 border border-blue-100 text-blue-700 px-4 py-3 text-center">
-                Keep your profile information up to date for better communication.
+            <div class="upload-overlay" onclick="document.getElementById('profilePicture').click()">
+                📷 Change Photo
             </div>
-
-            <form id="profileForm" action="<?= base_url('/user-profile/update') ?>" method="post">
-                <?= csrf_field() ?>
-                <div class="form-section">
-                    <h5>Personal Information</h5>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="firstName" class="block text-sm font-medium text-gray-700">First Name *</label>
-                            <input type="text" id="firstName" name="first_name" value="<?= esc($profile['first_name'] ?? session()->get('first_name') ?? '') ?>" required onblur="this.value = this.value.replace(/\s+/g,' ').trim().split(' ').map(function(w){return w?(w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()):'';}).join(' ')" class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300" />
-                        </div>
-                        <div class="form-group">
-                            <label for="lastName" class="block text-sm font-medium text-gray-700">Last Name *</label>
-                            <input type="text" id="lastName" name="last_name" value="<?= esc($profile['last_name'] ?? session()->get('last_name') ?? '') ?>" required onblur="this.value = this.value.replace(/\s+/g,' ').trim().split(' ').map(function(w){return w?(w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()):'';}).join(' ')" class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300" />
-                        </div>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="username" class="block text-sm font-medium text-gray-700">Username *</label>
-                            <input type="text" id="username" name="username" value="<?= esc($profile['username'] ?? session()->get('username') ?? '') ?>" required class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300" />
-                        </div>
-                        <div class="form-group">
-                            <label for="contactNumber" class="block text-sm font-medium text-gray-700">Contact Number *</label>
-                            <input type="tel" id="contactNumber" name="contact_number" value="<?= esc($profile['contact_number'] ?? session()->get('contact_number') ?? '') ?>" placeholder="e.g., 09123456789" inputmode="numeric" maxlength="11" pattern="[0-9]{11}" title="Please enter 11-digit phone number (numbers only)" required oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300" />
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="email" class="block text-sm font-medium text-gray-700">Email Address *</label>
-                        <input type="email" id="email" name="email"
-                               value="<?= esc($profile['display_email'] ?? session()->get('email') ?? '') ?>" required
-                               class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300" />
-                        <small class="text-gray-500 text-sm">
-                            <?php if (empty($profile['display_email'] ?? '') && isset($profile['email']) && preg_match('/^[0-9a-f]{64}$/i', (string) $profile['email'])): ?>
-                                Your address is no longer stored in plaintext. Please enter your current email above to update it.
-                            <?php endif; ?>
-                        </small>
-                    </div>
-                </div>
-
-                <div class="form-section">
-                    <h5>Location Information</h5>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="province" class="block text-sm font-medium text-gray-700">Province *</label>
-                            <select id="province" name="province" required class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
-                                <option value="">Select province</option>
-                                <?php if (!$provinceSelectedInList && $selectedProvince !== ''): ?>
-                                    <option value="<?= esc($selectedProvince) ?>" selected>
-                                        <?= esc($selectedProvince) ?>
-                                    </option>
-                                <?php endif; ?>
-                                <?php foreach ($provinceList as $province): ?>
-                                    <option value="<?= esc($province) ?>" <?= ($selectedProvince === $province) ? 'selected' : '' ?>><?= esc($province) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="municipality" class="block text-sm font-medium text-gray-700">Municipality *</label>
-                            <select id="municipality" name="municipality" required class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
-                                <option value="">Select municipality</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-section">
-                    <h5>Password Settings</h5>
-                    <p class="text-muted">Need to change your password?</p>
-                    <a href="#" class="forgot-password-link" onclick="forgotPassword(event)">
-                        🔒 Reset Password via Email
-                    </a>
-                </div>
-
-                <div class="mt-4 flex flex-wrap gap-2">
-                    <button type="submit" class="bg-blue-800 hover:bg-blue-900 text-white py-2 px-4 rounded-md inline-flex items-center gap-2">
-                        ✔️ <span>Save Changes</span>
-                    </button>
-                    <button type="button" class="bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded-md" onclick="window.location.href='<?= base_url('/dashboard') ?>'">
-                        Cancel
-                    </button>
-                </div>
-            </form>
+            <input type="file" id="profilePicture" class="hidden" accept="image/*" onchange="previewImage(event)">
+        </div>
+        <div class="flex-1">
+            <h2 class="text-2xl font-semibold"><?php echo esc($profile['first_name'] ?? session()->get('first_name') ?? ''); ?> <?php echo esc($profile['last_name'] ?? session()->get('last_name') ?? ''); ?></h2>
+            <p class="text-gray-600"><?php echo esc($profile['display_email'] ?? session()->get('email') ?? ''); ?></p>
         </div>
     </div>
+
+    <!-- contact info card -->
+    <div class="mb-4">
+        <h5 class="text-lg font-semibold mb-3">Contact Information</h5>
+        <p class="text-sm text-gray-700 mb-2">Email: <?= esc($profile['display_email'] ?? session()->get('email') ?? 'Not provided') ?></p>
+        <p class="text-sm text-gray-700 mb-4">Contact No: <?= esc($profile['contact_number'] ?? session()->get('contact_number') ?? 'Not provided') ?></p>
+        <a href="#" class="text-blue-600 text-sm">+ Add Email Address</a>
+    </div>
+
+    <!-- form cards -->
+    <form id="profileForm" action="<?= base_url('/user-profile/update') ?>" method="post">
+        <?= csrf_field() ?>
+
+        <div class="profile-card mb-4">
+            <div class="p-6">
+            <h5 class="text-lg font-semibold mb-3">Personal Information</h5>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="firstName" class="block text-sm font-medium text-gray-700">First Name *</label>
+                    <input type="text" id="firstName" name="first_name" value="<?= esc($profile['first_name'] ?? session()->get('first_name') ?? '') ?>" required onblur="this.value = this.value.replace(/\s+/g,' ').trim().split(' ').map(function(w){return w?(w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()):'';}).join(' ')" class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                </div>
+                <div class="form-group">
+                    <label for="lastName" class="block text-sm font-medium text-gray-700">Last Name *</label>
+                    <input type="text" id="lastName" name="last_name" value="<?= esc($profile['last_name'] ?? session()->get('last_name') ?? '') ?>" required onblur="this.value = this.value.replace(/\s+/g,' ').trim().split(' ').map(function(w){return w?(w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()):'';}).join(' ')" class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                </div>
+            </div>
+            </div>
+        </div> <!-- end personal info card -->
+
+        <div class="profile-card mb-6">
+            <div class="p-6">
+            <h5 class="text-lg font-semibold mb-3">Location Information</h5>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="province" class="block text-sm font-medium text-gray-700">Province *</label>
+                    <select id="province" name="province" required class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                        <option value="">Select province</option>
+                        <?php if (!$provinceSelectedInList && $selectedProvince !== ''): ?>
+                            <option value="<?= esc($selectedProvince) ?>" selected>
+                                <?= esc($selectedProvince) ?>
+                            </option>
+                        <?php endif; ?>
+                        <?php foreach ($provinceList as $province): ?>
+                            <option value="<?= esc($province) ?>" <?= ($selectedProvince === $province) ? 'selected' : '' ?>><?= esc($province) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="municipality" class="block text-sm font-medium text-gray-700">Municipality *</label>
+                    <select id="municipality" name="municipality" required class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                        <option value="">Select municipality</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-card mb-6">
+            <div class="p-6">
+            <h5 class="text-lg font-semibold mb-3">Password Settings</h5>
+            <p class="text-muted">Need to change your password?</p>
+            <a href="#" class="forgot-password-link" onclick="forgotPassword(event)">
+                🔒 Reset Password via Email
+            </a>
+        </div>
+
+        <div class="mt-4 flex flex-wrap gap-2">
+            <button type="submit" class="bg-blue-800 hover:bg-blue-900 text-white py-2 px-4 rounded-md inline-flex items-center gap-2">
+                ✔️ <span>Save Changes</span>
+            </button>
+            <button type="button" class="bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded-md" onclick="window.location.href='<?= base_url('/dashboard') ?>'">
+                Cancel
+            </button>
+        </div>
+
+    </form>
+    </div> <!-- end overall container -->
 </div>
 
 <div class="success-modal" id="profileSuccessModal" aria-hidden="true">

@@ -196,7 +196,7 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-<div class="page-header flex flex-wrap justify-between items-center mb-4 mx-auto" style="max-width:1200px; margin-left:auto; margin-right:auto; padding-left:24px; padding-right:24px;">
+<div class="page-header flex flex-wrap justify-between items-center mb-4 mx-auto px-4 sm:px-6 lg:px-8" style="max-width:1200px; margin-left:auto; margin-right:auto;">
     <div>
         <h3 class="page-title mb-1"><?= svg_icon('shield', 'w-5 h-5 mr-3 text-blue-900') ?><span class="text-xl font-semibold">User Management</span></h3>
         <div class="text-gray-500">Manage users, roles, and administrative access.</div>
@@ -204,7 +204,7 @@
 </div>
 
 
-<div id="user-management-section" class="bg-white rounded-2xl shadow admin-card mx-auto" style="max-width:1200px; margin-left:auto; margin-right:auto; padding-left:24px; padding-right:24px;">
+<div id="user-management-section" class="bg-white rounded-2xl shadow admin-card mx-auto px-4 sm:px-6 lg:px-8" style="max-width:1200px; margin-left:auto; margin-right:auto; border-left: none;">
     <div class="p-6">
         <h4 class="text-lg font-semibold mb-4">User Management</h4>
 

@@ -106,7 +106,7 @@ $hideFooter = true;
                 <button type="submit" class="w-full bg-blue-800 hover:bg-blue-900 text-white font-semibold py-3 rounded-lg shadow uppercase text-sm">Create Account</button>
             </div>
 
-            <div class="md:col-span-2 text-center text-sm text-white-500">
+            <div class="md:col-span-2 text-center text-sm text-gray-500">
                 Already have an account? <a href="<?= base_url('/login') ?>" class="text-blue-700 font-medium hover:underline">Sign in</a>
             </div>
         </form>

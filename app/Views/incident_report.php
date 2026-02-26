@@ -181,6 +181,11 @@ table th,
         max-height: 90vh;
         overflow-y: auto;
     }
+
+    /* always leave some space at bottom of page content */
+    .content-wrapper {
+        padding-bottom: 0.5rem !important;
+    }
 </style>
     <!-- CSRF token for AJAX -->
     <meta name="csrf-token" content="<?= csrf_hash() ?>">
@@ -197,12 +202,12 @@ table th,
     $canReview = $isProvince || $isAdmin;
     $provinceList = $provinces ?? [];
 ?>
-<div class="px-0">
+<div class="px-4 sm:px-6 lg:px-8 mt-6 pb-8">
     <div class="w-full mb-8">
-        <!-- Upload Container -->
-        <div class="bg-white rounded-2xl shadow p-6 mb-6">
+        <!-- Upload Container (with enforced bottom margin) -->
+        <div class="bg-white rounded-2xl shadow p-6" style="margin-bottom:2rem;">
             <h4 class="text-lg font-semibold">Data Management</h4>
-            <div class="flex flex-wrap items-center gap-3 mt-4 mb-4">
+            <div class="flex justify-between items-center flex-wrap gap-3 mt-4 mb-4">
                 <div class="flex items-center gap-3">
                     <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" class="hidden" />
                     <button id="importButton" class="px-3 py-1.5 border border-blue-600 text-blue-600 rounded-md text-sm hover:bg-blue-600 hover:text-white active:bg-blue-700" onclick="document.getElementById('excelFile').click()" style="<?= $hasInitialRows ? 'display:none;' : '' ?>">
@@ -210,32 +215,32 @@ table th,
                     </button>
                     <span class="text-gray-500 text-sm file-name" id="fileName" style="<?= $hasInitialRows ? 'display:none;' : '' ?>">No file selected</span>
                 </div>
+                <div class="flex flex-wrap gap-2">
+                    <?php if ($isLgu || $isAdmin): ?>
+                        <button class="px-3 py-1.5 border border-blue-600 text-blue-600 rounded-md text-sm hover:bg-blue-600 hover:text-white active:bg-blue-700" onclick="openIncidentModal()">
+                            <?= svg_icon('plus','w-4 h-4') ?> Add Incident
+                        </button>
+                    <?php endif; ?>
+                    <button id="saveButton" class="px-3 py-1.5 border border-green-600 text-green-600 rounded-md text-sm hover:bg-green-600 hover:text-white active:bg-green-700" onclick="openSaveModal()" style="<?= $hasInitialRows ? 'display:none;' : '' ?>">
+                        <?= svg_icon('check','w-4 h-4') ?> Save to Database
+                    </button>
+                    <button id="generateReportButton" class="px-3 py-1.5 border border-sky-500 text-sky-500 rounded-md text-sm hover:bg-sky-500 hover:text-white active:bg-sky-600" onclick="downloadIncidentReport()">
+                        <?= svg_icon('chart','w-4 h-4') ?> Generate Report
+                    </button>
+                </div>
             </div>
             <?php if ($isLgu): ?>
                 <div class="mb-4">
                     <div class="bg-blue-50 border border-blue-200 text-blue-800 rounded-md p-3 text-sm">Upload at least one photo or document per incident. Attachments are reviewed by Province users.</div>
                 </div>
             <?php endif; ?>
-            <div class="flex flex-wrap gap-2 mb-4">
-                <?php if ($isLgu || $isAdmin): ?>
-                    <button class="px-3 py-1.5 border border-blue-600 text-blue-600 rounded-md text-sm hover:bg-blue-600 hover:text-white active:bg-blue-700" onclick="openIncidentModal()">
-                        <?= svg_icon('plus','w-4 h-4') ?> Add Incident
-                    </button>
-                <?php endif; ?>
-                <button id="saveButton" class="px-3 py-1.5 border border-green-600 text-green-600 rounded-md text-sm hover:bg-green-600 hover:text-white active:bg-green-700" onclick="openSaveModal()" style="<?= $hasInitialRows ? 'display:none;' : '' ?>">
-                    <?= svg_icon('check','w-4 h-4') ?> Save to Database
-                </button>
-                <button id="generateReportButton" class="px-3 py-1.5 border border-sky-500 text-sky-500 rounded-md text-sm hover:bg-sky-500 hover:text-white active:bg-sky-600" onclick="downloadIncidentReport()">
-                    <?= svg_icon('chart','w-4 h-4') ?> Generate Report
-                </button>
-            </div>
         </div>
         <!-- Table Container -->
-        <div class="bg-white rounded-2xl shadow p-6">
+        <div class="bg-white rounded-2xl shadow p-6" style="margin-top:2rem; margin-bottom:2rem;">
             <!-- negative horizontal margins cancel the card padding so the table can reach the rounded corners -->
-        <div class="overflow-x-auto -mx-6 px-6">
+        <div class="overflow-x-auto -mx-6 px-6 pb-6">
                 <!-- ensure table spans its container so the right edge aligns with the scroll wrapper -->
-                <table class="min-w-full w-full table-auto divide-y divide-gray-200 rounded-2xl overflow-hidden">
+                <table class="min-w-full w-full table-auto divide-y divide-gray-200 rounded-2xl overflow-hidden mb-6">
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-6 py-3 text-center align-middle text-xs font-medium sortable" data-col="N" onclick="setSort('N')" style="background:#002c76;color:#fff;min-width:60px;white-space:normal;word-break:break-word;">N<span class="sort-arrow"></span></th>
@@ -303,6 +308,8 @@ table th,
             </div>
         </div>
     </div>
+    <!-- bottom spacer to ensure visible gap when scrolling -->
+    <div class="h-4"></div>
 
 <div id="saveConfirmModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/40 w-screen h-screen" aria-hidden="true">
   <div class="bg-white rounded-2xl shadow-lg max-w-md w-full p-6 mx-4">

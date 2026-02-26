@@ -97,11 +97,18 @@
     .table-docs td {
         vertical-align: middle;
     }
+    /* center location (4th column) and date columns (5th) */
+    .table-docs td:nth-child(4),
+    .table-docs td:nth-child(5) {
+        text-align: center;
+    }
 
     .doc-actions {
         display: flex;
         gap: 8px;
         flex-wrap: wrap;
+        justify-content: center; /* center buttons */
+        width: 100%;
     }
 
     .preview-modal {
@@ -241,7 +248,7 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-<div class="content-wrapper">
+<div class="content-wrapper px-4 sm:px-6 lg:px-8">
     <?php
     $roleName = $roleName ?? (session()->get('role_name') ?? 'No Role');
     $isAdmin = $isAdmin ?? (bool) session()->get('is_admin');
@@ -335,7 +342,15 @@
                                 <option value="pops">POPS</option>
                                 <option value="budget">Budget</option>
                             </select>
-                            
+                            <select class="filter-input-my filter-province rounded-md border border-gray-200 px-2 py-1 text-sm">
+                                <option value="">All Provinces</option>
+                                <?php foreach (($provinces ?? []) as $province): ?>
+                                    <option value="<?= esc($province) ?>"><?= esc($province) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <select class="filter-input-my filter-municipality rounded-md border border-gray-200 px-2 py-1 text-sm">
+                                <option value="">All Municipalities</option>
+                            </select>
                             <input type="date" class="filter-input-my filter-date rounded-md border border-gray-200 px-2 py-1 text-sm" />
                         </div>
                         <thead>
@@ -665,11 +680,15 @@
                     const filterDate = new Date(dateVal);
                     if (rowDate.toDateString() !== filterDate.toDateString()) matches = false;
                 }
-                // Province/Municipality (for tables with location column)
+                // Province/Municipality (for tables with location column or data attributes)
                 if (provinceIdx !== null && tds[locationIdx]) {
                     const loc = tds[locationIdx].textContent;
                     if (provinceVal && !loc.includes(provinceVal)) matches = false;
                     if (municipalityVal && !loc.includes(municipalityVal)) matches = false;
+                } else {
+                    // fallback to data attributes on row (used by My Submissions)
+                    if (provinceVal && row.dataset.province && row.dataset.province !== provinceVal) matches = false;
+                    if (municipalityVal && row.dataset.municipality && row.dataset.municipality !== municipalityVal) matches = false;
                 }
                 row.style.display = matches ? '' : 'none';
             });
@@ -677,7 +696,7 @@
     }
 
     // My Submissions: [docType, file, status, uploaded, action]
-    setupColumnFilters('.table-docs:nth-of-type(1)', 0, 2, 3, null, null, null);
+    setupColumnFilters('.table-docs:nth-of-type(1)', 0, 2, 3, null, null, null); // location filters use data attributes for my submissions
     // Pending Documents: [docType, file, submitted by, location, uploaded, actions]
     setupColumnFilters('.table-docs:nth-of-type(2)', 0, 4, 4, 3, 4, 3);
     // Approved Documents: [docType, file, submitted by, location, approved, action]
