@@ -4,6 +4,7 @@
 The system now includes a complete admin user role management system with the following roles:
 - **ADMIN**: System administrator with full access to manage users and roles
 - **FOCAL**: Focal point user role
+  - Can only view approved incident reports and documents (pending/rejected items hidden)
 - **LGU**: Local Government Unit user role
 - **PROVINCE**: Province user role
 

@@ -62,4 +62,105 @@ final class IncidentReportControllerTest extends CIUnitTestCase
             }
         }
     }
+
+    public function testDefaultSortIsN(): void
+    {
+        // render the view with no initial rows and ensure the JS sets the initial
+        // sort column to "N" so the table appears ordered by incident number.
+        $output = view('incident_report', ['initialRows' => []]);
+        $this->assertStringContainsString("setSort('N')", $output);
+    }
+
+    public function testFocalViewHidesReviewAndActions(): void
+    {
+        // ensure the role_name in session is set so the view understands we're a focal user
+        $session = session();
+        $session->set('role_name', 'FOCAL');
+        $output = view('incident_report', ['initialRows' => []]);
+
+        // the table headers for review/actions should not be present
+        $this->assertStringNotContainsString('>Review<', $output);
+        $this->assertStringNotContainsString('>Actions<', $output);
+
+        // attachments header should still be there
+        $this->assertStringContainsString('>Attachments<', $output);
+
+        // JS side should know the user is focal so it can adjust rendering rules
+        $this->assertStringContainsString('const isFocal = true', $output);
+    }
+
+    public function testFilterRowsForRoleFocal(): void
+    {
+        $ctrl = new IncidentReport();
+        $ref = new ReflectionMethod($ctrl, 'filterRowsForRole');
+        $ref->setAccessible(true);
+
+        $rows = [
+            ['n' => 1, 'review_status' => 'approved'],
+            ['n' => 2, 'review_status' => 'pending'],
+            ['n' => 3, 'review_status' => 'rejected'],
+            ['n' => 4, 'review_status' => null],
+        ];
+
+        $filtered = $ref->invoke($ctrl, $rows, 'FOCAL');
+        $this->assertCount(1, $filtered);
+        $this->assertSame(1, $filtered[0]['n']);
+    }
+
+    public function testFilterRowsForRoleNonFocal(): void
+    {
+        $ctrl = new IncidentReport();
+        $ref = new ReflectionMethod($ctrl, 'filterRowsForRole');
+        $ref->setAccessible(true);
+
+        $rows = [
+            ['n' => 1, 'review_status' => 'approved'],
+            ['n' => 2, 'review_status' => 'pending'],
+        ];
+
+        // other roles should receive the unmodified dataset
+        $filtered = $ref->invoke($ctrl, $rows, 'LGU');
+        $this->assertSame($rows, $filtered);
+    }
+
+    public function testGenerateReportUsesRoleFilter(): void
+    {
+        // create controller and inject a fake model that returns mixed rows
+        $ctrl = new IncidentReport();
+        $fakeModel = new class extends \App\Models\IncidentReportModel {
+            public function findAll(?int $limit = null, int $offset = 0)
+            {
+                return [
+                    ['n' => 1, 'review_status' => 'approved', 'month_of_incident' => '1', 'year_of_incident' => 2020, 'province' => 'A', 'municipality' => 'B', 'location_category' => '', 'age' => '', 'gender' => '', 'occasion' => '', 'factors' => '', 'residence' => '', 'occupation' => '', 'remarks' => ''],
+                    ['n' => 2, 'review_status' => 'pending',  'month_of_incident' => '1', 'year_of_incident' => 2020, 'province' => 'A', 'municipality' => 'B', 'location_category' => '', 'age' => '', 'gender' => '', 'occasion' => '', 'factors' => '', 'residence' => '', 'occupation' => '', 'remarks' => ''],
+                ];
+            }
+        };
+        $refProp = new ReflectionProperty($ctrl, 'incidentReportModel');
+        $refProp->setAccessible(true);
+        $refProp->setValue($ctrl, $fakeModel);
+
+        // simulate focal user in session
+        $session = session();
+        $session->set('role_name', 'FOCAL');
+        $session->set('logged_in', true);
+
+        // ensure controller has a response object (CI normally injects this)
+        $resp = \Config\Services::response();
+        $refResp = new ReflectionProperty($ctrl, 'response');
+        $refResp->setAccessible(true);
+        $refResp->setValue($ctrl, $resp);
+
+        // ensure request is available too (used for query parameters)
+        $req = \Config\Services::request();
+        $refReq = new ReflectionProperty($ctrl, 'request');
+        $refReq->setAccessible(true);
+        $refReq->setValue($ctrl, $req);
+
+        $response = $ctrl->generateReport();
+        $json = json_decode((string) $response->getBody(), true);
+        // only one approved row should be returned
+        $this->assertCount(1, $json['data']);
+        $this->assertSame(1, $json['data'][0]['n']);
+    }
 }

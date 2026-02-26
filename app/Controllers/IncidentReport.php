@@ -15,6 +15,27 @@ class IncidentReport extends BaseController
     }
 
     /**
+     * Return only the rows that should be visible to a user with the given
+     * role.  Currently the only restriction is that FOCAL users may not see
+     * pending or rejected incidents; they are limited to those marked
+     * "approved".
+     *
+     * @param array $rows Rows retrieved from the database
+     * @param string $roleName Normalized role name (uppercased)
+     * @return array Filtered rows
+     */
+    public function filterRowsForRole(array $rows, string $roleName): array
+    {
+        if (strtoupper(trim($roleName)) === 'FOCAL') {
+            return array_values(array_filter($rows, function ($r) {
+                return isset($r['review_status']) && $r['review_status'] === 'approved';
+            }));
+        }
+
+        return $rows;
+    }
+
+    /**
      * Update a single incident by N (number)
      * Expects JSON body with fields to update
      */
@@ -280,25 +301,28 @@ class IncidentReport extends BaseController
                 ]);
             }
 
-            // Fetch all incidents
-            $incidents = $this->incidentReportModel->findAll();
+        // Fetch all incidents, but apply role-based filtering (e.g. focal users
+        // only see approved records).
+        $incidents = $this->incidentReportModel->findAll();
+        $roleName = strtoupper(trim((string) session()->get('role_name')));
+        $incidents = $this->filterRowsForRole($incidents, $roleName);
 
-            // Columns to include (excluding victim name)
-            $columns = [
-                'n',
-                'month_of_incident',
-                'year_of_incident',
-                'province',
-                'municipality',
-                'location_category',
-                'age',
-                'gender',
-                'occasion',
-                'factors',
-                'residence',
-                'occupation',
-                'remarks',
-            ];
+        // Columns to include (excluding victim name)
+        $columns = [
+            'n',
+            'month_of_incident',
+            'year_of_incident',
+            'province',
+            'municipality',
+            'location_category',
+            'age',
+            'gender',
+            'occasion',
+            'factors',
+            'residence',
+            'occupation',
+            'remarks',
+        ];
 
             // Prepare data
             $data = [];
@@ -735,6 +759,14 @@ class IncidentReport extends BaseController
             ]);
         }
 
+        // Focal users may not inspect attachments for unapproved incidents
+        $roleName = strtoupper(trim((string) session()->get('role_name')));
+        if ($roleName === 'FOCAL' && ($incident['review_status'] ?? '') !== 'approved') {
+            return $this->response->setStatusCode(403)->setJSON([
+                'message' => 'Forbidden.',
+            ]);
+        }
+
         $attachmentModel = new \App\Models\IncidentReportAttachmentModel();
         $attachments = $attachmentModel
             ->where('incident_n', $incidentN)
@@ -771,6 +803,15 @@ class IncidentReport extends BaseController
         if (!$attachment) {
             return $this->response->setStatusCode(404)->setJSON([
                 'message' => 'Attachment not found.',
+            ]);
+        }
+
+        // Focal users may only view attachments for approved incidents
+        $incident = $this->incidentReportModel->where('n', $attachment['incident_n'] ?? 0)->first();
+        $roleName = strtoupper(trim((string) session()->get('role_name')));
+        if ($roleName === 'FOCAL' && (!$incident || ($incident['review_status'] ?? '') !== 'approved')) {
+            return $this->response->setStatusCode(403)->setJSON([
+                'message' => 'Forbidden.',
             ]);
         }
 
@@ -842,6 +883,13 @@ class IncidentReport extends BaseController
             return $this->response->setStatusCode(404)->setJSON(['message' => 'Attachment not found.']);
         }
 
+        // Focal users should only be able to preview attachments of approved incidents
+        $incident = $this->incidentReportModel->where('n', $attachment['incident_n'] ?? 0)->first();
+        $roleName = strtoupper(trim((string) session()->get('role_name')));
+        if ($roleName === 'FOCAL' && (!$incident || ($incident['review_status'] ?? '') !== 'approved')) {
+            return $this->response->setStatusCode(403)->setJSON(['message' => 'Forbidden.']);
+        }
+
         // Prefer preview_path when available (converted PDF for office docs)
         $previewPath = $attachment['preview_path'] ?? null;
         if ($previewPath) {
@@ -892,6 +940,15 @@ class IncidentReport extends BaseController
         if (!$attachment) {
             return $this->response->setStatusCode(404)->setJSON([
                 'message' => 'Attachment not found.',
+            ]);
+        }
+
+        // disallow focal users from downloading attachments tied to unapproved incidents
+        $incident = $this->incidentReportModel->where('n', $attachment['incident_n'] ?? 0)->first();
+        $roleName = strtoupper(trim((string) session()->get('role_name')));
+        if ($roleName === 'FOCAL' && (!$incident || ($incident['review_status'] ?? '') !== 'approved')) {
+            return $this->response->setStatusCode(403)->setJSON([
+                'message' => 'Forbidden.',
             ]);
         }
 

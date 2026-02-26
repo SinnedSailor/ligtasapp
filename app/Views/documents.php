@@ -248,8 +248,10 @@
     $isLgu = $roleName === 'LGU';
     $isProvince = $roleName === 'PROVINCE';
     $isFocal = $roleName === 'FOCAL';
-    $canReview = $isProvince || $isAdmin;
-    $canViewApproved = $isFocal || $isAdmin;
+    $canReview = $isProvince || $isAdmin;              // can approve/reject
+    $canViewApproved = $isFocal || $isAdmin;           // can view approved docs
+    $canUpload = $isLgu;                               // only LGU users may upload
+
     $docLabels = [
         'ordinance' => 'Ordinance',
         'pops' => 'POPS Plan',
@@ -278,7 +280,7 @@
     <?php endif; ?>
 
 
-    <?php if ($isLgu || $canReview || $canViewApproved): ?>
+    <?php if ($canUpload): ?>
         <div class="doc-upload-card mt-6">
             <div class="section-title">Upload Documents</div>
             <form action="<?= base_url('/documents/upload') ?>" method="post" enctype="multipart/form-data" id="documentUploadForm">
@@ -312,7 +314,7 @@
 
     <?php elseif ($canReview || $canViewApproved): ?>
         <div class="mb-4 rounded-md bg-blue-50 border border-blue-100 text-blue-700 px-4 py-3">
-            Documents are managed by role-based review. Only approved documents are visible to FOCAL users.
+            Documents are managed by role-based review. LGU users may upload; province and admins review submissions. FOCAL users only see approved documents.
         </div>
     <?php else: ?>
         <div class="mb-4 rounded-md bg-yellow-50 border border-yellow-100 text-yellow-800 px-4 py-3">
@@ -400,7 +402,6 @@
                                 <option value="">All Municipalities</option>
                             </select>
                             <input type="date" class="filter-input-pending filter-date rounded-md border border-gray-200 px-2 py-1 text-sm" />
-                            // ...existing code...
                         </div>
                         <thead>
                             <tr>
@@ -462,7 +463,6 @@
                                 <option value="">All Municipalities</option>
                             </select>
                             <input type="date" class="filter-input-approved filter-date rounded-md border border-gray-200 px-2 py-1 text-sm" />
-                            // ...existing code...
                         </div>
                         <thead>
                             <tr>

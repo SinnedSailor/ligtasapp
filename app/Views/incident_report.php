@@ -190,6 +190,7 @@ table th,
     $roleName = $roleName ?? (session()->get('role_name') ?? '');
     $isLgu = strtoupper(trim((string) $roleName)) === 'LGU';
     $isProvince = strtoupper(trim((string) $roleName)) === 'PROVINCE';
+    $isFocal = strtoupper(trim((string) $roleName)) === 'FOCAL';
     $isAdmin = $isAdmin ?? (bool) session()->get('is_admin');
     $canReview = $isProvince || $isAdmin;
     $provinceList = $provinces ?? [];
@@ -197,6 +198,11 @@ table th,
 <div class="px-4">
     <div class="max-w-6xl mx-auto mb-8">
         <!-- Upload Container -->
+        <?php if ($isFocal): ?>
+            <div class="mb-4 text-sm text-gray-700">
+                <strong>Note:</strong> FOCAL users only see approved incidents; pending/rejected cases are hidden.
+            </div>
+        <?php endif; ?>
         <div class="bg-white rounded-2xl shadow p-6 mb-6">
             <h4 class="text-lg font-semibold">Data Management</h4>
             <div class="flex flex-wrap items-center gap-3 mt-4 mb-4">
@@ -247,8 +253,10 @@ table th,
                             <th class="px-6 py-3 text-center text-xs font-medium sortable" data-col="Occupation of the Victim" onclick="setSort('Occupation of the Victim')" style="background:#002c76;color:#fff;min-width:140px;white-space:normal;word-break:break-word;">Occupation of the Victim<span class="sort-arrow"></span></th>
                             <th class="px-6 py-3 text-center text-xs font-medium sortable" data-col="Remarks" onclick="setSort('Remarks')" style="background:#002c76;color:#fff;min-width:100px;white-space:normal;word-break:break-word;">Remarks<span class="sort-arrow"></span></th>
                             <th class="px-6 py-3 text-center text-xs font-medium" style="background:#002c76;color:#fff;min-width:100px;white-space:normal;word-break:break-word;">Attachments</th>
-                            <th class="px-6 py-3 text-center text-xs font-medium" style="background:#002c76;color:#fff;min-width:100px;white-space:normal;word-break:break-word;">Review</th>
-                            <th class="px-6 py-3 text-center text-xs font-medium rounded-tr-2xl" style="background:#002c76;color:#fff;min-width:100px;white-space:normal;word-break:break-word;">Actions</th>
+                            <?php if (! $isFocal): ?>
+                                <th class="px-6 py-3 text-center text-xs font-medium" style="background:#002c76;color:#fff;min-width:100px;white-space:normal;word-break:break-word;">Review</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium rounded-tr-2xl" style="background:#002c76;color:#fff;min-width:100px;white-space:normal;word-break:break-word;">Actions</th>
+                            <?php endif; ?>
                         </tr>
                         <tr>
                             <th class="px-3 py-2 text-center text-xs text-gray-400">&nbsp;</th>
@@ -265,14 +273,16 @@ table th,
                             <th class="px-3 py-2 text-center text-xs text-gray-400">(From what part does the case belong to? e.g.: Bakun, Benguet)<br>Region</th>
                             <th class="px-3 py-2 text-center text-xs text-gray-400">(e.g.: Student, Fisherfolk, Farmer, etc.)</th>
                             <th class="px-3 py-2 text-center text-xs text-gray-400">&nbsp;</th>
-                            <th class="px-3 py-2 text-center text-xs text-gray-400">&nbsp;</th>
-                            <th class="px-3 py-2 text-center text-xs text-gray-400">&nbsp;</th>
-                            <th class="px-3 py-2 text-center text-xs text-gray-400">&nbsp;</th>
+                            <?php if (! $isFocal): ?>
+                                <th class="px-3 py-2 text-center text-xs text-gray-400">&nbsp;</th>
+                                <th class="px-3 py-2 text-center text-xs text-gray-400">&nbsp;</th>
+                                <th class="px-3 py-2 text-center text-xs text-gray-400">&nbsp;</th>
+                            <?php endif; ?>
                         </tr>
                     </thead>
                     <tbody id="tableBody" class="bg-white divide-y divide-gray-100">
                         <tr>
-                            <td colspan="16" class="px-4 py-6 text-center text-sm text-gray-400 empty-message rounded-b-2xl">No data yet. Upload an Excel file or click "Add Incident" to add data.</td>
+                            <td colspan="<?= $isFocal ? 13 : 15 ?>" class="px-4 py-6 text-center text-sm text-gray-400 empty-message rounded-b-2xl">No data yet. Upload an Excel file or click "Add Incident" to add data.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -541,6 +551,12 @@ table th,
         return blob;
     }
 
+    // save the vertical scroll offset when the user leaves or reloads the page
+    window.addEventListener('beforeunload', () => {
+        sessionStorage.setItem('incidentScrollY', window.scrollY);
+        sessionStorage.setItem('incidentCurrentPage', currentPage);
+    });
+
     async function fetchAttachmentPreviewJson(attachmentId) {
         const res = await fetch(`${attachmentPreviewDataUrl}/${attachmentId}`, { credentials: 'same-origin' });
         // 202 means conversion queued - surface that to the caller so it can poll/notify
@@ -589,6 +605,7 @@ table th,
     const rejectUrl = "<?= base_url('/incident-report/reject') ?>";
     const canUploadAttachments = <?= $isLgu ? 'true' : 'false' ?>;
     const canReviewIncidents = <?= $canReview ? 'true' : 'false' ?>;
+    const isFocal = <?= $isFocal ? 'true' : 'false' ?>;
     const municipalities = <?= json_encode($municipalities ?? []) ?>;
     const columns = [
         'N',
@@ -656,8 +673,23 @@ table th,
     const importButton = document.getElementById('importButton');
 
     // apply default sort once the DOM is ready
+    // show incidents in natural numeric order by default; users can click other
+    // column headers to re-sort.  Formerly the table defaulted to sorting by
+    // year which caused the N column to look "out of order" when viewing
+    // mixed years.
     document.addEventListener('DOMContentLoaded', () => {
-        setSort('Year of Incident');
+        // restore pagination page and scroll from prior visit if available
+        const lastPage = sessionStorage.getItem('incidentCurrentPage');
+        if (lastPage !== null) {
+            currentPage = parseInt(lastPage, 10) || 1;
+        }
+
+        setSort('N');
+
+        const lastPos = sessionStorage.getItem('incidentScrollY');
+        if (lastPos !== null) {
+            window.scrollTo(0, parseInt(lastPos, 10) || 0);
+        }
     });
     const saveButton = document.getElementById('saveButton');
     const fileNameLabel = document.getElementById('fileName');
@@ -1231,6 +1263,7 @@ table th,
             pageSizeSelect.addEventListener('change', function() {
                 pageSize = parseInt(pageSizeSelect.value, 10) || pageSize;
                 currentPage = 1;
+                sessionStorage.setItem('incidentCurrentPage', currentPage);
                 renderTable();
             });
         }
@@ -1239,6 +1272,7 @@ table th,
             prevPageButton.addEventListener('click', function() {
                 if (currentPage > 1) {
                     currentPage--;
+                    sessionStorage.setItem('incidentCurrentPage', currentPage);
                     renderTable();
                 }
             });
@@ -1249,6 +1283,7 @@ table th,
                 const totalPages = getTotalPages();
                 if (currentPage < totalPages) {
                     currentPage++;
+                    sessionStorage.setItem('incidentCurrentPage', currentPage);
                     renderTable();
                 }
             });
@@ -1365,10 +1400,14 @@ table th,
 
     function renderTable() {
         const tbody = document.getElementById('tableBody');
+        // remember scroll position so the user doesn't get carried to the top
+        const savedScroll = window.scrollY;
 
         if (tableData.length === 0) {
             tbody.innerHTML = '<tr><td colspan="17" class="empty-message">No data yet. Upload an Excel file or click "Add Incident" to add data.</td></tr>';
             updatePaginationControls();
+            // restore scroll in case the message changed layout
+            window.scrollTo(0, savedScroll);
             return;
         }
 
@@ -1387,11 +1426,20 @@ table th,
                 if (!isNaN(na) && !isNaN(nb)) {
                     if (na < nb) return sortDirection === 'asc' ? -1 : 1;
                     if (na > nb) return sortDirection === 'asc' ? 1 : -1;
-                    return 0;
+                    // fall through to tie-breaker below
+                } else {
+                    if (va < vb) return sortDirection === 'asc' ? -1 : 1;
+                    if (va > vb) return sortDirection === 'asc' ? 1 : -1;
+                    // fall through to tie-breaker below
                 }
 
-                if (va < vb) return sortDirection === 'asc' ? -1 : 1;
-                if (va > vb) return sortDirection === 'asc' ? 1 : -1;
+                // when values are equal (or not comparable) use the N column as a
+                // stable secondary key so that rows maintain their incident number
+                // order even when sorted by another field like year.
+                const naN = parseFloat(a['N'] || 0);
+                const nbN = parseFloat(b['N'] || 0);
+                if (naN < nbN) return -1;
+                if (naN > nbN) return 1;
                 return 0;
             });
         }
@@ -1441,22 +1489,30 @@ table th,
                 `;
             }
 
-            html += `<td>
-                <div><span class="status-pill ${statusClass}">${reviewStatus || 'pending'}</span></div>
-                <div class="text-gray-500 text-sm">${attachmentsCount} file(s)</div>
-                ${viewButton}
-            </td>
-            <td>
-                ${reviewControls || '<span class="text-gray-500">-</span>'}
-            </td>
-            <td>
-                <button aria-label="Edit" class="inline-flex items-center justify-center px-2 py-1 border border-blue-800 text-blue-800 rounded text-sm hover:bg-blue-800 hover:text-white active:bg-blue-900" onclick="openIncidentModal(${index})">${iconPencil}</button>
-                <button aria-label="Delete" class="inline-flex items-center justify-center px-2 py-1 border border-red-600 text-red-600 rounded text-sm hover:bg-red-600 hover:text-white active:bg-red-700" onclick="deleteRow(${index})">${iconTrash}</button>
-            </td></tr>`;
+            // attachments cell always shown; exclude status pill for focal users
+            let attachmentsCell = '';
+            if (isFocal) {
+                attachmentsCell = `<div class="text-gray-500 text-sm">${attachmentsCount} file(s)</div>${viewButton}`;
+            } else {
+                attachmentsCell = `<div><span class="status-pill ${statusClass}">${reviewStatus || 'pending'}</span></div>
+                    <div class="text-gray-500 text-sm">${attachmentsCount} file(s)</div>
+                    ${viewButton}`;
+            }
+
+            html += `<td>${attachmentsCell}</td>`;
+            if (!isFocal) {
+                html += `<td>${reviewControls || '<span class="text-gray-500">-</span>'}</td>`;
+                html += `<td>
+                    <button aria-label="Edit" class="inline-flex items-center justify-center px-2 py-1 border border-blue-800 text-blue-800 rounded text-sm hover:bg-blue-800 hover:text-white active:bg-blue-900" onclick="openIncidentModal(${index})">${iconPencil}</button>
+                    <button aria-label="Delete" class="inline-flex items-center justify-center px-2 py-1 border border-red-600 text-red-600 rounded text-sm hover:bg-red-600 hover:text-white active:bg-red-700" onclick="deleteRow(${index})">${iconTrash}</button>
+                </td>`;
+            }
         });
 
         tbody.innerHTML = html;
         updatePaginationControls();
+        // restore the scroll position after re-render
+        window.scrollTo(0, savedScroll);
     }
 
     function getColumnClass(col) {
@@ -2249,6 +2305,9 @@ table th,
     }
 
     async function openAttachmentViewer(incidentN) {
+        // keep scroll stored whenever we navigate around or show modals so
+        // the user returns to the same spot if the page is reloaded.
+        sessionStorage.setItem('incidentScrollY', window.scrollY);
         if (!incidentN) {
             showAttachmentModal('Incident number is missing.');
             return;
@@ -2539,8 +2598,11 @@ table th,
                 return;
             }
 
+            // update the in-memory data so the new status is reflected immediately
             tableData = tableData.map((row) => {
-                if (row['N'] === incidentN) {
+                // incidentN may be a number while row['N'] may be a string (coming from server),
+                // so use loose equality or coerce to number to ensure a match.
+                if (row['N'] == incidentN) {
                     return {
                         ...row,
                         review_status: result.status || (action === 'approve' ? 'approved' : 'rejected'),
@@ -2548,6 +2610,7 @@ table th,
                 }
                 return row;
             });
+
             renderTable();
             showAttachmentModal('Incident updated successfully.');
         } catch (error) {

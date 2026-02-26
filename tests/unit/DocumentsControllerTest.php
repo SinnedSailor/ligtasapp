@@ -190,6 +190,22 @@ final class DocumentsControllerTest extends CIUnitTestCase
         $this->assertEmpty($model->where('user_id', 30)->findAll());
     }
 
+    public function testFocalCannotSeeUploadSection(): void
+    {
+        $this->withSession([
+            'logged_in' => true,
+            'role_name' => 'FOCAL',
+            'user_id'   => 42,
+            'is_admin'  => false,
+        ]);
+
+        $response = $this->get('/documents');
+        $response->assertOK();
+        // the upload form should not be rendered for focal users
+        $response->assertDontSee('name="ordinance_files"');
+        $response->assertDontSee('Submit Documents');
+    }
+
     public function testDuplicateFilesAreSkipped(): void
     {
         $this->withSession([
