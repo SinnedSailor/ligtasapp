@@ -200,11 +200,6 @@ table th,
 <div class="px-0">
     <div class="w-full mb-8">
         <!-- Upload Container -->
-        <?php if ($isFocal): ?>
-            <div class="mb-4 text-sm text-gray-700">
-                <strong>Note:</strong> FOCAL users only see approved incidents; pending/rejected cases are hidden.
-            </div>
-        <?php endif; ?>
         <div class="bg-white rounded-2xl shadow p-6 mb-6">
             <h4 class="text-lg font-semibold">Data Management</h4>
             <div class="flex flex-wrap items-center gap-3 mt-4 mb-4">
