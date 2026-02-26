@@ -241,7 +241,7 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-<div class="content-wrapper" style="margin: 24px;">
+<div class="content-wrapper">
     <?php
     $roleName = $roleName ?? (session()->get('role_name') ?? 'No Role');
     $isAdmin = $isAdmin ?? (bool) session()->get('is_admin');

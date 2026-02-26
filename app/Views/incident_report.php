@@ -187,7 +187,7 @@ table th,
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-<div class="content-wrapper" style="margin: 24px;">
+<div class="content-wrapper">
 <?php
     $roleName = $roleName ?? (session()->get('role_name') ?? '');
     $isLgu = strtoupper(trim((string) $roleName)) === 'LGU';
@@ -197,8 +197,8 @@ table th,
     $canReview = $isProvince || $isAdmin;
     $provinceList = $provinces ?? [];
 ?>
-<div class="px-4">
-    <div class="max-w-6xl mx-auto mb-8">
+<div class="px-0">
+    <div class="w-full mb-8">
         <!-- Upload Container -->
         <?php if ($isFocal): ?>
             <div class="mb-4 text-sm text-gray-700">

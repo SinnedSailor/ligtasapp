@@ -135,7 +135,7 @@
         </nav>
     <?php endif; ?>
 
-    <div class="container-fluid <?= $pageBodyClass ?>">
+    <div class="container-fluid px-0 <?= $pageBodyClass ?>">
         <?php if (!$hideSidebar): ?>
             <nav id="sidebar" class="fixed left-0 top-0 z-30 w-72 lg:w-64 h-screen flex-shrink-0 flex flex-col bg-white border-r border-slate-100 p-4 <?= $hideNavbar ? '' : 'pt-16' ?>">
                 <!-- Brand -->
