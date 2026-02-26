@@ -46,6 +46,21 @@
         #sidebar.sidebar-collapsed .text-xs.uppercase { display: none; } /* hide "Menu" header */
         #sidebar.sidebar-collapsed .flex.items-center>div:not(.w-16) { display: none; } /* hide profile text */
 
+        /* ensure horizontal scrolling wrappers reserve space for the vertical scrollbar */
+        .overflow-x-auto {
+            scrollbar-gutter: stable;
+        }
+
+        /* when the sidebar is collapsed we also need to shrink the shifted topbar/main-panel */
+        body.sidebar-collapsed-main .topbar-shift {
+            left: 5rem !important;
+            width: calc(100% - 5rem) !important;
+        }
+        body.sidebar-collapsed-main #sidebar + .main-panel {
+            margin-left: 5rem !important;
+            width: calc(100% - 5rem) !important;
+        }
+
         /* sidebar link */
         #sidebar a,
         #sidebar a svg,
@@ -112,8 +127,8 @@
     <!-- header -->
 <div class="container-scroller">
     <?php if (!$hideNavbar): ?>
-        <nav class="w-full fixed top-4 left-0 z-40 px-4 topbar-shift">
-            <div class="max-w-7xl mx-auto bg-white/80 backdrop-blur-md rounded-2xl px-4 py-3 shadow-md flex items-center justify-between gap-4">
+        <nav class="w-full fixed top-4 left-0 z-40 px-4 sm:px-6 lg:px-8 topbar-shift">
+            <div class="max-w-7xl mx-auto bg-white/80 backdrop-blur-md rounded-2xl px-4 sm:px-6 lg:px-8 py-3 shadow-md flex items-center justify-between gap-4">
                 <div class="flex items-center gap-4">
                     <a class="text-xl font-semibold text-slate-900 flex items-center gap-3" href="<?= base_url('/dashboard') ?>">
                         <?= svg_icon('home', 'w-6 h-6 text-indigo-600') ?>
@@ -205,7 +220,7 @@
             </nav>
         <?php endif; ?>
 
-        <div class="<?= $mainPanelClass ?> <?= $hideSidebar ? '' : 'ml-72 lg:ml-64' ?> h-screen overflow-y-scroll <?= $hideNavbar ? '' : 'pt-20' ?>">
+        <div class="<?= $mainPanelClass ?> h-screen overflow-y-scroll <?= $hideNavbar ? '' : 'pt-20' ?>">
             <div class="content-wrapper">
                 <?= $this->renderSection('content') ?>
 
