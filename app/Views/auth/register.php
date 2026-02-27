@@ -53,27 +53,27 @@ $hideFooter = true;
 
             <div>
                 <label for="first_name" class="sr-only">First name</label>
-                <input id="first_name" name="first_name" type="text" required placeholder="First name" class="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                <input id="first_name" name="first_name" type="text" required placeholder="First name" pattern="[A-Za-z\s]+" title="Letters and spaces only" class="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-300" />
             </div>
 
             <div>
                 <label for="last_name" class="sr-only">Last name</label>
-                <input id="last_name" name="last_name" type="text" required placeholder="Last name" class="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                <input id="last_name" name="last_name" type="text" required placeholder="Last name" pattern="[A-Za-z\s]+" title="Letters and spaces only" class="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-300" />
             </div>
 
             <div>
                 <label for="username" class="sr-only">Username</label>
-                <input id="username" name="username" type="text" required placeholder="Username" class="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                <input id="username" name="username" type="text" required placeholder="Username" class="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-300" />
             </div>
 
             <div>
                 <label for="email" class="sr-only">Email</label>
-                <input id="email" name="email" type="email" required placeholder="Email" class="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                <input id="email" name="email" type="email" required placeholder="Email" class="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-300" />
             </div>
 
             <div>
                 <label for="province" class="sr-only">Province</label>
-                <select id="province" name="province" required class="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                <select id="province" name="province" required class="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-black placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-blue-300">
                     <option value="">Select province</option>
                     <?php foreach (($provinces ?? []) as $province): ?>
                         <option value="<?= esc($province) ?>" <?= (old('province') === $province) ? 'selected' : '' ?>><?= esc($province) ?></option>
@@ -83,7 +83,7 @@ $hideFooter = true;
 
             <div>
                 <label for="municipality" class="sr-only">Municipality</label>
-                <select id="municipality" name="municipality" required class="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                <select id="municipality" name="municipality" required class="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-black placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-blue-300">
                     <option value="">Select municipality</option>
                 </select>
             </div>
@@ -91,14 +91,14 @@ $hideFooter = true;
             <div class="md:col-span-2">
                 <label for="password" class="sr-only">Password</label>
                 <div class="relative w-full rounded-lg overflow-hidden border border-gray-200 bg-white">
-                    <input id="password" name="password" type="password" required placeholder="Password" class="w-full bg-transparent px-4 py-3 pr-10 text-sm text-white placeholder-white/70 focus:outline-none focus:ring-0" />
+                    <input id="password" name="password" type="password" required placeholder="Password" class="w-full bg-transparent px-4 py-3 pr-10 text-sm text-black placeholder-gray-500 focus:outline-none focus:ring-0" />
                 </div>
             </div>
 
             <div class="md:col-span-2">
                 <label for="password_confirm" class="sr-only">Confirm Password</label>
                 <div class="relative w-full rounded-lg overflow-hidden border border-gray-200 bg-white">
-                    <input id="password_confirm" name="password_confirm" type="password" required placeholder="Confirm Password" class="w-full bg-transparent px-4 py-3 pr-10 text-sm text-white placeholder-white/70 focus:outline-none focus:ring-0" />
+                    <input id="password_confirm" name="password_confirm" type="password" required placeholder="Confirm Password" class="w-full bg-transparent px-4 py-3 pr-10 text-sm text-black placeholder-gray-500 focus:outline-none focus:ring-0" />
                 </div>
             </div>
 
@@ -106,8 +106,8 @@ $hideFooter = true;
                 <button type="submit" class="w-full bg-blue-800 hover:bg-blue-900 text-white font-semibold py-3 rounded-lg shadow uppercase text-sm">Create Account</button>
             </div>
 
-            <div class="md:col-span-2 text-center text-sm text-gray-500">
-                Already have an account? <a href="<?= base_url('/login') ?>" class="text-blue-700 font-medium hover:underline">Sign in</a>
+            <div class="md:col-span-2 text-center text-sm text-white-500">
+                Already have an account? <a href="<?= base_url('/login') ?>" class="text-white font-medium hover:underline">Sign in</a>
             </div>
         </form>
     </div>
@@ -118,6 +118,7 @@ $hideFooter = true;
 <script>
     const municipalities = <?= json_encode($municipalities ?? []) ?>;
 
+    function updateMunicipalities() {
         const provinceInput = document.getElementById('province');
         const municipalityInput = document.getElementById('municipality');
         const province = provinceInput.value;
@@ -160,6 +161,16 @@ $hideFooter = true;
         });
         // store original eye icon
         btn.dataset.eye = btn.innerHTML;
+    });
+
+    // prevent numbers in name fields while typing
+    ['first_name','last_name'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input', () => {
+                el.value = el.value.replace(/[^A-Za-z\s]/g, '');
+            });
+        }
     });
 </script>
 <?= $this->endSection() ?>

@@ -532,7 +532,17 @@ class Admin extends BaseController
             return $accessCheck;
         }
 
-        return view('admin/backup');
+        // read last backup timestamp from writable folder
+        $last = null;
+        $path = WRITEPATH . 'backup_timestamp';
+        if (is_file($path)) {
+            $ts = intval(file_get_contents($path));
+            if ($ts > 0) {
+                $last = date('F j, Y g:i a', $ts);
+            }
+        }
+
+        return view('admin/backup', ['lastBackup' => $last]);
     }
 
     /**
@@ -558,6 +568,10 @@ class Admin extends BaseController
         }
 
         $json = json_encode($admin, JSON_PRETTY_PRINT);
+
+        // record backup time
+        @file_put_contents(WRITEPATH . 'backup_timestamp', time());
+
         return $this->response
             ->setHeader('Content-Type', 'application/json')
             ->setHeader('Content-Disposition', 'attachment; filename="admin-backup-'.date('Ymd-His').'.json"')

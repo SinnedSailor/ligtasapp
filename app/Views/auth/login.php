@@ -10,7 +10,7 @@ $hideFooter = true;
     /* page background photo with gradient overlay */
     .auth-bg {
         background: 
-            linear-gradient(135deg,rgba(4, 242, 255, 0.6) 0%, rgba(22, 41, 209, 0.6) 60%),
+            linear-gradient(135deg,rgba(4, 242, 255, 0.6) 0%, rgba(22, 53, 209, 0.6) 60%),
             url('<?= base_url('assets/images/water.png') ?>') center/cover no-repeat;
         background-size: cover;
         background-position: center;

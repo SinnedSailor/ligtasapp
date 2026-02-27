@@ -28,6 +28,11 @@
 
     <div class="bg-white rounded-2xl shadow p-6">
         <h5 class="text-lg font-semibold text-gray-700 mb-4">Administrator Backup</h5>
+        <?php if (isset($lastBackup) && $lastBackup): ?>
+            <p class="text-sm text-gray-500 mb-2">Last backed up: <strong><?= esc($lastBackup) ?></strong></p>
+        <?php else: ?>
+            <p class="text-sm text-gray-500 mb-2">Last backed up: <em>never</em></p>
+        <?php endif; ?>
         <p class="text-sm text-gray-600 mb-4">Download a JSON snapshot of the administrator account. Keep this file in a safe place; it can be used to restore the account if it is accidentally deleted or modified.</p>
         <form method="get" action="<?= base_url('admin/backup/export') ?>">
             <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Download Backup</button>
