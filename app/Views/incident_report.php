@@ -1530,15 +1530,6 @@ table th,
         // Status priority: pending first, rejected in the middle, approved last
         const statusPriority = s => s === 'approved' ? 2 : (s === 'rejected' ? 1 : 0);
 
-        // apply sorting — always use review_status as primary sort key (pending
-        // first, approved last), then the user-selected column as secondary.
-        let dataToRender = [...tableData].sort((a, b) => {
-            // Primary: status priority
-            const sp = statusPriority(a.review_status || 'pending') - statusPriority(b.review_status || 'pending');
-            if (sp !== 0) return sp;
-
-            // Secondary: user-selected column (if any)
-            if (sortColumn) {
         // apply filters first
         let dataToRender = tableData.filter(r => {
             // text search against the entire row
@@ -1563,10 +1554,16 @@ table th,
             if (sex && String(r['Gender of the Person']) !== sex) return false;
             return true;
         });
-        // apply sorting if requested
-        if (sortColumn) {
-        if (sortColumn) {
-            dataToRender = [...tableData].sort((a, b) => {
+
+        // apply sorting — always use review_status as primary sort key (pending
+        // first, approved last), then the user-selected column as secondary.
+        dataToRender = dataToRender.sort((a, b) => {
+            // Primary: status priority
+            const sp = statusPriority(a.review_status || 'pending') - statusPriority(b.review_status || 'pending');
+            if (sp !== 0) return sp;
+
+            // Secondary: user-selected column (if any)
+            if (sortColumn) {
                 let vaRaw = a[sortColumn] || '';
                 let vbRaw = b[sortColumn] || '';
                 let va = vaRaw.toString().toLowerCase();
@@ -1584,16 +1581,13 @@ table th,
                 }
             }
 
-                // when values are equal (or not comparable) use the N column as a
-                // stable secondary key so that rows maintain their incident number
-                // order even when sorted by another field like year.
-                const naN = parseFloat(a['N'] || 0);
-                const nbN = parseFloat(b['N'] || 0);
-                if (naN < nbN) return -1;
-                if (naN > nbN) return 1;
-                return 0;
-            });
-        }
+            // Tertiary: N column as stable tie-breaker
+            const naN = parseFloat(a['N'] || 0);
+            const nbN = parseFloat(b['N'] || 0);
+            if (naN < nbN) return -1;
+            if (naN > nbN) return 1;
+            return 0;
+        });
 
         if (currentPage > getTotalPages()) {
             currentPage = getTotalPages();
