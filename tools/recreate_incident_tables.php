@@ -24,6 +24,7 @@ $queries[] = "CREATE TABLE IF NOT EXISTS `incident_reports` (
   `remarks` TEXT DEFAULT NULL,
   `row_hash` VARCHAR(64) DEFAULT NULL,
   `review_status` VARCHAR(20) DEFAULT NULL,
+  `review_note` TEXT DEFAULT NULL,
   `reviewed_by` INT(11) UNSIGNED DEFAULT NULL,
   `reviewed_at` DATETIME DEFAULT NULL,
   `created_at` DATETIME DEFAULT NULL,

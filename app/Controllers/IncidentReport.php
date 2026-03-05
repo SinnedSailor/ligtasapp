@@ -588,6 +588,8 @@ class IncidentReport extends BaseController
             'residence',
             'occupation',
             'remarks',
+            // include review note so exports and API responses carry it
+            'review_note',
         ];
 
             // Prepare data
@@ -1034,16 +1036,39 @@ class IncidentReport extends BaseController
             }
         }
 
-        $this->incidentReportModel->update($incident['id'], [
+        // capture optional note when rejecting
+        $note = '';
+        if ($status === 'rejected') {
+            $payload = $this->request->getJSON(true);
+            if (is_array($payload) && isset($payload['note'])) {
+                $note = trim((string) $payload['note']);
+            }
+        }
+
+        $updateData = [
             'review_status' => $status,
             'reviewed_by' => (int) session()->get('user_id'),
             'reviewed_at' => date('Y-m-d H:i:s'),
-        ]);
+        ];
 
-        return $this->response->setJSON([
+        if ($status === 'rejected') {
+            $updateData['review_note'] = $note !== '' ? $note : null;
+        } else {
+            // clear any existing note when approving or changing status
+            $updateData['review_note'] = null;
+        }
+
+        $this->incidentReportModel->update($incident['id'], $updateData);
+
+        $responseBody = [
             'message' => 'Incident updated.',
             'status' => $status,
-        ]);
+        ];
+        if ($status === 'rejected') {
+            $responseBody['note'] = $note;
+        }
+
+        return $this->response->setJSON($responseBody);
     }
 
     public function listAttachments(int $incidentN)

@@ -34,6 +34,10 @@ class IncidentReportModel extends Model
         'review_status',
         'reviewed_by',
         'reviewed_at',
+        // newly added field for notes when an incident is rejected; previously
+        // the controller would attempt to update this column but it wasn't
+        // included in the allowedFields list so the value was silently dropped.
+        'review_note',
     ];
 
     // Ensure victim name is hashed for new/updated records

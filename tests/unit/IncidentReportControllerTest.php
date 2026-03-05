@@ -97,6 +97,8 @@ final class IncidentReportControllerTest extends CIUnitTestCase
         // province/municipality columns should be present in the table header
         $this->assertStringContainsString('>Province<', $output);
         $this->assertStringContainsString('>Municipality/City<', $output);
+        // new review note column header should also appear
+        $this->assertStringContainsString('>Review Note<', $output);
         // JS variable for initial categories should exist (even if empty)
         $this->assertStringContainsString('initialLocationCategories', $output);
         // JS variable for occasions should also be defined now
@@ -109,7 +111,13 @@ final class IncidentReportControllerTest extends CIUnitTestCase
         $this->assertStringContainsString('occasionList', $output);
         $this->assertStringContainsString('occupationList', $output);
     }
-
+    public function testViewShowsReviewNoteValue(): void
+    {
+        // the review note column should render the actual note text if provided
+        $rows = [['n' => 42, 'review_note' => 'Reason explained']];
+        $output = view('incident_report', ['initialRows' => $rows]);
+        $this->assertStringContainsString('Reason explained', $output);
+    }
     public function testFocalViewHidesReviewAndActions(): void
     {
         // ensure the role_name in session is set so the view understands we're a focal user
@@ -165,6 +173,126 @@ final class IncidentReportControllerTest extends CIUnitTestCase
         $this->assertSame($rows, $filtered);
     }
 
+    public function testRejectStoresNote(): void
+    {
+        $ctrl = new IncidentReport();
+
+        // fake model that captures update payload
+        $fakeModel = new class extends \App\Models\IncidentReportModel {
+            public $lastUpdate;
+            public function where($col, $val)
+            {
+                return $this;
+            }
+            public function first()
+            {
+                return ['id' => 7, 'n' => 123, 'province' => 'X'];
+            }
+            public function update($id, $data)
+            {
+                $this->lastUpdate = ['id' => $id, 'data' => $data];
+            }
+        };
+        $refProp = new ReflectionProperty($ctrl, 'incidentReportModel');
+        $refProp->setAccessible(true);
+        $refProp->setValue($ctrl, $fakeModel);
+
+        // simulate logged-in reviewer
+        $session = session();
+        $session->set('role_name', 'PROVINCE');
+        $session->set('is_admin', false);
+        $session->set('logged_in', true);
+        $session->set('user_id', 55);
+
+        // stub request so getJSON returns note
+        $stubReq = new class {
+            public function getJSON($assoc = false)
+            {
+                return ['note' => 'Not suitable data'];
+            }
+            // other methods may be called by controller but aren't needed for this test
+        };
+        $refReq = new ReflectionProperty($ctrl, 'request');
+        $refReq->setAccessible(true);
+        $refReq->setValue($ctrl, $stubReq);
+
+        // response object to satisfy method expectations
+        $resp = \Config\Services::response();
+        $refResp = new ReflectionProperty($ctrl, 'response');
+        $refResp->setAccessible(true);
+        $refResp->setValue($ctrl, $resp);
+
+        // invoke private method directly
+        $refm = new ReflectionMethod($ctrl, 'updateReviewStatus');
+        $refm->setAccessible(true);
+        $result = $refm->invoke($ctrl, 123, 'rejected');
+
+        $this->assertSame(['message' => 'Incident updated.', 'status' => 'rejected', 'note' => 'Not suitable data'], json_decode((string) $result->getBody(), true));
+        $this->assertSame('Not suitable data', $fakeModel->lastUpdate['data']['review_note']);
+        $this->assertSame(55, $fakeModel->lastUpdate['data']['reviewed_by']);
+    }
+
+    public function testModelAllowsReviewNoteField(): void
+    {
+        $model = new \App\Models\IncidentReportModel();
+        $ref = new \ReflectionProperty($model, 'allowedFields');
+        $ref->setAccessible(true);
+        $fields = $ref->getValue($model);
+        $this->assertContains('review_note', $fields, 'Allowed fields should include review_note so it can be persisted');
+    }
+
+    public function testApproveClearsNote(): void
+    {
+        $ctrl = new IncidentReport();
+        $fakeModel = new class extends \App\Models\IncidentReportModel {
+            public $lastUpdate;
+            public function where($col, $val)
+            {
+                return $this;
+            }
+            public function first()
+            {
+                return ['id' => 8, 'n' => 456, 'province' => 'Y'];
+            }
+            public function update($id, $data)
+            {
+                $this->lastUpdate = ['id' => $id, 'data' => $data];
+            }
+        };
+        $refProp = new ReflectionProperty($ctrl, 'incidentReportModel');
+        $refProp->setAccessible(true);
+        $refProp->setValue($ctrl, $fakeModel);
+
+        $session = session();
+        $session->set('role_name', 'PROVINCE');
+        $session->set('is_admin', false);
+        $session->set('logged_in', true);
+        $session->set('user_id', 99);
+
+        $stubReq = new class {
+            public function getJSON($assoc = false)
+            {
+                return null;
+            }
+        };
+        $refReq = new ReflectionProperty($ctrl, 'request');
+        $refReq->setAccessible(true);
+        $refReq->setValue($ctrl, $stubReq);
+
+        $resp = \Config\Services::response();
+        $refResp = new ReflectionProperty($ctrl, 'response');
+        $refResp->setAccessible(true);
+        $refResp->setValue($ctrl, $resp);
+
+        $refm = new ReflectionMethod($ctrl, 'updateReviewStatus');
+        $refm->setAccessible(true);
+        $result = $refm->invoke($ctrl, 456, 'approved');
+
+        $this->assertSame(['message' => 'Incident updated.', 'status' => 'approved'], json_decode((string) $result->getBody(), true));
+        $this->assertNull($fakeModel->lastUpdate['data']['review_note']);
+        $this->assertSame(99, $fakeModel->lastUpdate['data']['reviewed_by']);
+    }
+
     public function testGenerateReportUsesRoleFilter(): void
     {
         // create controller and inject a fake model that returns mixed rows
@@ -204,6 +332,58 @@ final class IncidentReportControllerTest extends CIUnitTestCase
         // only one approved row should be returned
         $this->assertCount(1, $json['data']);
         $this->assertSame(1, $json['data'][0]['n']);
+    }
+
+    public function testGenerateReportIncludesReviewNoteForLgu(): void
+    {
+        $ctrl = new IncidentReport();
+        $fakeModel = new class extends \App\Models\IncidentReportModel {
+            public function findAll(?int $limit = null, int $offset = 0)
+            {
+                return [
+                    [
+                        'n' => 5,
+                        'review_status' => 'rejected',
+                        'review_note' => 'Insufficient detail',
+                        'month_of_incident' => '2',
+                        'year_of_incident' => 2022,
+                        'province' => 'P',
+                        'municipality' => 'M',
+                        'location_category' => '',
+                        'age' => '',
+                        'gender' => '',
+                        'occasion' => '',
+                        'factors' => '',
+                        'residence' => '',
+                        'occupation' => '',
+                        'remarks' => '',
+                    ],
+                ];
+            }
+        };
+        $refProp = new ReflectionProperty($ctrl, 'incidentReportModel');
+        $refProp->setAccessible(true);
+        $refProp->setValue($ctrl, $fakeModel);
+
+        // simulate LGU user in session
+        $session = session();
+        $session->set('role_name', 'LGU');
+        $session->set('logged_in', true);
+
+        $resp = \Config\Services::response();
+        $refResp = new ReflectionProperty($ctrl, 'response');
+        $refResp->setAccessible(true);
+        $refResp->setValue($ctrl, $resp);
+
+        $req = \Config\Services::request();
+        $refReq = new ReflectionProperty($ctrl, 'request');
+        $refReq->setAccessible(true);
+        $refReq->setValue($ctrl, $req);
+
+        $response = $ctrl->generateReport();
+        $json = json_decode((string) $response->getBody(), true);
+        $this->assertCount(1, $json['data']);
+        $this->assertSame('Insufficient detail', $json['data'][0]['review_note']);
     }
 
     public function testGenerateReportPdf(): void
