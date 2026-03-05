@@ -334,7 +334,7 @@ document.addEventListener('DOMContentLoaded', function () {
         chart:      { type: 'donut', height: 288, width: '100%' },
         series:     rem.vals,
         labels:     rem.keys,
-        colors:     ['#10b981','#C9282D','#FFDE15','#9ca3af','#a78bfa'],
+        colors:     ['#C9282D','#10b981','#FFDE15','#9ca3af','#a78bfa'],
         legend:     { position: 'bottom' },
         dataLabels: { enabled: false }
       });
