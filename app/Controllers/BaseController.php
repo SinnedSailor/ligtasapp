@@ -193,6 +193,31 @@ abstract class BaseController extends Controller
         ];
     }
 
+    /**
+     * Returns the province the current session user is restricted to, or
+     * null when the user should see all-province data.
+     *
+     * Rules:
+     *  - FOCAL role  → null  (no restriction)
+     *  - Admin       → null  (no restriction)
+     *  - Everyone else → their session province (may also be null when not set)
+     *
+     * The dashboard is intentionally excluded from province filtering and
+     * must remain unrestricted at the call site.
+     */
+    protected function getProvinceFilter(): ?string
+    {
+        $roleName = strtoupper(trim((string) session()->get('role_name')));
+        $isAdmin  = (bool) session()->get('is_admin');
+
+        if ($roleName === 'FOCAL' || $isAdmin) {
+            return null;
+        }
+
+        $province = trim((string) session()->get('province'));
+        return $province !== '' ? $province : null;
+    }
+
     protected function isValidRegion1Location(string $province, string $municipality): bool
     {
         $province = trim($province);

@@ -563,6 +563,16 @@ class IncidentReport extends BaseController
         $roleName = strtoupper(trim((string) session()->get('role_name')));
         $incidents = $this->filterRowsForRole($incidents, $roleName);
 
+        // Province-based restriction: non-FOCAL, non-Admin users only receive
+        // incidents that belong to their own province.
+        $provinceFilter = $this->getProvinceFilter();
+        if ($provinceFilter !== null) {
+            $incidents = array_values(array_filter($incidents, function ($r) use ($provinceFilter) {
+                return isset($r['province'])
+                    && strcasecmp(trim((string) $r['province']), $provinceFilter) === 0;
+            }));
+        }
+
         // Columns to include (excluding victim name)
         $columns = [
             'n',
@@ -1013,6 +1023,17 @@ class IncidentReport extends BaseController
             ]);
         }
 
+        // Province users may only review incidents from their own province.
+        $provinceFilter = $this->getProvinceFilter();
+        if ($provinceFilter !== null) {
+            $incidentProvince = trim((string) ($incident['province'] ?? ''));
+            if ($incidentProvince === '' || strcasecmp($incidentProvince, $provinceFilter) !== 0) {
+                return $this->response->setStatusCode(403)->setJSON([
+                    'message' => 'You can only review incidents from your own province.',
+                ]);
+            }
+        }
+
         $this->incidentReportModel->update($incident['id'], [
             'review_status' => $status,
             'reviewed_by' => (int) session()->get('user_id'),
@@ -1046,6 +1067,18 @@ class IncidentReport extends BaseController
             return $this->response->setStatusCode(403)->setJSON([
                 'message' => 'Forbidden.',
             ]);
+        }
+
+        // Province-based restriction: non-FOCAL, non-Admin users can only list
+        // attachments for incidents that belong to their own province.
+        $provinceFilter = $this->getProvinceFilter();
+        if ($provinceFilter !== null) {
+            $incidentProvince = trim((string) ($incident['province'] ?? ''));
+            if ($incidentProvince !== '' && strcasecmp($incidentProvince, $provinceFilter) !== 0) {
+                return $this->response->setStatusCode(403)->setJSON([
+                    'message' => 'Forbidden.',
+                ]);
+            }
         }
 
         $attachmentModel = new \App\Models\IncidentReportAttachmentModel();
@@ -1096,6 +1129,16 @@ class IncidentReport extends BaseController
             ]);
         }
 
+        // Province-based restriction
+        $provinceFilter = $this->getProvinceFilter();
+        if ($provinceFilter !== null && $incident) {
+            $incidentProvince = trim((string) ($incident['province'] ?? ''));
+            if ($incidentProvince !== '' && strcasecmp($incidentProvince, $provinceFilter) !== 0) {
+                return $this->response->setStatusCode(403)->setJSON([
+                    'message' => 'Forbidden.',
+                ]);
+            }
+        }
         $previewPath = $attachment['preview_path'] ?? null;
         $previewMime = $attachment['preview_mime'] ?? null;
         $filePath = null;
@@ -1171,6 +1214,15 @@ class IncidentReport extends BaseController
             return $this->response->setStatusCode(403)->setJSON(['message' => 'Forbidden.']);
         }
 
+        // Province-based restriction
+        $provinceFilter = $this->getProvinceFilter();
+        if ($provinceFilter !== null && $incident) {
+            $incidentProvince = trim((string) ($incident['province'] ?? ''));
+            if ($incidentProvince !== '' && strcasecmp($incidentProvince, $provinceFilter) !== 0) {
+                return $this->response->setStatusCode(403)->setJSON(['message' => 'Forbidden.']);
+            }
+        }
+
         // Prefer preview_path when available (converted PDF for office docs)
         $previewPath = $attachment['preview_path'] ?? null;
         if ($previewPath) {
@@ -1231,6 +1283,17 @@ class IncidentReport extends BaseController
             return $this->response->setStatusCode(403)->setJSON([
                 'message' => 'Forbidden.',
             ]);
+        }
+
+        // Province-based restriction
+        $provinceFilter = $this->getProvinceFilter();
+        if ($provinceFilter !== null && $incident) {
+            $incidentProvince = trim((string) ($incident['province'] ?? ''));
+            if ($incidentProvince !== '' && strcasecmp($incidentProvince, $provinceFilter) !== 0) {
+                return $this->response->setStatusCode(403)->setJSON([
+                    'message' => 'Forbidden.',
+                ]);
+            }
         }
 
         $fullPath = WRITEPATH . 'uploads/' . $attachment['stored_path'];
