@@ -264,6 +264,7 @@ class Auth extends BaseController
         $locationCategories = $locationModel->getDistinctLocationCategories();
         $occasions = $locationModel->getDistinctOccasions();
         $occupations = $locationModel->getDistinctOccupations();
+        $otherFactors = $locationModel->getDistinctFactors();
 
         return view('incident_report', [
             'initialRows' => $rows,
@@ -274,6 +275,7 @@ class Auth extends BaseController
             'locationCategories' => $locationCategories,
             'occasions' => $occasions,
             'occupations' => $occupations,
+            'otherFactors' => $otherFactors,
         ]);
     }
 

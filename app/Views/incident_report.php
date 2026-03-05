@@ -400,7 +400,12 @@ table th,
 
         <div class="col-span-1">
           <label for="incidentYear" class="text-sm text-slate-600 block mb-1">Year of Incident</label>
-          <input type="text" id="incidentYear" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+          <select id="incidentYear" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
+            <option value="" disabled selected class="text-slate-400">Select year</option>
+            <?php for ($y = date('Y'); $y >= 2000; $y--): ?>
+              <option value="<?= $y ?>"><?= $y ?></option>
+            <?php endfor; ?>
+          </select>
         </div>
 
         <!-- the province/municipality inputs were previously removed; bring them back -->
@@ -455,7 +460,8 @@ table th,
 
         <div class="md:col-span-1">
           <label for="incidentFactors" class="text-sm text-slate-600 block mb-1">Other Factors</label>
-          <input type="text" id="incidentFactors" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+          <input list="factorsList" type="text" id="incidentFactors" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+          <datalist id="factorsList"></datalist>
         </div>
 
         <div class="md:col-span-1">
@@ -466,6 +472,7 @@ table th,
         <div class="md:col-span-1">
           <label for="incidentOccupation" class="text-sm text-slate-600 block mb-1">Occupation of the Victim</label>
           <input list="occupationList" type="text" id="incidentOccupation" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+          <datalist id="occupationList"></datalist>
         </div>
 
         <div class="md:col-span-3">
@@ -638,6 +645,7 @@ table th,
     const initialLocationCategories = <?= json_encode($locationCategories ?? []) ?>;
     const initialOccasions = <?= json_encode($occasions ?? []) ?>;
     const initialOccupations = <?= json_encode($occupations ?? []) ?>;
+    const initialFactors = <?= json_encode($otherFactors ?? []) ?>;
     const columns = [
         'N',
         'Month of Incident',
@@ -1447,6 +1455,7 @@ table th,
             updateLocationCategoryList();
             updateOccasionList();
             updateOccupationList();
+            updateFactorsList();
             return;
         }
 
@@ -1556,6 +1565,7 @@ table th,
         updateLocationCategoryList();
         updateOccasionList();
         updateOccupationList();
+        updateFactorsList();
     }
 
 
@@ -1607,6 +1617,22 @@ table th,
         Array.from(set).sort().forEach(occ => {
             const opt = document.createElement('option');
             opt.value = occ;
+            listEl.appendChild(opt);
+        });
+    }
+
+    function updateFactorsList() {
+        const listEl = document.getElementById('factorsList');
+        if (!listEl) return;
+        const set = new Set(initialFactors || []);
+        tableData.forEach(r => {
+            const f = (r['Other Factors'] || '').trim();
+            if (f) set.add(f);
+        });
+        listEl.innerHTML = '';
+        Array.from(set).sort().forEach(f => {
+            const opt = document.createElement('option');
+            opt.value = f;
             listEl.appendChild(opt);
         });
     }
