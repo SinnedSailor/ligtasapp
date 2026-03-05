@@ -210,22 +210,23 @@ table th,
             <div class="flex justify-between items-center flex-wrap gap-3 mt-4 mb-4">
                 <div class="flex items-center gap-3">
                     <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" class="hidden" />
-                    <button id="importButton" class="px-3 py-1.5 border border-blue-600 text-blue-600 rounded-md text-sm hover:bg-blue-600 hover:text-white active:bg-blue-700" onclick="document.getElementById('excelFile').click()" style="<?= $hasInitialRows ? 'display:none;' : '' ?>">
-                        <?= svg_icon('cloud-upload', 'w-4 h-4') ?> Import Excel File
+                    <button id="importButton" class="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white rounded-full text-sm hover:bg-blue-700 active:bg-blue-800" onclick="document.getElementById('excelFile').click()" style="<?= $hasInitialRows ? 'display:none;' : '' ?>">
+                        <?= svg_icon('cloud-upload', 'w-4 h-4 mr-2') ?> Import Excel File
                     </button>
                     <span class="text-gray-500 text-sm file-name" id="fileName" style="<?= $hasInitialRows ? 'display:none;' : '' ?>">No file selected</span>
                 </div>
                 <div class="flex flex-wrap gap-2">
                     <?php if ($isLgu || $isAdmin): ?>
-                        <button class="px-3 py-1.5 border border-blue-600 text-blue-600 rounded-md text-sm hover:bg-blue-600 hover:text-white active:bg-blue-700" onclick="openIncidentModal()">
-                            <?= svg_icon('plus','w-4 h-4') ?> Add Incident
+                        <button class="inline-flex items-center px-3 py-1.5 text-white rounded-full text-sm" style="background-color:#1C4D8D;" onclick="openIncidentModal()"
+                                onmouseover="this.style.backgroundColor='#163c6c'" onmouseout="this.style.backgroundColor='#1C4D8D'" onmousedown="this.style.backgroundColor='#0f2a4e'" onmouseup="this.style.backgroundColor='#163c6c'">
+                            <?= svg_icon('plus','w-4 h-4 mr-2') ?> Add Incident
                         </button>
                     <?php endif; ?>
-                    <button id="saveButton" class="px-3 py-1.5 border border-green-600 text-green-600 rounded-md text-sm hover:bg-green-600 hover:text-white active:bg-green-700" onclick="openSaveModal()" style="<?= $hasInitialRows ? 'display:none;' : '' ?>">
-                        <?= svg_icon('check','w-4 h-4') ?> Save to Database
+                    <button id="saveButton" class="inline-flex items-center px-3 py-1.5 bg-green-600 text-white rounded-full text-sm hover:bg-green-700 active:bg-green-800" onclick="openSaveModal()" style="<?= $hasInitialRows ? 'display:none;' : '' ?>">
+                        <?= svg_icon('check','w-4 h-4 mr-2') ?> Save to Database
                     </button>
-                    <button id="generateReportButton" class="px-3 py-1.5 border border-sky-500 text-sky-500 rounded-md text-sm hover:bg-sky-500 hover:text-white active:bg-sky-600" onclick="downloadIncidentReport()">
-                        <?= svg_icon('chart','w-4 h-4') ?> Generate Report
+                    <button id="generateReportButton" class="inline-flex items-center px-3 py-1.5 text-white rounded-full text-sm" style="background-color:#0065F8;" onmouseover="this.style.backgroundColor='#0053C5'" onmouseout="this.style.backgroundColor='#0065F8'" onmousedown="this.style.backgroundColor='#0040A1'" onmouseup="this.style.backgroundColor='#0053C5'" onclick="downloadIncidentReport()">
+                        <?= svg_icon('chart','w-4 h-4 mr-2') ?> Generate Report
                     </button>
                 </div>
             </div>
@@ -319,8 +320,8 @@ table th,
     </div>
     <div class="text-sm text-slate-600 mb-6">This will save the current imported rows into the database. Continue?</div>
     <div class="flex justify-end gap-3">
-      <button type="button" class="px-3 py-1.5 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-300 hover:text-white active:bg-gray-400" onclick="hideModal('saveConfirmModal')">Cancel</button>
-      <button type="button" class="px-3 py-1.5 border border-green-600 text-green-600 rounded-md hover:bg-green-600 hover:text-white active:bg-green-700" onclick="confirmSaveToDatabase()">Yes, Save</button>
+      <button type="button" class="inline-flex items-center px-3 py-1.5 bg-gray-300 text-gray-700 rounded-full hover:bg-gray-400 active:bg-gray-500" onclick="hideModal('saveConfirmModal')"><?= svg_icon('x','w-4 h-4 mr-2') ?>Cancel</button>
+      <button type="button" class="inline-flex items-center px-3 py-1.5 bg-green-600 text-white rounded-full hover:bg-green-700 active:bg-green-800" onclick="confirmSaveToDatabase()"><?= svg_icon('check','w-4 h-4 mr-2') ?>Yes, Save</button>
     </div>
   </div>
 </div>
@@ -333,7 +334,7 @@ table th,
     </div>
     <div class="text-sm text-slate-700 mb-6"><div id="importSuccessMessage">Import completed.</div></div>
     <div class="flex justify-end">
-      <button type="button" class="px-3 py-1.5 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-600 hover:text-white active:bg-blue-700" onclick="hideModal('importSuccessModal')">OK</button>
+      <button type="button" class="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white rounded-full hover:bg-blue-700 active:bg-blue-800" onclick="hideModal('importSuccessModal')"><?= svg_icon('check','w-4 h-4 mr-2') ?>OK</button>
     </div>
   </div>
 </div>
@@ -346,7 +347,7 @@ table th,
     </div>
     <div class="text-sm text-slate-700 mb-6"><div id="saveResultMessage">Save completed.</div></div>
     <div class="flex justify-end">
-      <button type="button" class="px-3 py-1.5 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-600 hover:text-white active:bg-blue-700" onclick="hideModal('saveResultModal')">OK</button>
+      <button type="button" class="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white rounded-full hover:bg-blue-700 active:bg-blue-800" onclick="hideModal('saveResultModal')"><?= svg_icon('check','w-4 h-4 mr-2') ?>OK</button>
     </div>
   </div>
 </div>
@@ -360,7 +361,7 @@ table th,
     </div>
     <div class="text-sm text-slate-700 mb-4"><div id="attachmentModalMessage">Please upload at least one file.</div></div>
     <div class="flex justify-end">
-      <button type="button" class="px-3 py-1.5 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-600 hover:text-white active:bg-blue-700" onclick="hideModal('attachmentModal')">OK</button>
+      <button type="button" class="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white rounded-full hover:bg-blue-700 active:bg-blue-800" onclick="hideModal('attachmentModal')"><?= svg_icon('check','w-4 h-4 mr-2') ?>OK</button>
 
 
 <!-- Review confirm modal (Tailwind) -->
@@ -372,8 +373,8 @@ table th,
     </div>
     <div class="text-sm text-slate-700 mb-4"><div id="reviewConfirmMessage">Are you sure you want to update this incident?</div></div>
     <div class="flex justify-end gap-2">
-      <button type="button" class="px-3 py-1.5 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-300 hover:text-white active:bg-gray-400" onclick="hideModal('reviewConfirmModal')">Cancel</button>
-      <button type="button" id="reviewConfirmAction" class="px-3 py-1.5 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-600 hover:text-white active:bg-blue-700" onclick="submitReview()">Confirm</button>
+      <button type="button" class="inline-flex items-center px-3 py-1.5 bg-gray-300 text-gray-700 rounded-full hover:bg-gray-400 active:bg-gray-500" onclick="hideModal('reviewConfirmModal')"><?= svg_icon('x','w-4 h-4 mr-2') ?>Cancel</button>
+      <button type="button" id="reviewConfirmAction" class="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white rounded-full hover:bg-blue-700 active:bg-blue-800" onclick="submitReview()"><?= svg_icon('check','w-4 h-4 mr-2') ?>Confirm</button>
     </div>
   </div>
 </div>
@@ -493,7 +494,7 @@ table th,
                 <input type="file" id="incidentDocumentsInput" class="inline-block w-auto max-w-xs text-sm text-slate-700" accept=".pdf,.doc,.docx" multiple />
                 <div id="incidentUploadFileListDocuments" class="mt-1"></div>
             </div>
-            <button type="button" id="incidentUploadButton" class="px-3 py-1.5 border border-indigo-600 text-indigo-600 rounded-md text-sm hover:bg-indigo-600 hover:text-white active:bg-indigo-700" onclick="uploadIncidentAttachments()">Upload Attachments</button>
+            <button type="button" id="incidentUploadButton" class="inline-flex items-center px-3 py-1.5 bg-indigo-600 text-white rounded-full text-sm hover:bg-indigo-700 active:bg-indigo-800" onclick="uploadIncidentAttachments()"><?= svg_icon('cloud-upload','w-4 h-4 mr-2') ?>Upload Attachments</button>
           </div>
         </div>
       <?php endif; ?>
@@ -505,7 +506,7 @@ table th,
                 class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 opacity-50 cursor-not-allowed">
           Add Incident
         </button>
-        <button type="button" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400" onclick="hideModal('incidentModal')">Cancel</button>
+        <button type="button" class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-700 rounded-full hover:bg-gray-400" onclick="hideModal('incidentModal')"><?= svg_icon('x','w-4 h-4 mr-2') ?>Cancel</button>
       </div>
     </form>
   </div>
@@ -525,9 +526,9 @@ table th,
       </div>
     </div>
     <div class="flex justify-between items-center gap-2 mt-4">
-      <a id="attachmentDownload" href="#" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-3 py-1.5 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-600 hover:text-white active:bg-blue-700">Download</a>
+      <a id="attachmentDownload" href="#" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white rounded-full hover:bg-blue-700 active:bg-blue-800"><?= svg_icon('download','w-4 h-4 mr-2') ?>Download</a>
       <div class="flex justify-end gap-2">
-        <button type="button" class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md" onclick="hideModal('attachmentViewerModal'); closeAttachmentViewer && closeAttachmentViewer()">Close</button>
+        <button type="button" class="inline-flex items-center px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full" onclick="hideModal('attachmentViewerModal'); closeAttachmentViewer && closeAttachmentViewer()"><?= svg_icon('x','w-4 h-4 mr-2') ?>Close</button>
       </div>
     </div>
   </div>
@@ -542,7 +543,7 @@ table th,
     </div>
     <div class="text-sm text-slate-700 mb-6"><div id="excelErrorMessage">Error reading file.</div></div>
     <div class="flex justify-end">
-      <button type="button" class="px-3 py-1.5 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-600 hover:text-white active:bg-blue-700" onclick="hideModal('excelErrorModal')">OK</button>
+      <button type="button" class="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white rounded-full hover:bg-blue-700 active:bg-blue-800" onclick="hideModal('excelErrorModal')"><?= svg_icon('check','w-4 h-4 mr-2') ?>OK</button>
     </div>
   </div>
 </div>
@@ -682,6 +683,7 @@ table th,
     const iconX       = `<?= svg_icon('x', 'w-4 h-4') ?>`;
     const iconPencil  = `<?= svg_icon('pencil', 'w-4 h-4') ?>`;
     const iconTrash   = `<?= svg_icon('trash', 'w-4 h-4') ?>`;
+    const iconEye     = `<?= svg_icon('eye', 'w-4 h-4 mr-2') ?>`;
     const editableColumns = columns.filter(col => col !== 'N');
     const columnAliases = {
         'Year': 'Year of Incident',
@@ -1511,13 +1513,13 @@ table th,
             const reviewStatus = row.review_status || 'pending';
             const statusClass = reviewStatus === 'approved' ? 'status-approved' : (reviewStatus === 'rejected' ? 'status-rejected' : 'status-pending');
 
-            const viewButton = `<button class="inline-flex items-center gap-2 px-3 py-1 border border-gray-400 text-gray-700 rounded text-sm hover:bg-gray-400 hover:text-white mt-1" onclick="openAttachmentViewer(${row['N']})">View</button>`;
+            const viewButton = `<button class="inline-flex items-center gap-2 px-3 py-1 bg-gray-400 text-white rounded-full text-sm hover:bg-gray-500 mt-1" onclick="openAttachmentViewer(${row['N']})">${iconEye}View</button>`;
 
             let reviewControls = '';
             if (canReviewIncidents) {
                 
-                const approveBtn = `<button aria-label="Approve" class="inline-flex items-center justify-center px-2 py-1 border border-green-600 text-green-600 rounded text-sm hover:bg-green-600 hover:text-white active:bg-green-700" onclick="reviewIncident(${row['N']}, 'approve')">${iconCheck}</button>`;
-                const rejectBtn  = `<button aria-label="Reject"  class="inline-flex items-center justify-center px-2 py-1 border border-red-600 text-red-600 rounded text-sm hover:bg-red-600 hover:text-white active:bg-red-700" onclick="reviewIncident(${row['N']}, 'reject')">${iconX}</button>`;
+                const approveBtn = `<button aria-label="Approve" class="inline-flex items-center justify-center px-2 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 active:bg-green-800" onclick="reviewIncident(${row['N']}, 'approve')">${iconCheck}</button>`;
+                const rejectBtn  = `<button aria-label="Reject"  class="inline-flex items-center justify-center px-2 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700 active:bg-red-800" onclick="reviewIncident(${row['N']}, 'reject')">${iconX}</button>`;
                 reviewControls = `
                     <div class="flex gap-1 flex-wrap">
                         ${approveBtn}
@@ -1540,8 +1542,8 @@ table th,
             if (!isFocal) {
                 html += `<td>${reviewControls || '<span class="text-gray-500">-</span>'}</td>`;
                 html += `<td>
-                    <button aria-label="Edit" class="inline-flex items-center justify-center px-2 py-1 border border-blue-800 text-blue-800 rounded text-sm hover:bg-blue-800 hover:text-white active:bg-blue-900" onclick="openIncidentModal(${index})">${iconPencil}</button>
-                    <button aria-label="Delete" class="inline-flex items-center justify-center px-2 py-1 border border-red-600 text-red-600 rounded text-sm hover:bg-red-600 hover:text-white active:bg-red-700" onclick="deleteRow(${index})">${iconTrash}</button>
+                    <button aria-label="Edit" class="inline-flex items-center justify-center px-2 py-1 bg-blue-800 text-white rounded text-sm hover:bg-blue-900 active:bg-blue-950" onclick="openIncidentModal(${index})">${iconPencil}</button>
+                    <button aria-label="Delete" class="inline-flex items-center justify-center px-2 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700 active:bg-red-800" onclick="deleteRow(${index})">${iconTrash}</button>
                 </td>`;
             }
         });

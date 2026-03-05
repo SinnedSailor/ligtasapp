@@ -187,7 +187,6 @@ class IncidentReport extends BaseController
         $mapped['residence'] = $this->toString($data['residence'] ?? '');
         $mapped['occupation'] = $this->toString($data['occupation'] ?? '');
         $mapped['remarks'] = $this->toString($data['remarks'] ?? '');
-
         $mapped['row_hash'] = $this->hashRow($mapped);
 
         // Avoid duplicates: if row with same hash exists, return it instead of inserting
@@ -290,10 +289,6 @@ class IncidentReport extends BaseController
         ]);
     }
 
-    /**
-     * Generate incident report (excluding victim names)
-     * Returns JSON or downloadable file (CSV)
-     */
         /**
          * Generate incident report (excluding victim names)
          * Returns JSON or downloadable file (CSV)

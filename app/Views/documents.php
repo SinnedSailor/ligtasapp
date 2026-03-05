@@ -335,23 +335,23 @@
             <?php if (!empty($myDocuments)): ?>
                 <div class="table-responsive">
                     <table class="w-full table-docs">
-                        <div class="table-filter-card mb-2 p-2 bg-slate-50 rounded-md flex flex-wrap gap-2">
-                            <select class="filter-input-my filter-doc-type rounded-md border border-gray-200 px-2 py-1 text-sm">
+                        <div class="table-filter-card mb-2 p-2 bg-white rounded-md flex flex-wrap gap-2">
+                            <select class="filter-input-my filter-doc-type rounded-full border border-blue-300 bg-blue-100 text-blue-800 px-2 py-1 text-sm">
                                 <option value="">All Types</option>
                                 <option value="ordinance">Ordinance</option>
                                 <option value="pops">POPS</option>
                                 <option value="budget">Budget</option>
                             </select>
-                            <select class="filter-input-my filter-province rounded-md border border-gray-200 px-2 py-1 text-sm">
+                            <select class="filter-input-my filter-province rounded-full border border-blue-300 bg-blue-100 text-blue-800 px-2 py-1 text-sm">
                                 <option value="">All Provinces</option>
                                 <?php foreach (($provinces ?? []) as $province): ?>
                                     <option value="<?= esc($province) ?>"><?= esc($province) ?></option>
                                 <?php endforeach; ?>
                             </select>
-                            <select class="filter-input-my filter-municipality rounded-md border border-gray-200 px-2 py-1 text-sm">
+                            <select class="filter-input-my filter-municipality rounded-full border border-blue-300 bg-blue-100 text-blue-800 px-2 py-1 text-sm">
                                 <option value="">All Municipalities</option>
                             </select>
-                            <input type="date" class="filter-input-my filter-date rounded-md border border-gray-200 px-2 py-1 text-sm" />
+                            <input type="date" class="filter-input-my filter-date rounded-full border border-blue-300 bg-blue-100 text-blue-800 px-2 py-1 text-sm" />
                         </div>
                         <thead>
                             <tr>
@@ -373,12 +373,12 @@
                                         </span>
                                     </td>
                                     <td><?= esc(date('M d, Y', strtotime($doc['created_at']))) ?></td>
-                                    <td>
+                                    <td>  
                                         <div class="doc-actions">
-                                            <button class="inline-flex items-center gap-2 px-3 py-1 border rounded text-sm text-gray-700 bg-white hover:bg-gray-50 doc-preview" type="button" data-doc-id="<?= $doc['id'] ?>" data-doc-name="<?= esc($doc['original_name']) ?>">
+                                            <button class="inline-flex items-center gap-2 px-3 py-1 border border-gray-300 rounded text-sm text-gray-700 bg-white hover:bg-gray-50 doc-preview" type="button" data-doc-id="<?= $doc['id'] ?>" data-doc-name="<?= esc($doc['original_name']) ?>">
                                                 View
                                             </button>
-                                            <a class="inline-flex items-center gap-2 px-3 py-1 border border-blue-200 rounded text-sm text-blue-700 hover:bg-blue-50" href="<?= base_url('/documents/download/' . $doc['id']) ?>">
+                                            <a class="inline-flex items-center gap-2 px-3 py-1 border border-gray-300 rounded text-sm text-gray-700 bg-white hover:bg-gray-50" href="<?= base_url('/documents/download/' . $doc['id']) ?>">
                                                 Download
                                             </a>
                                         </div>
@@ -400,23 +400,23 @@
             <?php if (!empty($pendingDocuments)): ?>
                 <div class="table-responsive">
                     <table class="w-full table-docs">
-                        <div class="table-filter-card mb-2 p-2 bg-slate-50 rounded-md flex flex-wrap gap-2">
-                            <select class="filter-input-pending filter-doc-type rounded-md border border-gray-200 px-2 py-1 text-sm">
+                        <div class="table-filter-card mb-2 p-2 bg-white rounded-md flex flex-wrap gap-2">
+                            <select class="filter-input-pending filter-doc-type rounded-full border border-blue-300 bg-blue-100 text-blue-800 px-2 py-1 text-sm">
                                 <option value="">All Types</option>
                                 <option value="ordinance">Ordinance</option>
                                 <option value="pops">POPS</option>
                                 <option value="budget">Budget</option>
                             </select>
-                            <select class="filter-input-pending filter-province rounded-md border border-gray-200 px-2 py-1 text-sm">
+                            <select class="filter-input-pending filter-province rounded-full border border-blue-300 bg-blue-100 text-blue-800 px-2 py-1 text-sm">
                                 <option value="">All Provinces</option>
                                 <?php foreach (($provinces ?? []) as $province): ?>
                                     <option value="<?= esc($province) ?>"><?= esc($province) ?></option>
                                 <?php endforeach; ?>
                             </select>
-                            <select class="filter-input-pending filter-municipality rounded-md border border-gray-200 px-2 py-1 text-sm">
+                            <select class="filter-input-pending filter-municipality rounded-full border border-blue-300 bg-blue-100 text-blue-800 px-2 py-1 text-sm">
                                 <option value="">All Municipalities</option>
                             </select>
-                            <input type="date" class="filter-input-pending filter-date rounded-md border border-gray-200 px-2 py-1 text-sm" />
+                            <input type="date" class="filter-input-pending filter-date rounded-full border border-blue-300 bg-blue-100 text-blue-800 px-2 py-1 text-sm" />
                         </div>
                         <thead>
                             <tr>
@@ -438,10 +438,10 @@
                                     <td><?= esc(date('M d, Y', strtotime($doc['created_at']))) ?></td>
                                     <td>
                                         <div class="doc-actions">
-                                            <button class="inline-flex items-center gap-2 px-2 py-1 border border-slate-200 rounded text-sm text-slate-700 hover:bg-slate-50 doc-preview" type="button" data-doc-id="<?= $doc['id'] ?>" data-doc-name="<?= esc($doc['original_name']) ?>">
+                                            <button class="inline-flex items-center gap-2 px-2 py-1 border border-blue-300 rounded-full text-sm text-blue-700 hover:bg-blue-50 doc-preview" type="button" data-doc-id="<?= $doc['id'] ?>" data-doc-name="<?= esc($doc['original_name']) ?>">
                                                 View
                                             </button>
-                                            <a class="inline-flex items-center gap-2 px-3 py-1 border border-blue-200 rounded text-sm text-blue-700 hover:bg-blue-50" href="<?= base_url('/documents/download/' . $doc['id']) ?>">Download</a>
+                                            <a class="inline-flex items-center gap-2 px-3 py-1 border border-blue-300 rounded-full text-sm text-blue-700 bg-white hover:bg-blue-50" href="<?= base_url('/documents/download/' . $doc['id']) ?>">Download</a>
                                         </div>
                                     </td>
                                 </tr>
@@ -461,23 +461,23 @@
             <?php if (!empty($approvedDocuments)): ?>
                 <div class="table-responsive">
                     <table class="w-full table-docs">
-                        <div class="table-filter-card mb-2 p-2 bg-slate-50 rounded-md flex flex-wrap gap-2">
-                            <select class="filter-input-approved filter-doc-type rounded-md border border-gray-200 px-2 py-1 text-sm">
+                        <div class="table-filter-card mb-2 p-2 bg-white rounded-md flex flex-wrap gap-2">
+                            <select class="filter-input-approved filter-doc-type rounded-full border border-blue-300 bg-blue-100 text-blue-800 px-2 py-1 text-sm">
                                 <option value="">All Types</option>
                                 <option value="ordinance">Ordinance</option>
                                 <option value="pops">POPS</option>
                                 <option value="budget">Budget</option>
                             </select>
-                            <select class="filter-input-approved filter-province rounded-md border border-gray-200 px-2 py-1 text-sm">
+                            <select class="filter-input-approved filter-province rounded-full border border-blue-300 bg-blue-100 text-blue-800 px-2 py-1 text-sm">
                                 <option value="">All Provinces</option>
                                 <?php foreach (($provinces ?? []) as $province): ?>
                                     <option value="<?= esc($province) ?>"><?= esc($province) ?></option>
                                 <?php endforeach; ?>
                             </select>
-                            <select class="filter-input-approved filter-municipality rounded-md border border-gray-200 px-2 py-1 text-sm">
+                            <select class="filter-input-approved filter-municipality rounded-full border border-blue-300 bg-blue-100 text-blue-800 px-2 py-1 text-sm">
                                 <option value="">All Municipalities</option>
                             </select>
-                            <input type="date" class="filter-input-approved filter-date rounded-md border border-gray-200 px-2 py-1 text-sm" />
+                            <input type="date" class="filter-input-approved filter-date rounded-full border border-blue-300 bg-blue-100 text-blue-800 px-2 py-1 text-sm" />
                         </div>
                         <thead>
                             <tr>
@@ -499,10 +499,10 @@
                                     <td><?= esc($doc['reviewed_at'] ? date('M d, Y', strtotime($doc['reviewed_at'])) : '-') ?></td>
                                     <td>
                                         <div class="doc-actions">
-                                            <button class="inline-flex items-center gap-2 px-3 py-1 border rounded text-sm text-gray-700 bg-white hover:bg-gray-50 doc-preview" type="button" data-doc-id="<?= $doc['id'] ?>" data-doc-name="<?= esc($doc['original_name']) ?>">
+                                            <button class="inline-flex items-center gap-2 px-3 py-1 border border-blue-300 rounded-full text-sm text-blue-700 bg-white hover:bg-blue-50 doc-preview" type="button" data-doc-id="<?= $doc['id'] ?>" data-doc-name="<?= esc($doc['original_name']) ?>">
                                                 View
                                             </button>
-                                            <a class="inline-flex items-center gap-2 px-3 py-1 border border-blue-200 rounded text-sm text-blue-700 hover:bg-blue-50" href="<?= base_url('/documents/download/' . $doc['id']) ?>">Download</a>
+                                            <a class="inline-flex items-center gap-2 px-3 py-1 border border-blue-300 rounded-full text-sm text-blue-700 bg-white hover:bg-blue-50" href="<?= base_url('/documents/download/' . $doc['id']) ?>">Download</a>
                                         </div>
                                     </td>
                                 </tr>
@@ -527,7 +527,7 @@
             </div>
             <div class="preview-footer">
                 <div class="doc-actions">
-                    <a class="inline-flex items-center gap-2 px-3 py-1 border border-blue-200 rounded text-sm text-blue-700 hover:bg-blue-50" id="previewDownload" href="#">Download</a>
+                    <a class="inline-flex items-center gap-2 px-3 py-1 border border-blue-300 rounded-full text-sm text-blue-700 bg-white hover:bg-blue-50" id="previewDownload" href="#">Download</a>
                 </div>
                 <?php if ($canReview): ?>
                     <div class="doc-actions">

@@ -29,14 +29,50 @@
     <div class="bg-white rounded-2xl shadow p-6">
         <h5 class="text-lg font-semibold text-gray-700 mb-4">Administrator Backup</h5>
         <?php if (isset($lastBackup) && $lastBackup): ?>
-            <p class="text-sm text-gray-500 mb-2">Last backed up: <strong><?= esc($lastBackup) ?></strong></p>
+            <p class="text-sm text-gray-500 mb-2">Last backed up: <strong><span id="lastBackupDate"><?= esc($lastBackup) ?></span></strong></p>
         <?php else: ?>
-            <p class="text-sm text-gray-500 mb-2">Last backed up: <em>never</em></p>
+            <p class="text-sm text-gray-500 mb-2">Last backed up: <em id="lastBackupDate">never</em></p>
         <?php endif; ?>
         <p class="text-sm text-gray-600 mb-4">Download a JSON snapshot of the administrator account. Keep this file in a safe place; it can be used to restore the account if it is accidentally deleted or modified.</p>
-        <form method="get" action="<?= base_url('admin/backup/export') ?>">
-            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Download Backup</button>
-        </form>
+        <!-- download in new tab and update the timestamp client‑side so the view reflects the action immediately -->
+        <a id="backupDownload" href="<?= base_url('admin/backup/export') ?>" target="_blank" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 inline-block">
+            Download Backup
+        </a>
+        <script>
+            // when the user clicks the download link, update the displayed "last backed up" time
+            document.addEventListener('DOMContentLoaded', function() {
+                var link = document.getElementById('backupDownload');
+                if (!link) return;
+
+                link.addEventListener('click', function() {
+                    // format should match PHP's date('F j, Y g:i a')
+                    var now = new Date();
+                    var options = { month: 'long', day: 'numeric', year: 'numeric' };
+                    var datePart = now.toLocaleDateString('en-US', options);
+                    var hours = now.getHours() % 12;
+                    if (hours === 0) hours = 12;
+                    var minutes = now.getMinutes().toString().padStart(2, '0');
+                    var ampm = now.getHours() < 12 ? 'am' : 'pm';
+                    var timePart = hours + ':' + minutes + ' ' + ampm;
+                    var display = datePart + ' ' + timePart;
+
+                    var elem = document.getElementById('lastBackupDate');
+                    if (elem) {
+                        // if the existing element is <em> (never case), replace with a strong wrapper
+                        if (elem.tagName.toLowerCase() === 'em') {
+                            var strong = document.createElement('strong');
+                            var newSpan = document.createElement('span');
+                            newSpan.id = 'lastBackupDate';
+                            newSpan.textContent = display;
+                            strong.appendChild(newSpan);
+                            elem.parentNode.replaceChild(strong, elem);
+                        } else {
+                            elem.textContent = display;
+                        }
+                    }
+                });
+            });
+        </script>
     </div>
 
     <div class="bg-white rounded-2xl shadow p-6 mt-8">
