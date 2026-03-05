@@ -203,4 +203,20 @@ class IncidentReportModel extends Model
         $result = $builder->get()->getResultArray();
         return array_map(fn($r) => $r['occupation'], $result);
     }
+
+    /**
+     * Return sorted non-empty distinct factors values stored in database.
+     */
+    public function getDistinctFactors(): array
+    {
+        $builder = $this->builder();
+        $builder->select('factors')
+                ->distinct()
+                ->where('factors IS NOT NULL', null, false)
+                ->where('factors !=', '')
+                ->orderBy('factors', 'asc');
+
+        $result = $builder->get()->getResultArray();
+        return array_map(fn($r) => $r['factors'], $result);
+    }
 }
