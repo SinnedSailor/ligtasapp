@@ -290,6 +290,206 @@ class IncidentReport extends BaseController
         ]);
     }
 
+    /**
+     * Return aggregated chart data for the dashboard.
+     * ONLY approved incidents are included — pending/rejected are excluded.
+     * Accepts optional ?remarks= query param to filter all charts/stats to a
+     * specific remarks value (e.g. Deceased, Alive, Missing).
+     * The by_remarks distribution dataset is always returned unfiltered so the
+     * dropdown can be populated on every response.
+     */
+    public function chartData()
+    {
+        if (!session()->get('logged_in')) {
+            return $this->response->setStatusCode(401)->setJSON(['message' => 'Unauthorized.']);
+        }
+
+        $db = \Config\Database::connect();
+
+        // Optional remarks filter — e.g. ?remarks=Deceased
+        $remarksFilter = trim((string) ($this->request->getGet('remarks') ?: ''));
+
+        // Closure: adds LOWER(TRIM(remarks)) = '...' to any builder when filter is active
+        $rf = function ($builder) use ($db, $remarksFilter) {
+            if ($remarksFilter !== '') {
+                $builder->where(
+                    "LOWER(TRIM(remarks)) = '" . $db->escapeStr(strtolower($remarksFilter)) . "'",
+                    null, false
+                );
+            }
+            return $builder;
+        };
+
+        // ── Stat-card counts ─────────────────────────────────────────────
+        $q = $rf($db->table('incident_reports')->where('review_status', 'approved'));
+        $totalIncidents = (int) $q->countAllResults();
+
+        $currentYear  = (int) date('Y');
+        $currentMonth = (int) date('n');
+
+        $q2 = $rf($db->table('incident_reports')
+            ->where('review_status', 'approved')
+            ->where('year_of_incident', $currentYear)
+            ->where('month_of_incident', $currentMonth));
+        $thisMonth = (int) $q2->countAllResults();
+
+        // Total Fatalities: deceased count WITHIN the active remarks filter.
+        // When filter = "All" → count of deceased among all approved incidents.
+        // When filter = "Deceased" → equals $totalIncidents (100% death rate).
+        // When filter = "Alive" → 0.
+        $q3 = $rf($db->table('incident_reports')
+            ->where('review_status', 'approved')
+            ->where("LOWER(remarks) = 'deceased'", null, false));
+        $totalFatalities = (int) $q3->countAllResults();
+
+        $deathRate = $totalIncidents > 0
+            ? round(($totalFatalities / $totalIncidents) * 100, 1)
+            : 0;
+
+        // Province with most incidents within the active filter
+        $q4 = $rf($db->table('incident_reports')
+            ->select('province, COUNT(*) AS cnt')
+            ->where('review_status', 'approved')
+            ->where('province IS NOT NULL', null, false)
+            ->where('province !=', ''));
+        $topProvinceRow = $q4->groupBy('province')->orderBy('cnt', 'DESC')->limit(1)->get()->getRow();
+
+        $highestRiskProvince    = $topProvinceRow ? $topProvinceRow->province : '—';
+        $highestRiskCount       = $topProvinceRow ? (int) $topProvinceRow->cnt : 0;
+        $highestRiskPct         = $totalIncidents > 0 && $highestRiskCount > 0
+            ? round(($highestRiskCount / $totalIncidents) * 100)
+            : 0;
+
+        // ── Age groups (ordered) ────────────────────────────────────────────
+        $remarksCondition = $remarksFilter !== ''
+            ? " AND LOWER(TRIM(remarks)) = '" . $db->escapeStr(strtolower($remarksFilter)) . "'"
+            : '';
+
+        $byAgeGroupRaw = $db->query("
+            SELECT
+                CASE
+                    WHEN age BETWEEN 0  AND 4  THEN '0-4'
+                    WHEN age BETWEEN 5  AND 14 THEN '5-14'
+                    WHEN age BETWEEN 15 AND 24 THEN '15-24'
+                    WHEN age BETWEEN 25 AND 34 THEN '25-34'
+                    WHEN age BETWEEN 35 AND 44 THEN '35-44'
+                    WHEN age BETWEEN 45 AND 64 THEN '45-64'
+                    WHEN age >= 65             THEN '65+'
+                    ELSE 'Unknown'
+                END AS age_group,
+                COUNT(*) AS cnt
+            FROM incident_reports
+            WHERE review_status = 'approved' AND age IS NOT NULL{$remarksCondition}
+            GROUP BY age_group
+        ")->getResultArray();
+
+        $ageGroupOrder = ['0-4', '5-14', '15-24', '25-34', '35-44', '45-64', '65+', 'Unknown'];
+        $ageGroupMap   = [];
+        foreach ($byAgeGroupRaw as $ag) {
+            $ageGroupMap[$ag['age_group']] = (int) $ag['cnt'];
+        }
+        $byAgeGroup = [];
+        foreach ($ageGroupOrder as $label) {
+            if (isset($ageGroupMap[$label])) {
+                $byAgeGroup[] = ['age_group' => $label, 'cnt' => $ageGroupMap[$label]];
+            }
+        }
+
+        $mostAffectedGroup = '—';
+        $mostAffectedCount = 0;
+        foreach ($byAgeGroup as $ag) {
+            if ($ag['cnt'] > $mostAffectedCount) {
+                $mostAffectedCount = $ag['cnt'];
+                $mostAffectedGroup = $ag['age_group'];
+            }
+        }
+        $mostAffectedPct = $totalIncidents > 0 && $mostAffectedCount > 0
+            ? round(($mostAffectedCount / $totalIncidents) * 100)
+            : 0;
+
+        // ── Chart datasets (filtered by remarks when active) ─────────────────
+        $q5 = $rf($db->table('incident_reports')
+            ->select('year_of_incident AS yr, COUNT(*) AS cnt')
+            ->where('review_status', 'approved')
+            ->where('year_of_incident IS NOT NULL', null, false));
+        $byYear = $q5->groupBy('year_of_incident')->orderBy('year_of_incident', 'ASC')->get()->getResultArray();
+
+        $q6 = $rf($db->table('incident_reports')
+            ->select('province, COUNT(*) AS cnt')
+            ->where('review_status', 'approved')
+            ->where('province IS NOT NULL', null, false)
+            ->where('province !=', ''));
+        $byProvince = $q6->groupBy('province')->orderBy('cnt', 'DESC')->get()->getResultArray();
+
+        $q7 = $rf($db->table('incident_reports')
+            ->select('residence, COUNT(*) AS cnt')
+            ->where('review_status', 'approved')
+            ->where('residence IS NOT NULL', null, false)
+            ->where('residence !=', ''));
+        $byResidence = $q7->groupBy('residence')->orderBy('cnt', 'DESC')->limit(10)->get()->getResultArray();
+
+        $q8 = $rf($db->table('incident_reports')
+            ->select('factors, COUNT(*) AS cnt')
+            ->where('review_status', 'approved')
+            ->where('factors IS NOT NULL', null, false)
+            ->where('factors !=', ''));
+        $byFactors = $q8->groupBy('factors')->orderBy('cnt', 'DESC')->limit(5)->get()->getResultArray();
+
+        $q9 = $rf($db->table('incident_reports')
+            ->select('location_category, COUNT(*) AS cnt')
+            ->where('review_status', 'approved')
+            ->where('location_category IS NOT NULL', null, false)
+            ->where('location_category !=', ''));
+        $byLocation = $q9->groupBy('location_category')->orderBy('cnt', 'DESC')->get()->getResultArray();
+
+        $q10 = $rf($db->table('incident_reports')
+            ->select('occasion, COUNT(*) AS cnt')
+            ->where('review_status', 'approved')
+            ->where('occasion IS NOT NULL', null, false)
+            ->where('occasion !=', ''));
+        $byOccasion = $q10->groupBy('occasion')->orderBy('cnt', 'DESC')->limit(6)->get()->getResultArray();
+
+        $q11 = $rf($db->table('incident_reports')
+            ->select('gender, COUNT(*) AS cnt')
+            ->where('review_status', 'approved')
+            ->where('gender IS NOT NULL', null, false)
+            ->where('gender !=', ''));
+        $bySex = $q11->groupBy('gender')->get()->getResultArray();
+
+        // Remarks distribution — ALWAYS unfiltered so the dropdown stays populated
+        $byRemarks = $db->table('incident_reports')
+            ->select('remarks, COUNT(*) AS cnt')
+            ->where('review_status', 'approved')
+            ->where('remarks IS NOT NULL', null, false)
+            ->where('remarks !=', '')
+            ->groupBy('remarks')
+            ->orderBy('cnt', 'DESC')
+            ->get()->getResultArray();
+
+        return $this->response->setJSON([
+            'active_remarks_filter' => $remarksFilter,
+            'stats' => [
+                'total_incidents'           => $totalIncidents,
+                'this_month'                => $thisMonth,
+                'total_fatalities'          => $totalFatalities,
+                'death_rate'                => $deathRate,
+                'highest_risk_province'     => $highestRiskProvince,
+                'highest_risk_province_pct' => $highestRiskPct,
+                'most_affected_age_group'   => $mostAffectedGroup,
+                'most_affected_age_pct'     => $mostAffectedPct,
+            ],
+            'by_year'      => $byYear,
+            'by_province'  => $byProvince,
+            'by_residence' => $byResidence,
+            'by_factors'   => $byFactors,
+            'by_location'  => $byLocation,
+            'by_occasion'  => $byOccasion,
+            'by_sex'       => $bySex,
+            'by_age_group' => $byAgeGroup,
+            'by_remarks'   => $byRemarks,
+        ]);
+    }
+
         /**
          * Generate incident report (excluding victim names)
          * Returns JSON or downloadable file (CSV)
@@ -562,8 +762,6 @@ class IncidentReport extends BaseController
             'image/jpeg',
             'image/png',
             'application/pdf',
-            'application/msword',
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         ];
 
         $uploadDir = WRITEPATH . 'uploads/incident_reports/' . $incidentN;
@@ -655,8 +853,6 @@ class IncidentReport extends BaseController
             'image/jpeg',
             'image/png',
             'application/pdf',
-            'application/msword',
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         ];
 
         $tmpDir = WRITEPATH . 'uploads/incident_reports/tmp/' . $sessionToken;
