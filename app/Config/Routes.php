@@ -35,6 +35,7 @@ $routes->get('/incident-report/attachments/download/(:num)', 'IncidentReport::do
 $routes->post('/incident-report/approve/(:num)', 'IncidentReport::approve/$1');
 $routes->post('/incident-report/reject/(:num)', 'IncidentReport::reject/$1');
 $routes->get('/incident-report/generateReport', 'IncidentReport::generateReport');
+$routes->get('/incident-report/chart-data', 'IncidentReport::chartData');
 // legacy '/pops' route now redirects
 $routes->get('/pops', static fn() => redirect()->to('/documents'));
 $routes->get('/user-profile', 'Auth::user_profile');
