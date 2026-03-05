@@ -187,11 +187,14 @@ table th,
         padding-bottom: 0.5rem !important;
     }
 
-    /* ensure SweetAlert dialogs reliably float above the incident modal
-       card; z-index values added via JS can be overridden by the modal's
-       stacking context, so use !important to guarantee precedence */
     .swal2-container {
         z-index: 99999 !important;
+    }
+
+    /* Add Incident modal labels styling */
+    #incidentModal label {
+        color: #002c76;
+        font-weight: 600;
     }
 </style>
     <!-- CSRF token for AJAX -->
@@ -243,9 +246,10 @@ table th,
                 </div>
             <?php endif; ?>
         </div>
-        <!-- Filter/Search Container -->
-        <div class="bg-white rounded-2xl shadow p-6 mb-6">
-            <div class="flex flex-wrap items-center gap-3">
+        <!-- Table Container (includes filters) -->
+        <div class="bg-white rounded-2xl shadow p-6" style="margin-top:2rem; margin-bottom:2rem;">
+            <div class="-mx-6 px-6">
+                <div class="flex flex-wrap items-center gap-2 mb-4">
                 <div class="flex items-center rounded-full bg-gray-50 border border-gray-200 overflow-hidden" style="max-width:320px;">
                     <div class="px-3 text-gray-500"><?= svg_icon('search','w-4 h-4') ?></div>
                     <input type="text" id="incidentSearch" placeholder="Search incidents" class="py-2 px-3 text-sm bg-transparent outline-none w-full" />
@@ -284,12 +288,6 @@ table th,
                     </select>
                 </div>
                 <div class="flex items-center gap-1">
-                    <?= svg_icon('location','w-4 h-4 text-gray-500') ?>
-                    <select id="filterLocation" class="rounded-full border border-gray-300 px-3 py-1.5 text-sm">
-                        <option value="">Location Category</option>
-                    </select>
-                </div>
-                <div class="flex items-center gap-1">
                     <?= svg_icon('user','w-4 h-4 text-gray-500') ?>
                     <select id="filterSex" class="rounded-full border border-gray-300 px-3 py-1.5 text-sm">
                         <option value="">Sex</option>
@@ -297,11 +295,12 @@ table th,
                         <option value="Female">Female</option>
                     </select>
                 </div>
+                <button id="clearFiltersBtn" class="inline-flex items-center px-3 py-1.5 bg-gray-200 text-gray-700 rounded-full text-sm hover:bg-gray-300 ml-1" onclick="clearFilters()">
+                    <?= svg_icon('x','w-4 h-4 mr-1') ?>Clear
+                </button>
+                </div>
             </div>
-        </div>
         <!-- Table Container -->
-        <div class="bg-white rounded-2xl shadow p-6" style="margin-top:2rem; margin-bottom:2rem;">
-            
         <div class="overflow-x-auto -mx-6 px-6 pb-6">
                 
                 <table class="min-w-full w-full table-auto divide-y divide-gray-200 rounded-2xl overflow-hidden mb-6">
@@ -344,7 +343,13 @@ table th,
                             <th class="px-6 py-3 text-center text-xs text-gray-400">&nbsp;</th>
                             <?php if (! $isFocal): ?>
                                 <th class="px-6 py-3 text-center text-xs text-gray-400">&nbsp;</th>
-                                <th class="px-6 py-3 text-center text-xs text-gray-400">&nbsp;</th>
+                                <th class="px-6 py-3 text-center text-xs text-gray-400">
+                                    <?php if ($canReview): ?>
+                                        <button type="button" class="inline-flex items-center px-2 py-1 bg-green-600 text-white rounded-full text-xs whitespace-nowrap" onclick="approveAllRows()">Approve all</button>
+                                    <?php else: ?>
+                                        &nbsp;
+                                    <?php endif; ?>
+                                </th>
                                 <th class="px-6 py-3 text-center text-xs text-gray-400">&nbsp;</th>
                             <?php endif; ?>
                         </tr>
@@ -371,8 +376,8 @@ table th,
                 </div>
             </div>
         </div>
-    </div>
-    <!-- bottom spacer to ensure visible gap when scrolling -->
+    </div><!-- bottom spacer to ensure visible gap when scrolling -->
+    
     <div class="h-4"></div>
 
 <div id="saveConfirmModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/40 w-screen h-screen" aria-hidden="true">
@@ -427,20 +432,7 @@ table th,
       <button type="button" class="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white rounded-full hover:bg-blue-700 active:bg-blue-800" onclick="hideModal('attachmentModal')"><?= svg_icon('check','w-4 h-4 mr-2') ?>OK</button>
 
 
-<!-- Review confirm modal (Tailwind) -->
-<div id="reviewConfirmModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/40 w-screen h-screen" aria-hidden="true">
-  <div class="bg-white rounded-2xl shadow-lg max-w-md w-full p-4 mx-4">
-    <div class="flex items-center justify-between mb-3">
-      <h5 class="text-lg font-semibold">Confirm Review</h5>
-      <button type="button" class="text-slate-400 hover:text-slate-600" onclick="hideModal('reviewConfirmModal')" aria-label="Close">&times;</button>
-    </div>
-    <div class="text-sm text-slate-700 mb-4"><div id="reviewConfirmMessage">Are you sure you want to update this incident?</div></div>
-    <div class="flex justify-end gap-2">
-      <button type="button" class="inline-flex items-center px-3 py-1.5 bg-gray-300 text-gray-700 rounded-full hover:bg-gray-400 active:bg-gray-500" onclick="hideModal('reviewConfirmModal')"><?= svg_icon('x','w-4 h-4 mr-2') ?>Cancel</button>
-      <button type="button" id="reviewConfirmAction" class="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white rounded-full hover:bg-blue-700 active:bg-blue-800" onclick="submitReview()"><?= svg_icon('check','w-4 h-4 mr-2') ?>Confirm</button>
-    </div>
-  </div>
-</div>
+
 
 <div id="incidentModal" class="modal-overlay fixed inset-0 z-50 hidden flex items-center justify-center bg-black/40 w-screen h-screen" aria-hidden="true">
   <div class="bg-white rounded-2xl shadow-lg max-w-4xl w-full p-6 mx-4 max-h-[90vh] overflow-y-auto">
@@ -471,7 +463,6 @@ table th,
           </select>
         </div>
 
-        <!-- the province/municipality inputs were previously removed; bring them back -->
         <div class="col-span-1">
           <label for="incidentProvince" class="text-sm text-slate-600 block mb-1">Province</label>
           <select id="incidentProvince" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
@@ -578,10 +569,10 @@ table th,
       <div class="mt-4 flex justify-end gap-2">
         <!-- start disabled; JS will enable when form is valid -->
         <button type="button" id="incidentSaveButton" disabled
-                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 opacity-50 cursor-not-allowed">
+                class="px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 opacity-50 cursor-not-allowed">
           Add Incident
         </button>
-        <button type="button" class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-700 rounded-full hover:bg-gray-400" onclick="hideModal('incidentModal')"><?= svg_icon('x','w-4 h-4 mr-2') ?>Cancel</button>
+        <button type="button" class="inline-flex items-center px-4 py-2 bg-gray-200 text-gray-700 border border-gray-300 rounded-full hover:bg-gray-300 active:bg-gray-400" onclick="hideModal('incidentModal')"><?= svg_icon('x','w-4 h-4 mr-2') ?>Cancel</button>
       </div>
     </form>
   </div>
@@ -1359,7 +1350,7 @@ table th,
 
     document.addEventListener('DOMContentLoaded', function() {
         // move modals out of the scrolling panel so fixed positioning works
-        ['incidentModal','saveConfirmModal','importSuccessModal','saveResultModal','attachmentModal','reviewConfirmModal','attachmentViewerModal'].forEach(id => {
+        ['incidentModal','saveConfirmModal','importSuccessModal','saveResultModal','attachmentModal','attachmentViewerModal'].forEach(id => {
             const m = document.getElementById(id);
             if (m && m.parentNode && m.parentNode !== document.body) {
                 document.body.appendChild(m);
@@ -1914,6 +1905,7 @@ table th,
                 showCancelButton: true,
                 confirmButtonText: 'Yes, update',
                 cancelButtonText: 'Cancel',
+                confirmButtonColor: '#002c76',
                 zIndex: 20001,
                 appendTo: document.body
             });
@@ -2250,6 +2242,18 @@ table th,
                 el.addEventListener('change', renderTable);
             }
         });
+
+    // clear all filter inputs and rerender
+    function clearFilters() {
+        ['incidentSearch','filterMonth','filterYear','filterProvince','filterMunicipality','filterLocation','filterSex']
+            .forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+        const sel = document.getElementById('filterMunicipality');
+        if (sel) sel.innerHTML = '<option value="">Municipality</option>';
+        renderTable();
+    }
 
     function normalizeRow(row) {
         const normalized = { N: row['N'] ?? '', _local: true };
@@ -2685,8 +2689,7 @@ table th,
                         );
                     })();
 
-                    // Log thumbnail load failures and probe the server response so we can debug
-                    // why images sometimes show the broken-image icon in the UI.
+                
                     const thumbImg = button.querySelector('img');
                     if (thumbImg) {
                         thumbImg.addEventListener('error', async () => {
@@ -2776,29 +2779,57 @@ table th,
         }
     }
 
-    let pendingReview = { incidentN: null, action: null };
-
     function showReviewConfirm(incidentN, action) {
-        const messageEl = document.getElementById('reviewConfirmMessage');
         const actionLabel = action === 'approve' ? 'approve' : 'reject';
-        if (messageEl) {
-            messageEl.textContent = `Are you sure you want to ${actionLabel} this incident?`;
+        const options = {
+            title: 'Confirm Review',
+            text: `Are you sure you want to ${actionLabel} this incident?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: `Yes, ${actionLabel}`,
+            cancelButtonText: 'Cancel',
+            reverseButtons: true,
+            zIndex: 20001,
+            appendTo: document.body
+        };
+        // give approve a blue action color as requested
+        if (action === 'approve') {
+            options.confirmButtonColor = '#002c76';
+        } else if (action === 'reject') {
+            options.confirmButtonColor = '#dc2626';
         }
 
-        pendingReview = { incidentN, action };
-
-        showModal('reviewConfirmModal');
+        Swal.fire(options).then((result) => {
+            if (result.isConfirmed) {
+                performReview(incidentN, action);
+            }
+        });
     }
 
-    function submitReview() {
-        const { incidentN, action } = pendingReview;
-        if (!incidentN || !action) {
-            return;
-        }
-
-        hideModal('reviewConfirmModal');
-        performReview(incidentN, action);
+    // bulk approve helper
+    function approveAllRows() {
+        if (!canReviewIncidents) return;
+        Swal.fire({
+            title: 'Approve All?',
+            text: 'This will approve every incident in the list. Continue?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, approve all',
+            cancelButtonText: 'Cancel',
+            confirmButtonColor: '#002c76',
+            zIndex: 20001,
+            appendTo: document.body
+        }).then(result => {
+            if (result.isConfirmed) {
+                tableData.forEach(row => {
+                    if (row['N'] && row.review_status !== 'approved') {
+                        performReview(row['N'], 'approve');
+                    }
+                });
+            }
+        });
     }
+
 
     function deleteRow(index) {
         Swal.fire({
@@ -2807,6 +2838,7 @@ table th,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Yes, delete it',
+            confirmButtonColor: '#C9282D',
             cancelButtonText: 'Cancel',
             reverseButtons: true,
             zIndex: 20001,
@@ -2827,14 +2859,11 @@ table th,
     }
 
     async function uploadIncidentAttachments() {
-        // Upload entries from the client-side queue (currentUploadFiles).
-        // If queue is empty, try to pick up files from the native inputs.
 
         const row = (currentIncidentIndex !== null) ? tableData[currentIncidentIndex] : null;
         const incidentN = row && !row._local ? row['N'] : null;
         const isPreSave = !incidentN; // true when adding a new incident or editing a local row
 
-        // If user selected files in native inputs but didn't 'queue' them yet, add them now
         if (!currentUploadFiles || currentUploadFiles.length === 0) {
             if (incidentPicturesInput && incidentPicturesInput.files && incidentPicturesInput.files.length > 0) {
                 addFilesToQueue(Array.from(incidentPicturesInput.files), 'photo');
@@ -2855,7 +2884,7 @@ table th,
             return;
         }
 
-        // Prepare session token for pre-save uploads (only if at least one queued file has no sessionToken)
+        // Prepare session token for pre-save uploads 
         if (isPreSave) {
             currentAttachmentSession = currentAttachmentSession || String(Date.now()) + '-' + Math.floor(Math.random() * 10000);
             currentUploadFiles.forEach(f => { if (!f.sessionToken) f.sessionToken = currentAttachmentSession; });
@@ -2911,7 +2940,14 @@ table th,
             const response = await fetch(endpoint, { method: 'POST' });
             const result = await response.json();
             if (!response.ok) {
-                showAttachmentModal(result.message || 'Update failed.');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: result.message || 'Update failed.',
+                    confirmButtonText: 'OK',
+                    zIndex: 20001,
+                    appendTo: document.body
+                });
                 return;
             }
 
@@ -2929,9 +2965,24 @@ table th,
             });
 
             renderTable();
-            showAttachmentModal('Incident updated successfully.');
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: 'Incident updated successfully.',
+                timer: 1500,
+                showConfirmButton: false,
+                zIndex: 20001,
+                appendTo: document.body
+            });
         } catch (error) {
-            showAttachmentModal('Update failed: ' + error.message);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Update failed: ' + error.message,
+                confirmButtonText: 'OK',
+                zIndex: 20001,
+                appendTo: document.body
+            });
         }
     }
 
@@ -2939,17 +2990,14 @@ table th,
         showReviewConfirm(incidentN, action);
     }
 
-    const reviewConfirmAction = document.getElementById('reviewConfirmAction');
-    if (reviewConfirmAction) {
-        reviewConfirmAction.addEventListener('click', submitReview);
-    }
+
 </script>
 <?= $this->endSection() ?>
 
 <?= $this->section('pageScripts') ?>
 <script>
     function downloadIncidentReport() {
-        // Ask user whether they want CSV or PDF. 
+        // CSV or PDF option  
         Swal.fire({
             title: 'Download Report',
             input: 'radio',

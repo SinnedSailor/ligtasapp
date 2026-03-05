@@ -680,13 +680,12 @@
                     const filterDate = new Date(dateVal);
                     if (rowDate.toDateString() !== filterDate.toDateString()) matches = false;
                 }
-                // Province/Municipality (for tables with location column or data attributes)
+                // Province/Municipality 
                 if (provinceIdx !== null && tds[locationIdx]) {
                     const loc = tds[locationIdx].textContent;
                     if (provinceVal && !loc.includes(provinceVal)) matches = false;
                     if (municipalityVal && !loc.includes(municipalityVal)) matches = false;
                 } else {
-                    // fallback to data attributes on row (used by My Submissions)
                     if (provinceVal && row.dataset.province && row.dataset.province !== provinceVal) matches = false;
                     if (municipalityVal && row.dataset.municipality && row.dataset.municipality !== municipalityVal) matches = false;
                 }

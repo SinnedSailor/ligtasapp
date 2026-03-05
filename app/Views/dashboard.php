@@ -9,13 +9,6 @@
   <div class="mb-6">
     <div class="bg-white rounded-2xl shadow p-4 sm:p-6 flex flex-wrap items-center justify-between gap-4">
       <h2 class="text-xl font-semibold">Hello, <?= esc($firstName) ?>!</h2>
-      <div class="flex flex-wrap items-center gap-3">
-        <label for="remarks-filter" class="text-sm font-medium text-slate-600 whitespace-nowrap">Filter by Remarks:</label>
-        <select id="remarks-filter" class="text-sm border border-slate-300 rounded-lg px-3 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 min-w-[170px] cursor-pointer">
-          <option value="">All Statuses</option>
-        </select>
-        <span id="filter-badge" class="hidden text-xs font-semibold bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full"></span>
-      </div>
     </div>
   </div>
   <!-- stat cards -->
@@ -130,7 +123,6 @@
 document.addEventListener('DOMContentLoaded', function () {
 
   var allCharts      = [];
-  var dropdownReady  = false;   // populate options only on first successful load
 
   // ── Resize / scroll: always reference the live allCharts array ──────────
   ['resize', 'scroll'].forEach(function (evt) {
@@ -161,36 +153,11 @@ document.addEventListener('DOMContentLoaded', function () {
     };
   }
 
-  // ── Populate the dropdown once from the unfiltered by_remarks dataset ───
-  function populateDropdown(byRemarks) {
-    if (dropdownReady) return;
-    var sel = document.getElementById('remarks-filter');
-    byRemarks.forEach(function (r) {
-      var opt = document.createElement('option');
-      opt.value       = r.remarks;
-      opt.textContent = r.remarks + ' (' + Number(r.cnt).toLocaleString() + ')';
-      sel.appendChild(opt);
-    });
-    dropdownReady = true;
-  }
-
   // ── Update the active-filter badge ──────────────────────────────────────
-  function updateBadge(filter, total) {
-    var badge = document.getElementById('filter-badge');
-    if (!badge) return;
-    if (filter) {
-      badge.textContent = 'Showing: ' + filter + ' — ' + Number(total).toLocaleString() + ' incident(s)';
-      badge.classList.remove('hidden');
-    } else {
-      badge.textContent = '';
-      badge.classList.add('hidden');
-    }
-  }
 
   // ── Render everything from one API response ──────────────────────────────
   function renderDashboard(d) {
     var s      = d.stats;
-    var active = d.active_remarks_filter || '';
 
     // stat cards
     document.getElementById('stat-total-incidents').textContent  = Number(s.total_incidents).toLocaleString();
@@ -202,9 +169,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('stat-most-age-group').textContent   = s.most_affected_age_group || '—';
     document.getElementById('stat-most-age-pct').textContent     = s.most_affected_age_pct + '% affected';
 
-    // dropdown (once) + badge
-    populateDropdown(d.by_remarks);
-    updateBadge(active, s.total_incidents);
+    // no filter functionality; charts always loaded full data
 
     destroyAllCharts();
 
@@ -357,9 +322,6 @@ document.addEventListener('DOMContentLoaded', function () {
   loadData('');
 
   // Dropdown change → refetch with selected remarks value
-  document.getElementById('remarks-filter').addEventListener('change', function () {
-    loadData(this.value);
-  });
 
 });
 </script>

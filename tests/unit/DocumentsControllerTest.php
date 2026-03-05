@@ -235,4 +235,69 @@ final class DocumentsControllerTest extends CIUnitTestCase
         $response->assertRedirect();
         // duplicates were skipped as indicated by controller response
     }
+
+    // -- new tests for filter AJAX endpoint ---------------------------------
+
+    public function testDataEndpointReturnsOnlyMyDocumentsForLgu(): void
+    {
+        // dummy user row so join will not drop results
+        $db = \Config\Database::connect();
+        $db->table('users')->insert([
+            'id' => 7,
+            'username' => 'dummy7',
+            'password' => '',
+            'first_name_enc' => '',
+            'last_name_enc' => '',
+            'email_hash' => '',
+            'email_enc' => '',
+            'province' => '',
+            'municipality' => '',
+            'role_id' => null,
+            'is_admin' => 0,
+        ]);
+
+        // insert two docs for user 7
+        $model = new \App\Models\DocumentModel();
+        $model->insert([
+            'user_id' => 7,
+            'doc_type' => 'ordinance',
+            'original_name' => 'one.pdf',
+            'stored_name' => 'a',
+            'stored_path' => 'a',
+            'status' => 'pending',
+        ]);
+        $model->insert([
+            'user_id' => 7,
+            'doc_type' => 'pops',
+            'original_name' => 'two.pdf',
+            'stored_name' => 'b',
+            'stored_path' => 'b',
+            'status' => 'pending',
+        ]);
+
+        $this->withSession([
+            'logged_in' => true,
+            'role_name' => 'LGU',
+            'user_id'   => 7,
+            'is_admin'  => false,
+        ]);
+
+        $response = $this->get('/documents/data?table=my&doc_type=ordinance');
+        $response->assertOK();
+        $response->assertSee('one.pdf');
+        $response->assertDontSee('two.pdf');
+    }
+
+    public function testDataEndpointMyTableForbiddenForOtherRoles(): void
+    {
+        $this->withSession([
+            'logged_in' => true,
+            'role_name' => 'PROVINCE',
+            'user_id'   => 99,
+            'is_admin'  => false,
+        ]);
+
+        $response = $this->get('/documents/data?table=my');
+        $this->assertSame(403, $response->getStatusCode());
+    }
 }
