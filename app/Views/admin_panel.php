@@ -228,13 +228,13 @@
 
         <div class="overflow-x-auto">
             <table class="min-w-full w-full divide-y divide-gray-200">
-                <thead class="bg #002C76">
+                <thead class="bg-[#002c76]" style="background-color:#002c76">
                     <tr>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600">Username</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600">Name</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600">Email</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600">Role</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600">Actions</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-white">USERNAME</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-white">NAME</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-white">EMAIL</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-white">ROLE</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-white">ACTIONS</th>
                     </tr>
                 </thead>
                 <tbody id="user-tbody" class="bg-white divide-y divide-gray-100">
