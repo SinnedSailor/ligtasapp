@@ -50,13 +50,19 @@ class DocumentModel extends Model
         return $rows;
     }
 
-    public function getDocumentsByStatus(string $status): array
+    public function getDocumentsByStatus(string $status, ?string $province = null): array
     {
-        $rows = $this->select('documents.*, users.first_name_enc, users.last_name_enc, users.province, users.municipality')
+        $builder = $this->select('documents.*, users.first_name_enc, users.last_name_enc, users.province, users.municipality')
             ->join('users', 'users.id = documents.user_id')
-            ->where('documents.status', $status)
-            ->orderBy('documents.created_at', 'desc')
-            ->findAll();
+            ->where('documents.status', $status);
+
+        // When a province is supplied, restrict results to documents whose
+        // uploading user belongs to that province.
+        if ($province !== null && $province !== '') {
+            $builder->where('users.province', $province);
+        }
+
+        $rows = $builder->orderBy('documents.created_at', 'desc')->findAll();
 
         $userModel = new \App\Models\UserModel();
         foreach ($rows as &$r) {

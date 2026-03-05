@@ -235,6 +235,13 @@ class Auth extends BaseController
             $query->where('ir.review_status', 'approved');
         }
 
+        // Province-based restriction: non-FOCAL, non-Admin users only see
+        // incidents that belong to their own province.
+        $provinceFilter = $this->getProvinceFilter();
+        if ($provinceFilter !== null) {
+            $query->where('ir.province', $provinceFilter);
+        }
+
         $rows = $query->get()->getResultArray();
 
         // Decrypt victim names for display when possible

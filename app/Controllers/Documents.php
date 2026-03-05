@@ -45,7 +45,10 @@ class Documents extends BaseController
         }
 
         if ($roleName === 'PROVINCE' || $isAdmin) {
-            $data['pendingDocuments'] = $this->documentModel->getDocumentsByStatus('pending');
+            // PROVINCE users only see pending documents from their own province;
+            // Admin users see all pending documents.
+            $provinceFilter = $this->getProvinceFilter();
+            $data['pendingDocuments'] = $this->documentModel->getDocumentsByStatus('pending', $provinceFilter);
         }
 
         if ($roleName === 'FOCAL' || $isAdmin) {
@@ -216,6 +219,18 @@ class Documents extends BaseController
             return redirect()->to('/documents')->with('error', 'Document not found.');
         }
 
+        // Province users may only approve/reject documents uploaded by users
+        // from their own province.
+        $provinceFilter = $this->getProvinceFilter();
+        if ($provinceFilter !== null) {
+            $userModel = new \App\Models\UserModel();
+            $docOwner = $userModel->select('province')->find((int) $document['user_id']);
+            $ownerProvince = trim((string) ($docOwner['province'] ?? ''));
+            if ($ownerProvince === '' || strcasecmp($ownerProvince, $provinceFilter) !== 0) {
+                return redirect()->to('/documents')->with('error', 'You can only review documents from your own province.');
+            }
+        }
+
         if ($document['status'] !== 'pending') {
             return redirect()->to('/documents')->with('error', 'Only pending documents can be reviewed.');
         }
@@ -252,7 +267,18 @@ class Documents extends BaseController
         } elseif ($roleName === 'LGU' && $documentOwnerId === $userId) {
             $canDownload = true;
         } elseif ($roleName === 'PROVINCE') {
-            $canDownload = true;
+            $provinceFilter = $this->getProvinceFilter();
+            if ($provinceFilter === null) {
+                // No restriction (should not normally happen for PROVINCE, but safe fallback)
+                $canDownload = true;
+            } else {
+                $userModel = new \App\Models\UserModel();
+                $owner = $userModel->select('province')->find($documentOwnerId);
+                $ownerProvince = trim((string) ($owner['province'] ?? ''));
+                if ($ownerProvince !== '' && strcasecmp($ownerProvince, $provinceFilter) === 0) {
+                    $canDownload = true;
+                }
+            }
         } elseif ($roleName === 'FOCAL' && $document['status'] === 'approved') {
             $canDownload = true;
         }
@@ -292,7 +318,17 @@ class Documents extends BaseController
         } elseif ($roleName === 'LGU' && $documentOwnerId === $userId) {
             $canView = true;
         } elseif ($roleName === 'PROVINCE') {
-            $canView = true;
+            $provinceFilter = $this->getProvinceFilter();
+            if ($provinceFilter === null) {
+                $canView = true;
+            } else {
+                $userModel = new \App\Models\UserModel();
+                $owner = $userModel->select('province')->find($documentOwnerId);
+                $ownerProvince = trim((string) ($owner['province'] ?? ''));
+                if ($ownerProvince !== '' && strcasecmp($ownerProvince, $provinceFilter) === 0) {
+                    $canView = true;
+                }
+            }
         } elseif ($roleName === 'FOCAL' && $document['status'] === 'approved') {
             $canView = true;
         }

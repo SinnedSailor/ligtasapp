@@ -25,6 +25,48 @@ class IncidentReport extends BaseController
      * @param string $roleName Normalized role name (uppercased)
      * @return array Filtered rows
      */
+    /**
+     * Map a specific location_category string to a generic keyword label
+     * used by the dashboard "Incidents by location category" chart.
+     * E.g. "Padsan River (Suyo)" → "River", "Fishpond" → "Pond".
+     */
+    private function normalizeLocationKeyword(string $location): string
+    {
+        $lower = strtolower(trim($location));
+
+        // Order matters: more specific patterns first
+        $keywords = [
+            'septic'    => 'Septic Tank',
+            'river'     => 'River',
+            'pond'      => 'Pond',
+            'swamp'     => 'Swamp',
+            'dam'       => 'Dam',
+            'lake'      => 'Lake',
+            'sea'       => 'Sea',
+            'beach'     => 'Beach',
+            'pool'      => 'Pool',
+            'canal'     => 'Canal',
+            'creek'     => 'Creek',
+            'estero'    => 'Estero',
+            'quarry'    => 'Quarry',
+            'waterfall' => 'Waterfalls',
+            'falls'     => 'Falls',
+            'spring'    => 'Spring',
+            'well'      => 'Well',
+            'bay'       => 'Bay',
+            'tank'      => 'Tank',
+        ];
+
+        foreach ($keywords as $needle => $label) {
+            if (str_contains($lower, $needle)) {
+                return $label;
+            }
+        }
+
+        // Fall back to the original value (title-cased)
+        return trim(mb_convert_case($location, MB_CASE_TITLE, 'UTF-8'));
+    }
+
     public function filterRowsForRole(array $rows, string $roleName): array
     {
         if (strtoupper(trim($roleName)) === 'FOCAL') {
@@ -442,6 +484,19 @@ class IncidentReport extends BaseController
             ->where('location_category !=', ''));
         $byLocation = $q9->groupBy('location_category')->orderBy('cnt', 'DESC')->get()->getResultArray();
 
+        // Collapse specific location names into generic keywords for the dashboard chart
+        $locationKeywordMap = [];
+        foreach ($byLocation as $row) {
+            $keyword = $this->normalizeLocationKeyword((string) $row['location_category']);
+            $locationKeywordMap[$keyword] = ($locationKeywordMap[$keyword] ?? 0) + (int) $row['cnt'];
+        }
+        arsort($locationKeywordMap);
+        $byLocation = array_values(array_map(
+            fn($key, $val) => ['location_category' => $key, 'cnt' => $val],
+            array_keys($locationKeywordMap),
+            array_values($locationKeywordMap)
+        ));
+
         $q10 = $rf($db->table('incident_reports')
             ->select('occasion, COUNT(*) AS cnt')
             ->where('review_status', 'approved')
@@ -507,6 +562,16 @@ class IncidentReport extends BaseController
         $incidents = $this->incidentReportModel->findAll();
         $roleName = strtoupper(trim((string) session()->get('role_name')));
         $incidents = $this->filterRowsForRole($incidents, $roleName);
+
+        // Province-based restriction: non-FOCAL, non-Admin users only receive
+        // incidents that belong to their own province.
+        $provinceFilter = $this->getProvinceFilter();
+        if ($provinceFilter !== null) {
+            $incidents = array_values(array_filter($incidents, function ($r) use ($provinceFilter) {
+                return isset($r['province'])
+                    && strcasecmp(trim((string) $r['province']), $provinceFilter) === 0;
+            }));
+        }
 
         // Columns to include (excluding victim name)
         $columns = [
@@ -958,6 +1023,17 @@ class IncidentReport extends BaseController
             ]);
         }
 
+        // Province users may only review incidents from their own province.
+        $provinceFilter = $this->getProvinceFilter();
+        if ($provinceFilter !== null) {
+            $incidentProvince = trim((string) ($incident['province'] ?? ''));
+            if ($incidentProvince === '' || strcasecmp($incidentProvince, $provinceFilter) !== 0) {
+                return $this->response->setStatusCode(403)->setJSON([
+                    'message' => 'You can only review incidents from your own province.',
+                ]);
+            }
+        }
+
         $this->incidentReportModel->update($incident['id'], [
             'review_status' => $status,
             'reviewed_by' => (int) session()->get('user_id'),
@@ -991,6 +1067,18 @@ class IncidentReport extends BaseController
             return $this->response->setStatusCode(403)->setJSON([
                 'message' => 'Forbidden.',
             ]);
+        }
+
+        // Province-based restriction: non-FOCAL, non-Admin users can only list
+        // attachments for incidents that belong to their own province.
+        $provinceFilter = $this->getProvinceFilter();
+        if ($provinceFilter !== null) {
+            $incidentProvince = trim((string) ($incident['province'] ?? ''));
+            if ($incidentProvince !== '' && strcasecmp($incidentProvince, $provinceFilter) !== 0) {
+                return $this->response->setStatusCode(403)->setJSON([
+                    'message' => 'Forbidden.',
+                ]);
+            }
         }
 
         $attachmentModel = new \App\Models\IncidentReportAttachmentModel();
@@ -1041,6 +1129,16 @@ class IncidentReport extends BaseController
             ]);
         }
 
+        // Province-based restriction
+        $provinceFilter = $this->getProvinceFilter();
+        if ($provinceFilter !== null && $incident) {
+            $incidentProvince = trim((string) ($incident['province'] ?? ''));
+            if ($incidentProvince !== '' && strcasecmp($incidentProvince, $provinceFilter) !== 0) {
+                return $this->response->setStatusCode(403)->setJSON([
+                    'message' => 'Forbidden.',
+                ]);
+            }
+        }
         $previewPath = $attachment['preview_path'] ?? null;
         $previewMime = $attachment['preview_mime'] ?? null;
         $filePath = null;
@@ -1116,6 +1214,15 @@ class IncidentReport extends BaseController
             return $this->response->setStatusCode(403)->setJSON(['message' => 'Forbidden.']);
         }
 
+        // Province-based restriction
+        $provinceFilter = $this->getProvinceFilter();
+        if ($provinceFilter !== null && $incident) {
+            $incidentProvince = trim((string) ($incident['province'] ?? ''));
+            if ($incidentProvince !== '' && strcasecmp($incidentProvince, $provinceFilter) !== 0) {
+                return $this->response->setStatusCode(403)->setJSON(['message' => 'Forbidden.']);
+            }
+        }
+
         // Prefer preview_path when available (converted PDF for office docs)
         $previewPath = $attachment['preview_path'] ?? null;
         if ($previewPath) {
@@ -1176,6 +1283,17 @@ class IncidentReport extends BaseController
             return $this->response->setStatusCode(403)->setJSON([
                 'message' => 'Forbidden.',
             ]);
+        }
+
+        // Province-based restriction
+        $provinceFilter = $this->getProvinceFilter();
+        if ($provinceFilter !== null && $incident) {
+            $incidentProvince = trim((string) ($incident['province'] ?? ''));
+            if ($incidentProvince !== '' && strcasecmp($incidentProvince, $provinceFilter) !== 0) {
+                return $this->response->setStatusCode(403)->setJSON([
+                    'message' => 'Forbidden.',
+                ]);
+            }
         }
 
         $fullPath = WRITEPATH . 'uploads/' . $attachment['stored_path'];
