@@ -49,7 +49,7 @@ class IncidentReport extends BaseController
             'creek'     => 'Creek',
             'estero'    => 'Estero',
             'quarry'    => 'Quarry',
-            'waterfall' => 'Falls',
+            'waterfall' => 'Waterfalls',
             'falls'     => 'Falls',
             'spring'    => 'Spring',
             'well'      => 'Well',
