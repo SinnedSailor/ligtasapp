@@ -18,7 +18,6 @@ $hideFooter = true;
 
     /* glassmorphism card styling (for older browsers) */
     .glass-card {
-        /* ensure corners are rounded even if Tailwind class removed */
         border-radius: 3rem;
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
@@ -38,7 +37,7 @@ $hideFooter = true;
                         <img src="<?= base_url('assets/images/ligtas.png') ?>" alt="LIGTAS logo" class="w-full h-full object-cover" />
                     </div>
                     <h1 class="text-3xl font-extrabold text-white">LIGTAS</h1>
-                    <p class="text-sm text-white/80 mt-1">Local Incident Gathering and Tracking for Aquatic Safety</p>
+                    <p class="text-sm font-semibold text-white/80 mt-1">Local Incident Gathering and Tracking for Aquatic Safety</p>
                 </div>
                 <h4 class="text-lg font-semibold text-white mb-6">Welcome!</h4>
 

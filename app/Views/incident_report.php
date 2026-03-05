@@ -211,7 +211,7 @@ table th,
 ?>
 <div class="px-4 sm:px-6 lg:px-8 mt-6 pb-8">
     <div class="w-full mb-8">
-        <!-- Upload Container (with enforced bottom margin) -->
+        <!-- Upload Container -->
         <div class="bg-white rounded-2xl shadow p-6" style="margin-bottom:2rem;">
             <h4 class="text-lg font-semibold">Incident Report</h4>
             <div class="flex justify-between items-center flex-wrap gap-3 mt-4 mb-4">
@@ -242,6 +242,62 @@ table th,
                     <div class="bg-blue-50 border border-blue-200 text-blue-800 rounded-md p-3 text-sm">Upload at least one photo or document per incident. Attachments are reviewed by Province users.</div>
                 </div>
             <?php endif; ?>
+        </div>
+        <!-- Filter/Search Container -->
+        <div class="bg-white rounded-2xl shadow p-6 mb-6">
+            <div class="flex flex-wrap items-center gap-3">
+                <div class="flex items-center rounded-full bg-gray-50 border border-gray-200 overflow-hidden" style="max-width:320px;">
+                    <div class="px-3 text-gray-500"><?= svg_icon('search','w-4 h-4') ?></div>
+                    <input type="text" id="incidentSearch" placeholder="Search incidents" class="py-2 px-3 text-sm bg-transparent outline-none w-full" />
+                </div>
+                <div class="flex items-center gap-1">
+                    <?= svg_icon('calendar','w-4 h-4 text-gray-500') ?>
+                    <select id="filterMonth" class="rounded-full border border-gray-300 px-3 py-1.5 text-sm">
+                        <option value="">Month</option>
+                        <?php for ($m=1; $m<=12; $m++): ?>
+                            <option value="<?= $m ?>"><?= $m ?></option>
+                        <?php endfor; ?>
+                    </select>
+                </div>
+                <div class="flex items-center gap-1">
+                    <?= svg_icon('calendar','w-4 h-4 text-gray-500') ?>
+                    <select id="filterYear" class="rounded-full border border-gray-300 px-3 py-1.5 text-sm" style="width:5rem;">
+                        <option value="">Year</option>
+                        <?php $currentYear = date('Y'); for ($y=$currentYear; $y>=2000; $y--): ?>
+                            <option value="<?= $y ?>"><?= $y ?></option>
+                        <?php endfor; ?>
+                    </select>
+                </div>
+                <div class="flex items-center gap-1">
+                    <?= svg_icon('globe','w-4 h-4 text-gray-500') ?>
+                    <select id="filterProvince" class="rounded-full border border-gray-300 px-3 py-1.5 text-sm">
+                        <option value="">Province</option>
+                        <?php foreach ($provinceList as $prov): ?>
+                            <option value="<?= esc($prov) ?>"><?= esc($prov) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="flex items-center gap-1">
+                    <?= svg_icon('map-marker','w-4 h-4 text-gray-500') ?>
+                    <select id="filterMunicipality" class="rounded-full border border-gray-300 px-3 py-1.5 text-sm">
+                        <option value="">Municipality</option>
+                    </select>
+                </div>
+                <div class="flex items-center gap-1">
+                    <?= svg_icon('location','w-4 h-4 text-gray-500') ?>
+                    <select id="filterLocation" class="rounded-full border border-gray-300 px-3 py-1.5 text-sm">
+                        <option value="">Location Category</option>
+                    </select>
+                </div>
+                <div class="flex items-center gap-1">
+                    <?= svg_icon('user','w-4 h-4 text-gray-500') ?>
+                    <select id="filterSex" class="rounded-full border border-gray-300 px-3 py-1.5 text-sm">
+                        <option value="">Sex</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+            </div>
         </div>
         <!-- Table Container -->
         <div class="bg-white rounded-2xl shadow p-6" style="margin-top:2rem; margin-bottom:2rem;">
@@ -1471,8 +1527,32 @@ table th,
             return;
         }
 
+        // apply filters first
+        let dataToRender = tableData.filter(r => {
+            // text search against the entire row
+            const search = (document.getElementById('incidentSearch')?.value || '').toLowerCase().trim();
+            if (search) {
+                const hay = JSON.stringify(r).toLowerCase();
+                if (!hay.includes(search)) {
+                    return false;
+                }
+            }
+            const month = (document.getElementById('filterMonth')?.value || '').trim();
+            if (month && String(r['Month of Incident']) !== month) return false;
+            const year = (document.getElementById('filterYear')?.value || '').trim();
+            if (year && String(r['Year of Incident']) !== year) return false;
+            const prov = (document.getElementById('filterProvince')?.value || '').trim();
+            if (prov && String(r['Province']) !== prov) return false;
+            const muni = (document.getElementById('filterMunicipality')?.value || '').trim();
+            if (muni && String(r['Municipality/City where Incidence Occurred']) !== muni) return false;
+            const loc = (document.getElementById('filterLocation')?.value || '').trim();
+            if (loc && String(r['Location Category']) !== loc) return false;
+            const sex = (document.getElementById('filterSex')?.value || '').trim();
+            if (sex && String(r['Gender of the Person']) !== sex) return false;
+            return true;
+        });
         // apply sorting if requested
-        let dataToRender = tableData;
+        if (sortColumn) {
         if (sortColumn) {
             dataToRender = [...tableData].sort((a, b) => {
                 let vaRaw = a[sortColumn] || '';
@@ -1493,9 +1573,7 @@ table th,
                     // fall through to tie-breaker below
                 }
 
-                // when values are equal (or not comparable) use the N column as a
-                // stable secondary key so that rows maintain their incident number
-                // order even when sorted by another field like year.
+               
                 const naN = parseFloat(a['N'] || 0);
                 const nbN = parseFloat(b['N'] || 0);
                 if (naN < nbN) return -1;
@@ -2133,10 +2211,38 @@ table th,
 
     const incidentProvinceSelect = document.getElementById('incidentProvince');
     if (incidentProvinceSelect) {
-        // reset municipality whenever the province changes
+        // reset municipality whenever the province changes (modal)
         incidentProvinceSelect.addEventListener('change', () => updateIncidentMunicipalities());
         incidentProvinceSelect.addEventListener('input', () => updateIncidentMunicipalities());
     }
+
+    // update the municipality filter dropdown when province filter is changed
+    const filterProvinceSelect = document.getElementById('filterProvince');
+    const filterMunicipalitySelect = document.getElementById('filterMunicipality');
+    if (filterProvinceSelect && filterMunicipalitySelect) {
+        filterProvinceSelect.addEventListener('change', () => {
+            const prov = filterProvinceSelect.value;
+            filterMunicipalitySelect.innerHTML = '<option value="">Municipality</option>';
+            if (prov && municipalities[prov]) {
+                municipalities[prov].forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = m;
+                    opt.textContent = m;
+                    filterMunicipalitySelect.appendChild(opt);
+                });
+            }
+            renderTable();
+        });
+    }
+    // add listeners for other filter controls so table updates automatically
+    ['incidentSearch','filterMonth','filterYear','filterMunicipality','filterLocation','filterSex']
+        .forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('input', renderTable);
+                el.addEventListener('change', renderTable);
+            }
+        });
 
     function normalizeRow(row) {
         const normalized = { N: row['N'] ?? '', _local: true };
@@ -2836,8 +2942,7 @@ table th,
 <?= $this->section('pageScripts') ?>
 <script>
     function downloadIncidentReport() {
-        // Ask user whether they want CSV or PDF. confirm button uses the
-        // theme blue (#002c76) per request.
+        // Ask user whether they want CSV or PDF. 
         Swal.fire({
             title: 'Download Report',
             input: 'radio',
