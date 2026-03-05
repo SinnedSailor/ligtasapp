@@ -205,4 +205,40 @@ final class IncidentReportControllerTest extends CIUnitTestCase
         $this->assertCount(1, $json['data']);
         $this->assertSame(1, $json['data'][0]['n']);
     }
+
+    public function testGenerateReportPdf(): void
+    {
+        $ctrl = new IncidentReport();
+        $fakeModel = new class extends \App\Models\IncidentReportModel {
+            public function findAll(?int $limit = null, int $offset = 0)
+            {
+                return [
+                    ['n' => 1, 'review_status' => 'approved', 'month_of_incident' => '1', 'year_of_incident' => 2020, 'province' => 'A', 'municipality' => 'B', 'location_category' => '', 'age' => '', 'gender' => '', 'occasion' => '', 'factors' => '', 'residence' => '', 'occupation' => '', 'remarks' => ''],
+                ];
+            }
+        };
+        $refProp = new \ReflectionProperty($ctrl, 'incidentReportModel');
+        $refProp->setAccessible(true);
+        $refProp->setValue($ctrl, $fakeModel);
+
+        $session = session();
+        $session->set('role_name', 'LGU');
+        $session->set('logged_in', true);
+
+        $resp = \Config\Services::response();
+        $refResp = new \ReflectionProperty($ctrl, 'response');
+        $refResp->setAccessible(true);
+        $refResp->setValue($ctrl, $resp);
+
+        $req = \Config\Services::request();
+        $_GET['format'] = 'pdf';
+        $refReq = new \ReflectionProperty($ctrl, 'request');
+        $refReq->setAccessible(true);
+        $refReq->setValue($ctrl, $req);
+
+        $response = $ctrl->generateReport();
+        $this->assertSame('application/pdf', $response->getHeaderLine('Content-Type'));
+        $body = (string) $response->getBody();
+        $this->assertStringStartsWith('%PDF', $body);
+    }
 }

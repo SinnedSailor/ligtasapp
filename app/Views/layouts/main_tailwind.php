@@ -234,6 +234,15 @@
 <?php include(APPPATH . 'Views/layouts/sweetalert_script.php'); ?>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+ 
+    if (typeof Swal !== 'undefined' && Swal.setDefaults) {
+        Swal.setDefaults({
+            confirmButtonColor: '#002c76',
+            cancelButtonColor: '#9db4dd',
+            zIndex: 20000
+        });
+    }
+
     var logoutBtn = document.querySelector('a[title="Logout"]');
 
     // sidebar collapse toggle
