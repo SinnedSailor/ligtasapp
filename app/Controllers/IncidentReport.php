@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\IncidentReportModel;
+use Dompdf\Dompdf;
 
 
 class IncidentReport extends BaseController
@@ -534,14 +535,43 @@ class IncidentReport extends BaseController
                 $data[] = $row;
             }
 
-            // Optionally: return as CSV file
-            if ($this->request->getGet('format') === 'csv') {
+            // Optionally: return as CSV or PDF file
+            $fmt = $this->request->getGet('format');
+            if ($fmt === 'csv') {
                 $filename = 'incident_report_' . date('Ymd_His') . '.csv';
                 $csv = $this->arrayToCsv($data, $columns);
                 return $this->response
                     ->setHeader('Content-Type', 'text/csv')
                     ->setHeader('Content-Disposition', 'attachment; filename="' . $filename . '"')
                     ->setBody($csv);
+            }
+            if ($fmt === 'pdf') {
+                // build HTML table and convert to PDF using Dompdf
+                $html = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>' .
+                    'table{border-collapse:collapse;width:100%;font-size:12px;}td,th{border:1px solid #000;padding:4px;}th{background:#ddd;}' .
+                    '</style></head><body><table><thead><tr>';
+                foreach ($columns as $col) {
+                    $html .= '<th>' . htmlspecialchars(strtoupper(str_replace('_',' ',$col))) . '</th>';
+                }
+                $html .= '</tr></thead><tbody>';
+                foreach ($data as $row) {
+                    $html .= '<tr>';
+                    foreach ($columns as $col) {
+                        $html .= '<td>' . htmlspecialchars($row[$col] ?? '') . '</td>';
+                    }
+                    $html .= '</tr>';
+                }
+                $html .= '</tbody></table></body></html>';
+                $pdfLib = new \Dompdf\Dompdf();
+                $pdfLib->loadHtml($html);
+                $pdfLib->setPaper('A4', 'landscape');
+                $pdfLib->render();
+                $pdfContent = $pdfLib->output();
+                $filename = 'incident_report_' . date('Ymd_His') . '.pdf';
+                return $this->response
+                    ->setHeader('Content-Type', 'application/pdf')
+                    ->setHeader('Content-Disposition', 'attachment; filename="' . $filename . '"')
+                    ->setBody($pdfContent);
             }
 
             // Default: return as JSON

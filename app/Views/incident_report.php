@@ -182,9 +182,16 @@ table th,
         overflow-y: auto;
     }
 
-    /* always leave some space at bottom of page content */
+ 
     .content-wrapper {
         padding-bottom: 0.5rem !important;
+    }
+
+    /* ensure SweetAlert dialogs reliably float above the incident modal
+       card; z-index values added via JS can be overridden by the modal's
+       stacking context, so use !important to guarantee precedence */
+    .swal2-container {
+        z-index: 99999 !important;
     }
 </style>
     <!-- CSRF token for AJAX -->
@@ -210,7 +217,7 @@ table th,
             <div class="flex justify-between items-center flex-wrap gap-3 mt-4 mb-4">
                 <div class="flex items-center gap-3">
                     <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" class="hidden" />
-                    <button id="importButton" class="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white rounded-full text-sm hover:bg-blue-700 active:bg-blue-800" onclick="document.getElementById('excelFile').click()" style="<?= $hasInitialRows ? 'display:none;' : '' ?>">
+                    <button id="importButton" class="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white rounded-full text-sm hover:bg-blue-700 active:bg-blue-800" onclick="document.getElementById('excelFile').click()">
                         <?= svg_icon('cloud-upload', 'w-4 h-4 mr-2') ?> Import Excel File
                     </button>
                     <span class="text-gray-500 text-sm file-name" id="fileName" style="<?= $hasInitialRows ? 'display:none;' : '' ?>">No file selected</span>
@@ -222,7 +229,7 @@ table th,
                             <?= svg_icon('plus','w-4 h-4 mr-2') ?> Add Incident
                         </button>
                     <?php endif; ?>
-                    <button id="saveButton" class="inline-flex items-center px-3 py-1.5 bg-green-600 text-white rounded-full text-sm hover:bg-green-700 active:bg-green-800" onclick="openSaveModal()" style="<?= $hasInitialRows ? 'display:none;' : '' ?>">
+                    <button id="saveButton" class="inline-flex items-center px-3 py-1.5 bg-green-600 text-white rounded-full text-sm hover:bg-green-700 active:bg-green-800" onclick="openSaveModal()">
                         <?= svg_icon('check','w-4 h-4 mr-2') ?> Save to Database
                     </button>
                     <button id="generateReportButton" class="inline-flex items-center px-3 py-1.5 text-white rounded-full text-sm" style="background-color:#0065F8;" onmouseover="this.style.backgroundColor='#0053C5'" onmouseout="this.style.backgroundColor='#0065F8'" onmousedown="this.style.backgroundColor='#0040A1'" onmouseup="this.style.backgroundColor='#0053C5'" onclick="downloadIncidentReport()">
@@ -238,9 +245,9 @@ table th,
         </div>
         <!-- Table Container -->
         <div class="bg-white rounded-2xl shadow p-6" style="margin-top:2rem; margin-bottom:2rem;">
-            <!-- negative horizontal margins cancel the card padding so the table can reach the rounded corners -->
+            
         <div class="overflow-x-auto -mx-6 px-6 pb-6">
-                <!-- ensure table spans its container so the right edge aligns with the scroll wrapper -->
+                
                 <table class="min-w-full w-full table-auto divide-y divide-gray-200 rounded-2xl overflow-hidden mb-6">
                     <thead class="bg-gray-50">
                         <tr>
@@ -717,11 +724,11 @@ table th,
     const serverRows = <?= json_encode($initialRows ?? []) ?>;
     const importButton = document.getElementById('importButton');
 
-    // apply default sort once the DOM is ready
-    // show incidents in natural numeric order by default; users can click other
-    // column headers to re-sort.  Formerly the table defaulted to sorting by
-    // year which caused the N column to look "out of order" when viewing
-    // mixed years.
+    if (typeof Swal !== 'undefined' && Swal.setDefaults) {
+        Swal.setDefaults({ zIndex: 20000 });
+    }
+
+
     document.addEventListener('DOMContentLoaded', () => {
         // restore pagination page and scroll from prior visit if available
         const lastPage = sessionStorage.getItem('incidentCurrentPage');
@@ -884,11 +891,11 @@ table th,
         const showButtons = !hasData;
         if (importButton) {
             importButton.disabled = hasData;
-            importButton.style.display = showButtons ? '' : 'none';
+            // keep visible regardless of data
         }
         if (saveButton) {
             saveButton.disabled = hasData;
-            saveButton.style.display = showButtons ? '' : 'none';
+            // keep visible regardless of data
         }
         if (fileNameLabel) {
             fileNameLabel.style.display = showButtons ? '' : 'none';
@@ -1812,6 +1819,24 @@ table th,
     }
 
     async function saveIncidentFromModal() {
+        const isEdit = currentIncidentIndex !== null;
+        // if we're updating an existing incident, confirm with the user first
+        if (isEdit) {
+            const confirmResult = await Swal.fire({
+                title: 'Confirm Update',
+                text: 'Are you sure you want to update this incident?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, update',
+                cancelButtonText: 'Cancel',
+                zIndex: 20001,
+                appendTo: document.body
+            });
+            if (!confirmResult.isConfirmed) {
+                return;
+            }
+        }
+
         const genderField = incidentFieldMap.find(field => field.column === 'Gender of the Person');
         if (genderField) {
             const genderInput = document.getElementById(genderField.id);
@@ -1824,7 +1849,6 @@ table th,
             }
         }
 
-        const isEdit = currentIncidentIndex !== null;
         const row = isEdit ? tableData[currentIncidentIndex] : { 'N': tableData.length + 1, _local: true };
 
         incidentFieldMap.forEach(field => {
@@ -1911,6 +1935,19 @@ table th,
                     showIncidentFormMessage(result.message || 'Update failed.', 'danger');
                     return;
                 }
+
+                // show a brief success alert after edit so the user knows the
+                // update went through.  z-index default ensures it floats above
+                // the underlying form.
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Updated',
+                    text: 'Incident updated successfully.',
+                    timer: 1500,
+                    showConfirmButton: false,
+                    zIndex: 20001,
+                    appendTo: document.body
+                });
 
                 // after a successful update, if there are still queued files (maybe upload errored)
                 // try again so attachments are never lost
@@ -2398,17 +2435,32 @@ table th,
         el.classList.add('hidden');
         el.style.display = 'none';
         el.setAttribute('aria-hidden', 'true');
-        // restore scrolling
+     
         document.body.classList.remove('overflow-hidden');
         try { setScrollLock(false); } catch (e) { /* noop */ }
     }
 
+
     function openSaveModal() {
-        showModal('saveConfirmModal');
+        Swal.fire({
+            title: 'Confirm Save',
+            text: 'This will save the current imported rows into the database. Continue?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, save',
+            cancelButtonText: 'Cancel',
+            confirmButtonColor: '#002c76',
+            cancelButtonColor: '#9db4dd',
+            zIndex: 20001,
+            appendTo: document.body
+        }).then((result) => {
+            if (result.isConfirmed) {
+                saveToDatabase();
+            }
+        });
     }
 
     function confirmSaveToDatabase() {
-        hideModal('saveConfirmModal');
         saveToDatabase();
     }
 
@@ -2636,11 +2688,29 @@ table th,
     }
 
     function deleteRow(index) {
-        if (confirm('Are you sure you want to delete this row?')) {
-            tableData.splice(index, 1);
-            renderTable();
-            alert('Row deleted successfully!');
-        }
+        Swal.fire({
+            title: 'Confirm Deletion',
+            text: 'Are you sure you want to delete this row?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it',
+            cancelButtonText: 'Cancel',
+            reverseButtons: true,
+            zIndex: 20001,
+            appendTo: document.body
+        }).then((result) => {
+            if (result.isConfirmed) {
+                tableData.splice(index, 1);
+                renderTable();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Deleted',
+                    text: 'Row deleted successfully.',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            }
+        });
     }
 
     async function uploadIncidentAttachments() {
@@ -2766,8 +2836,33 @@ table th,
 <?= $this->section('pageScripts') ?>
 <script>
     function downloadIncidentReport() {
-        // Download as CSV
-        window.open('/incident-report/generateReport?format=csv', '_blank');
+        // Ask user whether they want CSV or PDF. confirm button uses the
+        // theme blue (#002c76) per request.
+        Swal.fire({
+            title: 'Download Report',
+            input: 'radio',
+            inputOptions: {
+                csv: 'CSV (as is)',
+                pdf: 'PDF'
+            },
+            inputValue: 'csv',
+            showCancelButton: true,
+            confirmButtonText: 'Download',
+            cancelButtonText: 'Cancel',
+            confirmButtonColor: '#002c76',
+            cancelButtonColor: '#9db4dd',
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'Please select a format';
+                }
+            },
+            zIndex: 20001,
+            appendTo: document.body
+        }).then((result) => {
+            if (result.isConfirmed && result.value) {
+                window.open(`/incident-report/generateReport?format=${result.value}`, '_blank');
+            }
+        });
     }
 </script>
 <?= $this->endSection() ?>
