@@ -1471,10 +1471,18 @@ table th,
             return;
         }
 
-        // apply sorting if requested
-        let dataToRender = tableData;
-        if (sortColumn) {
-            dataToRender = [...tableData].sort((a, b) => {
+        // Status priority: pending first, rejected in the middle, approved last
+        const statusPriority = s => s === 'approved' ? 2 : (s === 'rejected' ? 1 : 0);
+
+        // apply sorting — always use review_status as primary sort key (pending
+        // first, approved last), then the user-selected column as secondary.
+        let dataToRender = [...tableData].sort((a, b) => {
+            // Primary: status priority
+            const sp = statusPriority(a.review_status || 'pending') - statusPriority(b.review_status || 'pending');
+            if (sp !== 0) return sp;
+
+            // Secondary: user-selected column (if any)
+            if (sortColumn) {
                 let vaRaw = a[sortColumn] || '';
                 let vbRaw = b[sortColumn] || '';
                 let va = vaRaw.toString().toLowerCase();
@@ -1486,23 +1494,19 @@ table th,
                 if (!isNaN(na) && !isNaN(nb)) {
                     if (na < nb) return sortDirection === 'asc' ? -1 : 1;
                     if (na > nb) return sortDirection === 'asc' ? 1 : -1;
-                    // fall through to tie-breaker below
                 } else {
                     if (va < vb) return sortDirection === 'asc' ? -1 : 1;
                     if (va > vb) return sortDirection === 'asc' ? 1 : -1;
-                    // fall through to tie-breaker below
                 }
+            }
 
-                // when values are equal (or not comparable) use the N column as a
-                // stable secondary key so that rows maintain their incident number
-                // order even when sorted by another field like year.
-                const naN = parseFloat(a['N'] || 0);
-                const nbN = parseFloat(b['N'] || 0);
-                if (naN < nbN) return -1;
-                if (naN > nbN) return 1;
-                return 0;
-            });
-        }
+            // Tertiary: N column as stable tie-breaker
+            const naN = parseFloat(a['N'] || 0);
+            const nbN = parseFloat(b['N'] || 0);
+            if (naN < nbN) return -1;
+            if (naN > nbN) return 1;
+            return 0;
+        });
 
         if (currentPage > getTotalPages()) {
             currentPage = getTotalPages();
