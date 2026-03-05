@@ -25,6 +25,48 @@ class IncidentReport extends BaseController
      * @param string $roleName Normalized role name (uppercased)
      * @return array Filtered rows
      */
+    /**
+     * Map a specific location_category string to a generic keyword label
+     * used by the dashboard "Incidents by location category" chart.
+     * E.g. "Padsan River (Suyo)" → "River", "Fishpond" → "Pond".
+     */
+    private function normalizeLocationKeyword(string $location): string
+    {
+        $lower = strtolower(trim($location));
+
+        // Order matters: more specific patterns first
+        $keywords = [
+            'septic'    => 'Septic Tank',
+            'river'     => 'River',
+            'pond'      => 'Pond',
+            'swamp'     => 'Swamp',
+            'dam'       => 'Dam',
+            'lake'      => 'Lake',
+            'sea'       => 'Sea',
+            'beach'     => 'Beach',
+            'pool'      => 'Pool',
+            'canal'     => 'Canal',
+            'creek'     => 'Creek',
+            'estero'    => 'Estero',
+            'quarry'    => 'Quarry',
+            'waterfall' => 'Falls',
+            'falls'     => 'Falls',
+            'spring'    => 'Spring',
+            'well'      => 'Well',
+            'bay'       => 'Bay',
+            'tank'      => 'Tank',
+        ];
+
+        foreach ($keywords as $needle => $label) {
+            if (str_contains($lower, $needle)) {
+                return $label;
+            }
+        }
+
+        // Fall back to the original value (title-cased)
+        return trim(mb_convert_case($location, MB_CASE_TITLE, 'UTF-8'));
+    }
+
     public function filterRowsForRole(array $rows, string $roleName): array
     {
         if (strtoupper(trim($roleName)) === 'FOCAL') {
@@ -441,6 +483,19 @@ class IncidentReport extends BaseController
             ->where('location_category IS NOT NULL', null, false)
             ->where('location_category !=', ''));
         $byLocation = $q9->groupBy('location_category')->orderBy('cnt', 'DESC')->get()->getResultArray();
+
+        // Collapse specific location names into generic keywords for the dashboard chart
+        $locationKeywordMap = [];
+        foreach ($byLocation as $row) {
+            $keyword = $this->normalizeLocationKeyword((string) $row['location_category']);
+            $locationKeywordMap[$keyword] = ($locationKeywordMap[$keyword] ?? 0) + (int) $row['cnt'];
+        }
+        arsort($locationKeywordMap);
+        $byLocation = array_values(array_map(
+            fn($key, $val) => ['location_category' => $key, 'cnt' => $val],
+            array_keys($locationKeywordMap),
+            array_values($locationKeywordMap)
+        ));
 
         $q10 = $rf($db->table('incident_reports')
             ->select('occasion, COUNT(*) AS cnt')
