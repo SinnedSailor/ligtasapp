@@ -9,7 +9,6 @@ $hideFooter = true;
 <?= $this->section('pageStyles') ?>
 <style>
     .auth-bg {
-        /* similar background used on login; change photo URL if desired */
         background: 
             linear-gradient(135deg,rgba(4, 242, 255, 0.6) 0%, rgba(22, 41, 209, 0.6) 60%),
             url('<?= base_url('assets/images/water.png') ?>') center/cover no-repeat;
@@ -17,9 +16,7 @@ $hideFooter = true;
         background-position: center;
     }
 
-    /* glassmorphism card styling */
     .glass-card {
-        /* fully transparent background to match login container */
         backdrop-filter: blur(30px);
         -webkit-backdrop-filter: blur(30px);
         border: 1px solid rgba(255,255,255,0.25);
@@ -36,11 +33,11 @@ $hideFooter = true;
                 <img src="<?= base_url('assets/images/ligtas.png') ?>" alt="LIGTAS logo" class="w-full h-full object-cover" />
             </div>
             <h3 class="text-2xl font-extrabold text-white">LIGTAS</h3>
-            <p class="text-sm text-white/80 mt-1">Local Incident Gathering and Tracking for Aquatic Safety</p>
+            <p class="text-sm text-white">Local Incident Gathering and Tracking for Aquatic Safety</p>
         </div>
 
-        <h4 class="text-lg font-semibold text-white mb-4">Create your account</h4>
-        <p class="text-sm text-white/80 mb-6">Fill in the details to register</p>
+        <h4 class="text-lg font-semibold text-white">Create your account</h4>
+        <p class="text-sm text-white mb-3">Fill in the details to register</p>
 
         <?php if (session()->has('error')): ?>
             <div class="mb-4 rounded-md bg-red-900 bg-opacity-50 border border-red-700 text-red-100 px-4 py-3">
@@ -103,6 +100,13 @@ $hideFooter = true;
             </div>
 
             <div class="md:col-span-2">
+                <label class="inline-flex items-center text-white text-sm">
+                    <input id="agree" name="agree" type="checkbox" required class="form-checkbox h-4 w-4 text-blue-600" <?= old('agree') ? 'checked' : '' ?> />
+                    <span class="ml-2">I agree to the <a href="#" id="showTerms" class="underline hover:text-blue-300">Data Privacy Act of 2012 (RA&nbsp;10173)</a></span>
+                </label>
+            </div>
+
+            <div class="md:col-span-2">
                 <button type="submit" class="w-full bg-blue-800 hover:bg-blue-900 text-white font-semibold py-3 rounded-lg shadow uppercase text-sm">Create Account</button>
             </div>
 
@@ -112,6 +116,22 @@ $hideFooter = true;
         </form>
     </div>
 </div>
+
+<!-- Terms modal -->
+<div id="termsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+    <div class="bg-white rounded-lg max-w-lg w-full mx-4 p-6 relative">
+        <button id="closeTerms" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl leading-none">
+            &times;
+        </button>
+        <h2 class="text-xl font-semibold mb-4">Data Privacy Act of 2012 (RA 10173)</h2>
+        <div class="h-64 overflow-y-auto text-sm leading-relaxed text-gray-700">
+            <p class="text-justify indent-4 mb-4">This application acknowledges and upholds the provisions of the Data Privacy Act of 2012 (Republic Act No. 10173). Users must consent to the collection, processing, and storage of their personal information in accordance with the Act. The information collected will be used solely for the purpose of creating and managing accounts and will not be shared with unauthorized third parties.</p>
+            <p class="text-justify indent-4 mb-4">By checking the agreement box on the registration form, you state that you have read, understood, and agree to the terms of RA 10173. You also acknowledge that you have been informed about your rights under the Act, including your right to access, correct, and request deletion of your personal data.</p>
+            <p class="text-justify indent-4 mb-4">For the full text of the law, please visit <a href="https://www.privacy.gov.ph/data-privacy-act/" target="_blank" class="underline text-blue-600">the official website</a>.</p>
+        </div>
+    </div>
+</div>
+
 <?= $this->endSection() ?>
 
 <?= $this->section('pageScripts') ?>
@@ -146,6 +166,21 @@ $hideFooter = true;
     document.getElementById('province').addEventListener('change', updateMunicipalities);
     document.getElementById('province').addEventListener('input', updateMunicipalities);
     updateMunicipalities();
+
+    // show privacy terms modal
+    const showTermsBtn = document.getElementById('showTerms');
+    const termsModal = document.getElementById('termsModal');
+    const closeTermsBtn = document.getElementById('closeTerms');
+
+    if (showTermsBtn && termsModal && closeTermsBtn) {
+        showTermsBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            termsModal.classList.remove('hidden');
+        });
+        closeTermsBtn.addEventListener('click', () => {
+            termsModal.classList.add('hidden');
+        });
+    }
 
     // password visibility toggles
     document.querySelectorAll('.toggle-password').forEach(btn => {

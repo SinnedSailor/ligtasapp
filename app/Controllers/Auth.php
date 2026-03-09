@@ -107,6 +107,14 @@ class Auth extends BaseController
     {
         // Log incoming POST for debugging when validation fails in the UI
         log_message('debug', '[Auth::store_register] POST keys: ' . json_encode(array_keys($this->request->getPost())));
+        
+        // If agreement checkbox isn't sent, we need to log it too
+        log_message('debug', '[Auth::store_register] agree: ' . json_encode($agree));
+
+        $agree = $this->request->getPost('agree');
+        if (!$agree) {
+            return redirect()->back()->with('error', 'You must agree to the Data Privacy Act terms in order to register')->withInput();
+        }
 
         $data = [
             'first_name' => $this->request->getPost('first_name'),

@@ -37,18 +37,18 @@ $hideFooter = true;
                         <img src="<?= base_url('assets/images/ligtas.png') ?>" alt="LIGTAS logo" class="w-full h-full object-cover" />
                     </div>
                     <h1 class="text-3xl font-extrabold text-white">LIGTAS</h1>
-                    <p class="text-sm font-semibold text-white/80 mt-1">Local Incident Gathering and Tracking for Aquatic Safety</p>
+                    <p class="text-sm font-semibold text-white">Local Incident Gathering and Tracking for Aquatic Safety</p>
                 </div>
                 <h4 class="text-lg font-semibold text-white mb-6">Welcome!</h4>
 
                 <?php if (session()->getFlashdata('success')): ?>
-                    <div role="alert" class="mb-4 rounded-md bg-green-900 bg-opacity-50 border border-green-700 text-green-100 px-4 py-3">
+                    <div role="alert" class="mb-4 rounded-md bg-green-100 border border-green-200 text-green-800 px-4 py-3">
                         <span class="mr-2">/</span><?= session()->getFlashdata('success') ?>
                     </div>
                 <?php endif; ?>
 
                 <?php if (session()->getFlashdata('error')): ?>
-                    <div role="alert" class="mb-4 rounded-md bg-red-900 bg-opacity-50 border border-red-700 text-red-100 px-4 py-3">
+                    <div role="alert" class="mb-4 rounded-md bg-red-100 border border-red-200 text-red-800 px-4 py-3">
                         <span class="mr-2">X</span><?= session()->getFlashdata('error') ?>
                     </div>
                 <?php endif; ?>
