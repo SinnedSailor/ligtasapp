@@ -229,14 +229,14 @@ table th,
                     <?php if ($isLgu || $isAdmin): ?>
                         <button class="inline-flex items-center px-3 py-1.5 text-white rounded-full text-sm" style="background-color:#1C4D8D;" onclick="openIncidentModal()"
                                 onmouseover="this.style.backgroundColor='#163c6c'" onmouseout="this.style.backgroundColor='#1C4D8D'" onmousedown="this.style.backgroundColor='#0f2a4e'" onmouseup="this.style.backgroundColor='#163c6c'">
-                            <?= svg_icon('plus','w-4 h-4 mr-2') ?> Add Incident
+                            <?= svg_icon('plus','w-4 h-4 mr-2 stroke-current') ?> Add Incident
                         </button>
                     <?php endif; ?>
                     <button id="saveButton" class="inline-flex items-center px-3 py-1.5 bg-green-600 text-white rounded-full text-sm hover:bg-green-700 active:bg-green-800" onclick="openSaveModal()">
-                        <?= svg_icon('check','w-4 h-4 mr-2') ?> Save to Database
+                        <?= svg_icon('check','w-4 h-4 mr-2 stroke-current') ?> Save to Database
                     </button>
                     <button id="generateReportButton" class="inline-flex items-center px-3 py-1.5 text-white rounded-full text-sm" style="background-color:#0065F8;" onmouseover="this.style.backgroundColor='#0053C5'" onmouseout="this.style.backgroundColor='#0065F8'" onmousedown="this.style.backgroundColor='#0040A1'" onmouseup="this.style.backgroundColor='#0053C5'" onclick="downloadIncidentReport()">
-                        <?= svg_icon('chart','w-4 h-4 mr-2') ?> Generate Report
+                        <?= svg_icon('chart','w-4 h-4 mr-2 stroke-current') ?> Generate Report
                     </button>
                 </div>
             </div>
@@ -499,13 +499,18 @@ table th,
           <input type="text" id="incidentAge" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
         </div>
 
-        <div class="col-span-1">
-          <label for="incidentGender" class="text-sm text-slate-600 block mb-1">Sex</label>
-          <select id="incidentGender" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
-            <option value="" disabled selected class="text-slate-400">Select sex</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-          </select>
+        <div class="col-span-1" id="incidentGenderContainer">
+          <label class="text-sm text-slate-600 block mb-1">Sex</label>
+          <div class="flex gap-4">
+            <label class="inline-flex items-center">
+              <input type="radio" name="incidentGender" value="Male" class="form-radio text-indigo-600">
+              <span class="ml-1">Male</span>
+            </label>
+            <label class="inline-flex items-center">
+              <input type="radio" name="incidentGender" value="Female" class="form-radio text-indigo-600">
+              <span class="ml-1">Female</span>
+            </label>
+          </div>
         </div>
 
         <div class="md:col-span-1">
@@ -1312,6 +1317,26 @@ table th,
     function escapeHtml(s) { return String(s).replace(/[&<>\"'`]/g, function (m) { return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;' })[m]; }); }
     function formatBytes(bytes) { if (bytes === 0) return '0 B'; const sizes = ['B','KB','MB','GB','TB']; const i = Math.floor(Math.log(bytes)/Math.log(1024)); return (bytes/Math.pow(1024,i)).toFixed(1) + ' ' + sizes[i]; }
 
+    // helpers for incident modal form fields
+    function getFieldValue(id) {
+        if (id === 'incidentGender') {
+            const sel = document.querySelector('input[name="incidentGender"]:checked');
+            return sel ? sel.value : '';
+        }
+        const el = document.getElementById(id);
+        return el ? el.value : '';
+    }
+
+    function setFieldValue(id, val) {
+        if (id === 'incidentGender') {
+            const radios = document.querySelectorAll('input[name="incidentGender"]');
+            radios.forEach(r => { r.checked = (r.value === val); });
+            return;
+        }
+        const el = document.getElementById(id);
+        if (el) el.value = val;
+    }
+
     // validate save button enablement based on required fields & upload state
     function canSaveIncident() {
         if (!incidentSaveButton) return false;
@@ -1327,7 +1352,7 @@ table th,
             'incidentGender'
         ];
         for (const id of required) {
-            const val = document.getElementById(id)?.value || '';
+            const val = getFieldValue(id);
             if (!val.trim()) {
                 return false;
             }
@@ -1395,16 +1420,31 @@ table th,
 
         // Clear inline incident-form messages when user edits fields inside the modal
         incidentFieldMap.forEach(field => {
-            const el = document.getElementById(field.id);
-            if (el) {
-                el.addEventListener('input', () => {
-                    hideIncidentFormMessage();
-                    updateSaveButtonState();
+            if (field.id === 'incidentGender') {
+                // radio group
+                const radios = document.querySelectorAll('input[name="incidentGender"]');
+                radios.forEach(r => {
+                    r.addEventListener('input', () => {
+                        hideIncidentFormMessage();
+                        updateSaveButtonState();
+                    });
+                    r.addEventListener('change', () => {
+                        hideIncidentFormMessage();
+                        updateSaveButtonState();
+                    });
                 });
-                el.addEventListener('change', () => {
-                    hideIncidentFormMessage();
-                    updateSaveButtonState();
-                });
+            } else {
+                const el = document.getElementById(field.id);
+                if (el) {
+                    el.addEventListener('input', () => {
+                        hideIncidentFormMessage();
+                        updateSaveButtonState();
+                    });
+                    el.addEventListener('change', () => {
+                        hideIncidentFormMessage();
+                        updateSaveButtonState();
+                    });
+                }
             }
         });
 
@@ -1511,7 +1551,9 @@ table th,
         const savedScroll = window.scrollY;
 
         if (tableData.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="18" class="empty-message">No data yet. Upload an Excel file or click "Add Incident" to add data.</td></tr>';
+            const colCount = document.querySelectorAll('#tableBody')?.[0]?.closest('table')
+                ?.querySelectorAll('thead th')?.length || 1;
+            tbody.innerHTML = `<tr><td colspan="${colCount}" class="empty-message">No data yet. Upload an Excel file or click "Add Incident" to add data.</td></tr>`;
             updatePaginationControls();
             // restore scroll in case the message changed layout
             window.scrollTo(0, savedScroll);
@@ -1551,8 +1593,23 @@ table th,
             return true;
         });
 
-        // apply sorting — always use review_status as primary sort key (pending
-        // first, approved last), then the user-selected column as secondary.
+        // pag walang data after filtering "no results"
+        if (dataToRender.length === 0) {
+            const colCount = document.querySelectorAll('#tableBody')?.[0]?.closest('table')
+                ?.querySelectorAll('thead th')?.length || 1;
+            tbody.innerHTML = `<tr><td colspan="${colCount}" class="empty-message">No results found.</td></tr>`;
+            updatePaginationControls();
+            window.scrollTo(0, savedScroll);
+            // refresh datalist 
+            updateLocationCategoryList();
+            updateOccasionList();
+            updateOccupationList();
+            updateFactorsList();
+            return;
+        }
+
+        // apply sorting 
+        // first, approved last
         dataToRender = dataToRender.sort((a, b) => {
             // Primary: status priority
             const sp = statusPriority(a.review_status || 'pending') - statusPriority(b.review_status || 'pending');
@@ -1793,11 +1850,8 @@ table th,
         }
 
         incidentFieldMap.forEach(field => {
-            const input = document.getElementById(field.id);
-            if (!input) {
-                return;
-            }
-            input.value = row ? (row[field.column] || '') : '';
+            const val = row ? (row[field.column] || '') : '';
+            setFieldValue(field.id, val);
         });
 
         // Ensure the currently stored year (if any) exists as an option in the select
@@ -1922,24 +1976,17 @@ table th,
 
         const genderField = incidentFieldMap.find(field => field.column === 'Gender of the Person');
         if (genderField) {
-            const genderInput = document.getElementById(genderField.id);
-            if (genderInput && genderInput.value) {
-                const gender = genderInput.value;
-                if (gender !== 'Male' && gender !== 'Female' && gender !== '') {
-                    showIncidentFormMessage('Sex must be "Male" or "Female" only!', 'danger');
-                    return;
-                }
+            const gender = getFieldValue(genderField.id);
+            if (gender && gender !== 'Male' && gender !== 'Female') {
+                showIncidentFormMessage('Sex must be "Male" or "Female" only!', 'danger');
+                return;
             }
         }
 
         const row = isEdit ? tableData[currentIncidentIndex] : { 'N': tableData.length + 1, _local: true };
 
         incidentFieldMap.forEach(field => {
-            const input = document.getElementById(field.id);
-            if (!input) {
-                return;
-            }
-            row[field.column] = input.value;
+            row[field.column] = getFieldValue(field.id);
         });
 
         // Map frontend fields to backend/database fields (used for both create and update)
