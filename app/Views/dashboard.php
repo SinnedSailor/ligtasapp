@@ -269,7 +269,7 @@ document.addEventListener('DOMContentLoaded', function () {
         chart:      { type: 'pie', height: 288, width: '100%' },
         series:     sexVals,
         labels:     sexLabels,
-        colors:     ['#1581BF','#F875AA','#9ca3af'],
+        colors:     ['#F875AA','#1581BF','#9ca3af'],
         dataLabels: { enabled: false },
         legend:     { position: 'bottom' }
       });

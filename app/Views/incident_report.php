@@ -301,7 +301,7 @@ table th,
                 </div>
             </div>
         <!-- Table Container -->
-        <div class="overflow-x-auto -mx-6 px-6 pb-6">
+        <div id="tableScrollContainer" class="overflow-x-auto -mx-6 px-6 pb-6" style="cursor:grab;">
                 
                 <table class="min-w-full w-full table-auto divide-y divide-gray-200 rounded-2xl overflow-hidden mb-6">
                     <thead class="bg-gray-50">
@@ -317,7 +317,7 @@ table th,
                             <th class="px-6 py-3 text-center align-middle text-xs font-medium sortable" data-col="Gender of the Person" onclick="setSort('Gender of the Person')" style="background:#002c76;color:#fff;min-width:80px;white-space:normal;word-break:break-word;">SEX<span class="sort-arrow"></span></th>
                             <th class="px-6 py-3 text-center align-middle text-xs font-medium sortable" data-col="Occasion" onclick="setSort('Occasion')" style="background:#002c76;color:#fff;min-width:180px;white-space:normal;word-break:break-word;">OCCASION<span class="sort-arrow"></span></th>
                             <th class="px-6 py-3 text-center align-middle text-xs font-medium sortable" data-col="Other Factors" onclick="setSort('Other Factors')" style="background:#002c76;color:#fff;min-width:140px;white-space:normal;word-break:break-word;">OTHER FACTORS<span class="sort-arrow"></span></th>
-                            <th class="px-6 py-3 text-left align-middle text-xs font-medium sortable" data-col="Person's Residence" onclick="setSort(\"Person's Residence\")" style="background:#002c76;color:#fff;min-width:140px;white-space:normal;word-break:break-word;">PERSON'S RESIDENCE<span class="sort-arrow"></span></th>
+                            <th class="px-6 py-3 text-center align-middle text-xs font-medium sortable" data-col="Person's Residence" onclick="setSort(\"Person's Residence\")" style="background:#002c76;color:#fff;min-width:140px;white-space:normal;word-break:break-word;">PERSON'S RESIDENCE<span class="sort-arrow"></span></th>
                             <th class="px-6 py-3 text-center align-middle text-xs font-medium sortable" data-col="Occupation of the Victim" onclick="setSort('Occupation of the Victim')" style="background:#002c76;color:#fff;min-width:140px;white-space:normal;word-break:break-word;">OCCUPATION OF THE VICTIM<span class="sort-arrow"></span></th>
                             <th class="px-6 py-3 text-center align-middle text-xs font-medium sortable" data-col="Remarks" onclick="setSort('Remarks')" style="background:#002c76;color:#fff;min-width:100px;white-space:normal;word-break:break-word;">REMARKS<span class="sort-arrow"></span></th>
                             <th class="px-6 py-3 text-center align-middle text-xs font-medium sortable" data-col="Review Note" onclick="setSort('Review Note')" style="background:#002c76;color:#fff;min-width:150px;white-space:normal;word-break:break-word;">REVIEW NOTE<span class="sort-arrow"></span></th>
@@ -336,13 +336,13 @@ table th,
                             <th class="px-6 py-3 text-center text-xs text-gray-400">Last Name<br>First Name<br>Middle Name</th>
                             <th class="px-6 py-3 text-center text-xs text-gray-400">(e.g.: Resort, Tourist Spot, Beach, River)</th>
                             <th class="px-6 py-3 text-center text-xs text-gray-400">(Input whole number, e.g.: 25)</th>
-                            <th class="px-6 py-3 text-center text-xs text-gray-400">(Note entered when rejecting)</th>
                             <th class="px-6 py-3 text-center text-xs text-gray-400">(Sex assigned at birth)</th>
                             <th class="px-6 py-3 text-center text-xs text-gray-400">Choose between Summer Vacation, Holy Week, Halloween, Holiday Season, Disaster-Related,<br><span style='color:red'>Regular Days (Family Gathering, Outing/Picnic, etc), Work-Related</span></th>
                             <th class="px-6 py-3 text-center text-xs text-gray-400">(e.g.: Accident, Alcohol Intoxication, <span style='color:red'>Medical Condition</span>)</th>
                             <th class="px-6 py-3 text-center text-xs text-gray-400">(From what part does the case belong to? e.g.: Bakun, Benguet)<br>Region</th>
                             <th class="px-6 py-3 text-center text-xs text-gray-400">(e.g.: Student, Fisherfolk, Farmer, etc.)</th>
                             <th class="px-6 py-3 text-center text-xs text-gray-400">&nbsp;</th>
+                            <th class="px-6 py-3 text-center text-xs text-gray-400">(Note entered when rejecting)</th>
                             <?php if (! $isFocal): ?>
                                 <th class="px-6 py-3 text-center text-xs text-gray-400">&nbsp;</th>
                                 <th class="px-6 py-3 text-center text-xs text-gray-400">
@@ -432,9 +432,9 @@ table th,
     <div class="text-sm text-slate-700 mb-4"><div id="attachmentModalMessage">Please upload at least one file.</div></div>
     <div class="flex justify-end">
       <button type="button" class="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white rounded-full hover:bg-blue-700 active:bg-blue-800" onclick="hideModal('attachmentModal')"><?= svg_icon('check','w-4 h-4 mr-2') ?>OK</button>
-
-
-
+    </div>
+  </div>
+</div>
 
 <div id="incidentModal" class="modal-overlay fixed inset-0 z-50 hidden flex items-center justify-center bg-black/40 w-screen h-screen" aria-hidden="true">
   <div class="bg-white rounded-2xl shadow-lg max-w-4xl w-full p-6 mx-4 max-h-[90vh] overflow-y-auto">
@@ -555,15 +555,15 @@ table th,
           </div>
           <div class="text-gray-500 text-sm" id="incidentAttachmentHint"></div>
           <div class="flex flex-wrap gap-4 mt-2 items-end">
-            <div class="flex flex-col w-full md:w-auto">
-                <label for="incidentPicturesInput" class="text-sm text-slate-600 mb-1">Photos</label>
+            <div class="flex flex-col w-full md:w-auto items-start">
+                <label class="text-sm text-slate-600 mb-1">Photos</label>
                 <!-- only button area clickable: inline-block + max width -->
                 <input type="file" id="incidentPicturesInput" class="inline-block w-auto max-w-xs text-sm text-slate-700" accept=".jpg,.jpeg,.png" multiple />
                 <!-- list for queued pictures -->
                 <div id="incidentUploadFileListPictures" class="mt-1"></div>
             </div>
-            <div class="flex flex-col w-full md:w-auto">
-                <label for="incidentDocumentsInput" class="text-sm text-slate-600 mb-1">Documents</label>
+            <div class="flex flex-col w-full md:w-auto items-start">
+                <label class="text-sm text-slate-600 mb-1">Documents</label>
                 <input type="file" id="incidentDocumentsInput" class="inline-block w-auto max-w-xs text-sm text-slate-700" accept=".pdf" multiple />
                 <div id="incidentUploadFileListDocuments" class="mt-1"></div>
             </div>
@@ -3071,6 +3071,46 @@ table th,
 
 <?= $this->section('pageScripts') ?>
 <script>
+    /* ── Horizontal scroll helpers for mouse users ── */
+    (function () {
+        const el = document.getElementById('tableScrollContainer');
+        if (!el) return;
+
+        // 1. Shift + scroll wheel → horizontal scroll
+        el.addEventListener('wheel', function (e) {
+            if (e.shiftKey) {
+                e.preventDefault();
+                el.scrollLeft += e.deltaY;
+            }
+        }, { passive: false });
+
+        // 2. Click-drag to pan horizontally
+        let isDragging = false, startX = 0, scrollStart = 0;
+
+        el.addEventListener('mousedown', function (e) {
+            // Ignore clicks on interactive elements
+            if (e.target.closest('a, button, input, select, textarea, [onclick]')) return;
+            isDragging = true;
+            startX = e.pageX;
+            scrollStart = el.scrollLeft;
+            el.style.cursor = 'grabbing';
+            el.style.userSelect = 'none';
+        });
+
+        document.addEventListener('mousemove', function (e) {
+            if (!isDragging) return;
+            const dx = e.pageX - startX;
+            el.scrollLeft = scrollStart - dx;
+        });
+
+        document.addEventListener('mouseup', function () {
+            if (!isDragging) return;
+            isDragging = false;
+            el.style.cursor = 'grab';
+            el.style.userSelect = '';
+        });
+    })();
+
     function downloadIncidentReport() {
         // CSV or PDF option  
         Swal.fire({
