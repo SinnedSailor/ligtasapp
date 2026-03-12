@@ -88,7 +88,7 @@
                                             Assign Role
                                         </button>
                                         <?php if ($user['id'] != session()->get('user_id')): ?>
-                                            <button type="button" class="px-3 py-1.5 rounded-md text-sm <?= $user['is_admin'] ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-green-600 text-white hover:bg-green-700' ?>" onclick="<?= $user['is_admin'] ? 'revokeAdmin' : 'grantAdmin' ?>(<?= $user['id'] ?>)">
+                                            <button type="button" class="px-3 py-1.5 rounded-md text-sm <?= $user['is_admin'] ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-green-600   hover:bg-green-700' ?>" onclick="<?= $user['is_admin'] ? 'revokeAdmin' : 'grantAdmin' ?>(<?= $user['id'] ?>)">
                                                 <?= $user['is_admin'] ? 'Revoke Admin' : 'Make Admin' ?>
                                             </button>
                                         <?php else: ?>

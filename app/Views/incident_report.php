@@ -211,6 +211,7 @@ table th,
     $isAdmin = $isAdmin ?? (bool) session()->get('is_admin');
     $canReview = $isProvince || $isAdmin;
     $provinceList = $provinces ?? [];
+    $userProvince = session()->get('province') ?? '';
 ?>
 <div class="px-4 sm:px-6 lg:px-8 mt-6 pb-8">
     <div class="w-full mb-8">
@@ -467,11 +468,18 @@ table th,
 
         <div class="col-span-1">
           <label for="incidentProvince" class="text-sm text-slate-600 block mb-1">Province</label>
-          <select id="incidentProvince" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
+          <select id="incidentProvince"
+            class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300<?= $isLgu ? ' bg-gray-100 cursor-not-allowed opacity-75' : '' ?>"
+            <?= $isLgu ? 'disabled' : '' ?>>
+            <?php if (!$isLgu): ?>
             <option value="" disabled selected class="text-slate-400">Select province</option>
+            <?php endif; ?>
             <?php foreach ($provinceList as $prov): ?>
-              <option value="<?= esc($prov) ?>"><?= esc($prov) ?></option>
+              <option value="<?= esc($prov) ?>" <?= ($isLgu && $userProvince === $prov) ? 'selected' : '' ?>><?= esc($prov) ?></option>
             <?php endforeach; ?>
+            <?php if ($isLgu && $userProvince !== '' && !in_array($userProvince, $provinceList, true)): ?>
+              <option value="<?= esc($userProvince) ?>" selected><?= esc($userProvince) ?></option>
+            <?php endif; ?>
           </select>
         </div>
 
@@ -1853,6 +1861,16 @@ table th,
             const val = row ? (row[field.column] || '') : '';
             setFieldValue(field.id, val);
         });
+
+        // For LGU users opening a new incident, lock province to their profile province
+        <?php if ($isLgu && $userProvince !== ''): ?>
+        if (!isEdit) {
+            const provinceEl = document.getElementById('incidentProvince');
+            if (provinceEl) {
+                provinceEl.value = <?= json_encode($userProvince) ?>;
+            }
+        }
+        <?php endif; ?>
 
         // Ensure the currently stored year (if any) exists as an option in the select
         const yearValue = row ? (row['Year of Incident'] || '') : '';
