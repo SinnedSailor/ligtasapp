@@ -291,6 +291,7 @@
         <div class="doc-upload-card mt-6">
             <div class="section-title">Upload Documents</div>
             <form action="<?= base_url('/documents/upload') ?>" method="post" enctype="multipart/form-data" id="documentUploadForm">
+                <?= csrf_field() ?>
                 <div class="documents-grid">
                     <div class="document-card">
                         <h5> Ordinance</h5>
@@ -532,9 +533,11 @@
                 <?php if ($canReview): ?>
                     <div class="doc-actions">
                         <form method="post" id="previewApproveForm" action="#">
+                            <?= csrf_field() ?>
                             <button class="inline-flex items-center gap-2 px-3 py-1 bg-green-600 text-white rounded text-sm" type="submit">Approve</button>
                         </form>
                         <form method="post" id="previewRejectForm" action="#">
+                            <?= csrf_field() ?>
                             <button class="inline-flex items-center gap-2 px-3 py-1 bg-red-600 text-white rounded text-sm" type="submit">Reject</button>
                         </form>
                     </div>

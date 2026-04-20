@@ -63,8 +63,6 @@ $routes->get('/admin/getStats', 'Admin::getStats');
 $routes->get('/admin/backup', 'Admin::backup');
 $routes->get('/admin/backup/export', 'Admin::exportBackup');
 $routes->post('/admin/backup/restore', 'Admin::restoreBackup');
-$routes->get('/debug/decrypt-user/(:num)', 'Admin::debugDecryptUser/$1');
-$routes->get('/debug/decrypt-user', 'Admin::debugDecryptUser');
 $routes->get('/debug/repair-encryption/(:num)', 'Admin::repairEncryption/$1');
 $routes->get('/debug/repair-encryption', 'Admin::repairEncryption');
 

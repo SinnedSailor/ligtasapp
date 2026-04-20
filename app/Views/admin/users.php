@@ -156,6 +156,12 @@
 
 <?= $this->section('pageScripts') ?>
 <script>
+    // CSRF helper: read CSRF cookie value for AJAX requests
+    function getCsrfCookie() {
+        const match = document.cookie.match(/(?:^|;\s*)csrf_cookie_name=([^;]*)/);
+        return match ? decodeURIComponent(match[1]) : '';
+    }
+
     function setUserData(userId, userName) {
         document.getElementById('userId').value = userId;
         document.getElementById('userNameDisplay').textContent = userName;
@@ -191,7 +197,8 @@
             method: 'POST',
             body: formData,
             headers: {
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': getCsrfCookie()
             }
         })
         .then(response => response.json())
@@ -227,7 +234,8 @@
             method: 'POST',
             body: formData,
             headers: {
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': getCsrfCookie()
             }
         })
         .then(response => response.json())
@@ -260,7 +268,8 @@
             method: 'POST',
             body: formData,
             headers: {
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': getCsrfCookie()
             }
         })
         .then(response => response.json())

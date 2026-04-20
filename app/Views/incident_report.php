@@ -1099,7 +1099,7 @@ table th,
 
     function startFileUploadEntry(entry, incidentN) {
         return new Promise((resolve, reject) => {
-            const csrfToken = getCookie('csrf_cookie_name');
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
             entry.status = 'uploading';
             entry.progress = 0;
             updateFileUploadUI(entry.id);
@@ -1203,7 +1203,7 @@ table th,
 
         // If this was a successful temp upload, request server to remove the temp file
         if (entry.status === 'success' && entry.sessionToken && entry.storedName) {
-            const csrfToken = getCookie('csrf_cookie_name');
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
             fetch(tempAttachmentRemoveUrl, {
                 method: 'POST',
                 headers: csrfToken ? { 'X-CSRF-TOKEN': csrfToken } : {},
@@ -1263,7 +1263,7 @@ table th,
     async function clearUploadFileList() {
         // If we have temp-uploaded files on the server, try to remove them
         const toRemove = currentUploadFiles.filter(f => f.status === 'success' && f.sessionToken && f.storedName);
-        const csrfToken = getCookie('csrf_cookie_name');
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
         for (const f of toRemove) {
             try {
                 await fetch(tempAttachmentRemoveUrl, {
@@ -2562,7 +2562,7 @@ table th,
         try {
             setButtonLoading(saveButton, true, 'Saving...');
             setButtonLoading(importButton, true);
-            const csrfToken = getCookie('csrf_cookie_name');
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
             const response = await fetch(importUrl, {
                 method: 'POST',
                 headers: {
@@ -3014,9 +3014,13 @@ table th,
         }
 
         const endpoint = action === 'approve' ? `${approveUrl}/${incidentN}` : `${rejectUrl}/${incidentN}`;
-        const fetchOptions = { method: 'POST' };
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+        const fetchOptions = { method: 'POST', headers: {} };
+        if (csrfToken) {
+            fetchOptions.headers['X-CSRF-TOKEN'] = csrfToken;
+        }
         if (action === 'reject') {
-            fetchOptions.headers = { 'Content-Type': 'application/json' };
+            fetchOptions.headers['Content-Type'] = 'application/json';
             fetchOptions.body = JSON.stringify({ note });
         }
 

@@ -210,9 +210,17 @@ class Admin extends BaseController
      */
     public function createFirstAdmin()
     {
+        // Permanent lock: once an admin has ever been created, this endpoint is sealed
+        $lockFile = WRITEPATH . 'admin_bootstrap.lock';
+        if (is_file($lockFile)) {
+            return redirect()->to('/login')->with('error', 'Initial setup has already been completed');
+        }
+
         // Check if any admin exists
         $adminExists = $this->userModel->where('is_admin', 1)->first();
         if ($adminExists) {
+            // Create the lock file retroactively
+            @file_put_contents($lockFile, date('c'));
             return redirect()->to('/login')->with('error', 'Admin user already exists');
         }
 
@@ -227,9 +235,16 @@ class Admin extends BaseController
      */
     public function storeFirstAdmin()
     {
+        // Permanent lock: once an admin has ever been created, this endpoint is sealed
+        $lockFile = WRITEPATH . 'admin_bootstrap.lock';
+        if (is_file($lockFile)) {
+            return redirect()->to('/login')->with('error', 'Initial setup has already been completed');
+        }
+
         // Check if any admin exists
         $adminExists = $this->userModel->where('is_admin', 1)->first();
         if ($adminExists) {
+            @file_put_contents($lockFile, date('c'));
             return redirect()->to('/login')->with('error', 'Admin user already exists');
         }
 
@@ -290,6 +305,9 @@ class Admin extends BaseController
             $errorMessage = is_array($errors) ? implode(', ', $errors) : 'Admin creation failed';
             return redirect()->back()->with('error', $errorMessage)->withInput();
         }
+
+        // Seal the bootstrap endpoint permanently
+        @file_put_contents(WRITEPATH . 'admin_bootstrap.lock', date('c'));
 
         return redirect()->to('/login')->with('success', 'Admin user created successfully! Please log in.');
     }
@@ -451,39 +469,7 @@ class Admin extends BaseController
         ]);
     }
 
-    // Debugging helper — show raw DB values and decrypted values for user id=1
-    public function debugDecryptUser(int $id = 1)
-    {
-        $user = $this->userModel->find($id);
-        if (! $user) {
-            return $this->response->setJSON(['found' => false])->setStatusCode(404);
-        }
 
-        $decrypted = $this->userModel->decryptUserRow($user, true);
-
-        // Additional raw decryption attempts for debugging
-        $encrypter = \Config\Services::encrypter();
-        $debug = [];
-        foreach (['first_name','last_name','email','contact_number'] as $f) {
-            $debug[$f] = ['raw' => $user[$f] ?? null, 'decrypted_attempt' => null, 'error' => null];
-            if (!empty($user[$f])) {
-                try {
-                    $decoded = base64_decode($user[$f], true);
-                    $plain = $encrypter->decrypt($decoded);
-                    $debug[$f]['decrypted_attempt'] = $plain === false ? null : $plain;
-                } catch (\Throwable $e) {
-                    $debug[$f]['error'] = $e->getMessage();
-                }
-            }
-        }
-
-        return $this->response->setJSON([
-            'found' => true,
-            'raw' => $user,
-            'decrypted' => $decrypted,
-            'debug_decrypt' => $debug,
-        ]);
-    }
 
     // Repair encryption for a user by re-saving plaintext through the model callbacks.
     // This will encrypt fields using the current application encryption key.
@@ -604,11 +590,23 @@ class Admin extends BaseController
             return redirect()->back()->with('error', 'Backup does not appear to contain an admin account');
         }
 
+        // Whitelist only known safe columns to prevent arbitrary field injection
+        $allowed = [
+            'id', 'username', 'password', 'email', 'email_enc',
+            'first_name', 'first_name_enc', 'last_name', 'last_name_enc',
+            'province', 'municipality', 'is_admin', 'role_id',
+            'created_at', 'updated_at',
+        ];
+        $safeData = array_intersect_key($data, array_flip($allowed));
+
+        // Force admin flag – backup restore must not downgrade the admin record
+        $safeData['is_admin'] = 1;
+
         try {
             // Use table builder replace to bypass model callbacks/validation, since
             // the row already contains hashed/encrypted values.
             $builder = $this->userModel->builder();
-            $builder->replace($data);
+            $builder->replace($safeData);
         } catch (\Throwable $e) {
             return redirect()->back()->with('error', 'Failed to restore backup: ' . $e->getMessage());
         }

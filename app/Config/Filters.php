@@ -74,7 +74,7 @@ class Filters extends BaseFilters
     public array $globals = [
         'before' => [
             // 'honeypot',
-            // 'csrf',
+            'csrf',
             // 'invalidchars',
         ],
         'after' => [
@@ -119,6 +119,17 @@ class Filters extends BaseFilters
                 // old POPS-only route
                 'pops',
                 'user-profile',
+                // admin routes (except first-admin bootstrap)
+                'admin-panel',
+                'admin/users',
+                'admin/assignRole',
+                'admin/clearRole',
+                'admin/grantAdmin',
+                'admin/revokeAdmin',
+                'admin/getUsers',
+                'admin/getStats',
+                'admin/backup',
+                'admin/backup/*',
             ],
         ],
         'nocache' => [

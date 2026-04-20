@@ -28,6 +28,7 @@ $hideFooter = true;
             <?php endif; ?>
 
             <form method="POST" action="<?= base_url('admin/storeFirstAdmin') ?>" id="adminForm">
+                <?= csrf_field() ?>
                 <div class="mb-4">
                     <label for="firstName" class="block text-sm font-medium text-gray-700 mb-2">First Name *</label>
                     <input type="text" id="firstName" name="first_name" required value="<?= old('first_name') ?>" placeholder="Enter first name" class="block w-full rounded-md border-gray-200 bg-white py-2 px-3 text-sm shadow-sm focus:ring-2 focus:ring-blue-300" />

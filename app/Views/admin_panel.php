@@ -355,6 +355,12 @@
 
 <?= $this->section('pageScripts') ?>
 <script>
+    // CSRF helper: read CSRF cookie value for AJAX requests
+    function getCsrfCookie() {
+        const match = document.cookie.match(/(?:^|;\s*)csrf_cookie_name=([^;]*)/);
+        return match ? decodeURIComponent(match[1]) : '';
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         loadUsers();
         loadAdminStats();
@@ -519,7 +525,8 @@
 
         fetch('<?= base_url('admin/assignRole') ?>', {
             method: 'POST',
-            body: formData
+            body: formData,
+            headers: { 'X-CSRF-TOKEN': getCsrfCookie() }
         })
         .then(response => response.json())
         .then(data => {
@@ -562,7 +569,8 @@
 
         fetch('<?= base_url('admin/clearRole') ?>', {
             method: 'POST',
-            body: formData
+            body: formData,
+            headers: { 'X-CSRF-TOKEN': getCsrfCookie() }
         })
         .then(response => response.json())
         .then(data => {
@@ -619,7 +627,8 @@
 
         fetch(`<?= base_url('admin/') ?>${endpoint}`, {
             method: 'POST',
-            body: formData
+            body: formData,
+            headers: { 'X-CSRF-TOKEN': getCsrfCookie() }
         })
         .then(response => response.json())
         .then(data => {

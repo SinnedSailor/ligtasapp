@@ -43,7 +43,7 @@ $hideFooter = true;
 
                 <?php if (session()->getFlashdata('success')): ?>
                     <div role="alert" class="mb-4 rounded-md bg-green-100 border border-green-200 text-green-800 px-4 py-3">
-                        <span class="mr-2">/</span><?= session()->getFlashdata('success') ?>
+                        <?= session()->getFlashdata('success') ?>
                     </div>
                 <?php endif; ?>
 
