@@ -6,11 +6,14 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
-$routes->get('/', 'Home::index');
+$routes->get('/', static fn() => redirect()->to('/login'));
 
 // Authentication routes
 $routes->get('/login', 'Auth::login');
 $routes->post('/authenticate', 'Auth::authenticate');
+$routes->get('/verify-otp', 'Auth::verify_otp_form');
+$routes->post('/verify-otp', 'Auth::verify_otp');
+$routes->post('/resend-otp', 'Auth::resend_otp');
 $routes->get('/register', 'Auth::register');
 $routes->post('/store-register', 'Auth::store_register');
 $routes->get('/dashboard', 'Auth::dashboard');

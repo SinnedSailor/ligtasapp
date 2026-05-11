@@ -23,7 +23,9 @@ class UserModel extends Model
         'municipality',
         'contact_number_enc',
         'role_id',
-        'is_admin'
+        'is_admin',
+        'OTP',
+        'OTP_EXPIRED',
     ];
 
     // Dates
@@ -231,5 +233,34 @@ class UserModel extends Model
         $user['contact_number'] = $user['contact_number'] ?? '';
 
         return $user;
+
+        
+
     }
+
+    public function insert_otp(int $userId, array $data): bool
+    {
+        return $this->update($userId, [
+            'OTP'         => $data['otp'] ?? ($data['OTP'] ?? null),
+            'OTP_EXPIRED' => $data['otp_expiration'] ?? ($data['OTP_EXPIRED'] ?? null),
+        ]);
+    }
+
+    public function verify_otp(int $userId, string $otp): bool
+    {
+        $user = $this->select('OTP, OTP_EXPIRED')->find($userId);
+        if (! $user) {
+            return false;
+        }
+        if ((string) ($user['OTP'] ?? '') !== trim($otp)) {
+            return false;
+        }
+        if (empty($user['OTP_EXPIRED']) || strtotime($user['OTP_EXPIRED']) < time()) {
+            return false;
+        }
+        // Clear OTP after successful verification
+        $this->update($userId, ['OTP' => null, 'OTP_EXPIRED' => null]);
+        return true;
+    }
+
 }

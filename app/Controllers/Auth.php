@@ -21,72 +21,298 @@ class Auth extends BaseController
     }
 
     public function authenticate()
+{
+    $emailOrUsername = $this->request->getPost('email');
+    $password = $this->request->getPost('password');
+
+    if (empty($emailOrUsername) || empty($password)) {
+        return redirect()->back()->withInput()->with('error', 'Please provide credentials');
+    }
+
+    $userModel = new \App\Models\UserModel();
+
+    // 1. Find User (Deterministic Hash or Username)
+    if (strpos($emailOrUsername, '@') !== false) {
+        $key = env('encryption.key') ?: getenv('encryption.key');
+        $emailHash = hash_hmac('sha256', mb_strtolower(trim($emailOrUsername)), $key);
+
+        $user = $userModel->select('users.*, roles.name as role_name')
+            ->join('roles', 'roles.id = users.role_id', 'left')
+            ->groupStart()
+                ->where('users.email_hash', $emailHash)
+                ->orWhere('users.username', $emailOrUsername)
+            ->groupEnd()
+            ->first();
+    } else {
+        $user = $userModel->select('users.*, roles.name as role_name')
+            ->join('roles', 'roles.id = users.role_id', 'left')
+            ->where('users.username', $emailOrUsername)
+            ->first();
+    }
+
+    // 2. Validate User & Password
+    if (!$user || !password_verify($password, $user['password'])) {
+        return redirect()->back()->withInput()->with('error', 'Invalid credentials');
+    }
+
+    // 3. Generate and Store OTP
+    $otp = random_int(100000, 999999);
+    $otpData = [
+        'otp'            => $otp,
+        'otp_expiration' => date('Y-m-d H:i:s', strtotime('+5 minutes')),
+    ];
+
+    if (!$userModel->insert_otp($user['id'], $otpData)) {
+        return redirect()->back()->with('error', 'System error: Could not generate OTP.');
+    }
+
+    // 4. Send OTP to Email
+    $emailTo   = $userModel->decryptValue($user['email_enc'] ?? '');
+    $firstName = $userModel->decryptValue($user['first_name_enc'] ?? '') ?: ($user['username'] ?? 'User');
+    $emailService = \Config\Services::email();
+    $emailService->setFrom('mesiaswael@gmail.com', 'IWAS-LIGTAS');
+    $emailService->setTo($emailTo);
+    $emailService->setSubject('Your IWAS-LIGTAS Login Code');
+    $emailService->setMailType('html');
+    $otpDigits = implode('</td><td style="width:40px;height:48px;background:#f0f4ff;border:2px solid #c7d2fe;border-radius:8px;text-align:center;font-size:26px;font-weight:700;color:#1635d1;font-family:monospace;">',
+        str_split((string) $otp));
+    $emailBody = '
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f3f4f6;font-family:Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6;padding:30px 0;">
+    <tr><td align="center">
+      <table width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(22,53,209,0.10);">
+
+        <!-- Header logo strip -->
+        <tr>
+          <td align="center" style="padding:28px 0 18px;">
+            <img src="' . base_url('assets/images/ligtas.png') . '" alt="LIGTAS" width="64" height="64"
+                 style="border-radius:50%;border:3px solid #1635d1;display:block;" />
+          </td>
+        </tr>
+
+        <!-- Blue banner -->
+        <tr>
+          <td style="background:linear-gradient(135deg,#04f2ff 0%,#1635d1 100%);padding:32px 0;text-align:center;">
+            <div style="display:inline-block;width:68px;height:68px;border-radius:50%;background:#fff;line-height:68px;text-align:center;">
+              <span style="font-size:34px;">&#128274;</span>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Body -->
+        <tr>
+          <td style="padding:36px 48px 12px;">
+            <h1 style="margin:0 0 20px;font-size:26px;color:#1635d1;">Login Verification</h1>
+            <p style="margin:0 0 8px;font-size:15px;color:#374151;">Hi ' . esc($firstName) . ',</p>
+            <p style="margin:0 0 28px;font-size:15px;color:#374151;line-height:1.6;">
+              Use the one-time code below to complete your sign-in to <strong>IWAS-LIGTAS</strong>.
+              This code expires in <strong>5 minutes</strong>. Do not share it with anyone.
+            </p>
+          </td>
+        </tr>
+
+        <!-- OTP digit boxes -->
+        <tr>
+          <td align="center" style="padding:0 48px 32px;">
+            <table cellpadding="0" cellspacing="6" style="margin:0 auto;">
+              <tr>
+                <td style="width:40px;height:48px;background:#f0f4ff;border:2px solid #c7d2fe;border-radius:8px;text-align:center;font-size:26px;font-weight:700;color:#1635d1;font-family:monospace;">' . $otpDigits . '</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Divider -->
+        <tr><td style="padding:0 48px;"><hr style="border:none;border-top:1px solid #e5e7eb;"></td></tr>
+
+        <!-- Footer -->
+        <tr>
+          <td style="padding:20px 48px 32px;text-align:center;">
+            <p style="margin:0;font-size:12px;color:#9ca3af;">If you did not attempt to log in, please ignore this email. Your account remains secure.</p>
+            <p style="margin:8px 0 0;font-size:12px;color:#9ca3af;">&copy; ' . date('Y') . ' IWAS-LIGTAS &mdash; Local Incident Gathering and Tracking for Aquatic Safety</p>
+          </td>
+        </tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>';
+    $emailService->setMessage($emailBody);
+    if (! $emailService->send()) {
+        log_message('error', '[Auth::authenticate] OTP email failed: ' . $emailService->printDebugger(['headers']));
+        return redirect()->back()->with('error', 'Could not send OTP email. Please try again.');
+    }
+
+    // 5. Setup Temporary Session (Not fully logged in yet)
+    session()->set([
+        'temp_user_id' => $user['id'],
+        'otp_pending'  => true
+    ]);
+
+    return redirect()->to('/verify-otp')->with('message', 'A 6-digit code has been sent to your email.');
+}
+
+    public function verify_otp_form()
     {
-        $emailOrUsername = $this->request->getPost('email');
-        $password = $this->request->getPost('password');
+        if (session()->get('logged_in')) {
+            return redirect()->to('/dashboard');
+        }
+        if (! session()->get('otp_pending')) {
+            return redirect()->to('/login')->with('error', 'Please log in first.');
+        }
+        return view('auth/otp_verify', [
+            'hideNavbar'  => true,
+            'hideSidebar' => true,
+            'hideFooter'  => true,
+        ]);
+    }
 
-        // Validate inputs
-        if (empty($emailOrUsername) || empty($password)) {
-            return redirect()->back()->withInput()->with('error', 'Please provide email/username and password');
+    public function verify_otp()
+    {
+        if (session()->get('logged_in')) {
+            return redirect()->to('/dashboard');
+        }
+        $userId = session()->get('temp_user_id');
+        if (! $userId || ! session()->get('otp_pending')) {
+            return redirect()->to('/login')->with('error', 'Session expired. Please log in again.');
         }
 
-        // Check user in database by email (hashed) or username
-        $userModel = new UserModel();
-
-        // If input looks like an email, compute deterministic hash and compare to stored hashed email
-        if (strpos($emailOrUsername, '@') !== false) {
-            $key = env('encryption.key') ?: (getenv('encryption.key') ?: 'CHANGE_ME__SET_ENCRYPTION_KEY');
-            $emailHash = hash_hmac('sha256', mb_strtolower(trim($emailOrUsername)), $key);
-
-            $user = $userModel->select('users.*, roles.name as role_name')
-                ->join('roles', 'roles.id = users.role_id', 'left')
-                ->groupStart()
-                    ->where('users.email_hash', $emailHash)
-                    ->orWhere('users.username', $emailOrUsername)
-                ->groupEnd()
-                ->first();
-        } else {
-            $user = $userModel->select('users.*, roles.name as role_name')
-                ->join('roles', 'roles.id = users.role_id', 'left')
-                ->where('users.username', $emailOrUsername)
-                ->first();
+        $otp = trim((string) $this->request->getPost('otp'));
+        if (empty($otp)) {
+            return redirect()->back()->with('error', 'Please enter the verification code.');
         }
 
-        if (!$user) {
-            return redirect()->back()->withInput()->with('error', 'Invalid email/username or password');
-        }
-
-        // Verify password
-        if (!password_verify($password, $user['password'])) {
-            return redirect()->back()->withInput()->with('error', 'Invalid email/username or password');
-        }
-
-        // Decrypt user fields for session display
         $userModel = new \App\Models\UserModel();
-        $user = $userModel->decryptUserRow($user);
+        if (! $userModel->verify_otp((int) $userId, $otp)) {
+            return redirect()->back()->with('error', 'Invalid or expired verification code. Please try again.');
+        }
 
-        // Prefer decrypted plaintext email (from `email_enc`) for session storage if available
-        $emailPlain = $userModel->decryptValue($user['email_enc'] ?? '');
+        // OTP valid — build full session
+        $user = $userModel->select('users.*, roles.name as role_name')
+            ->join('roles', 'roles.id = users.role_id', 'left')
+            ->find((int) $userId);
 
-        // Store session data
+        if (! $user) {
+            return redirect()->to('/login')->with('error', 'User not found.');
+        }
+
+        $user = $userModel->decryptUserRow($user, true);
+
+        session()->remove(['temp_user_id', 'otp_pending']);
         session()->set([
-            'user_id' => $user['id'],
-            'email' => $emailPlain ?: ($user['email'] ?? ''),
-            'username' => $user['username'],
-            'first_name' => $user['first_name'],
-            'last_name' => $user['last_name'],
-            'province' => $user['province'],
-            'municipality' => $user['municipality'],
-            'contact_number' => $user['contact_number'] ?? null,
-            'role_id' => $user['role_id'],
-            'role_name' => $user['role_name'] ?? 'No Role',
-            'is_admin' => $user['is_admin'],
-            'logged_in' => true
+            'logged_in'    => true,
+            'user_id'      => $user['id'],
+            'username'     => $user['username'] ?? '',
+            'first_name'   => $user['first_name'] ?? '',
+            'last_name'    => $user['last_name'] ?? '',
+            'email'        => $user['email'] ?? '',
+            'province'     => $user['province'] ?? '',
+            'municipality' => $user['municipality'] ?? '',
+            'contact_number' => $user['contact_number'] ?? '',
+            'role_id'      => $user['role_id'] ?? null,
+            'role_name'    => $user['role_name'] ?? 'No Role',
+            'is_admin'     => (bool) ($user['is_admin'] ?? false),
         ]);
 
-        session()->setFlashdata('login_success', true);
         return redirect()->to('/dashboard');
     }
+
+    public function resend_otp()
+    {
+        $userId = session()->get('temp_user_id');
+        if (! $userId || ! session()->get('otp_pending')) {
+            return redirect()->to('/login')->with('error', 'Session expired. Please log in again.');
+        }
+
+        $userModel = new \App\Models\UserModel();
+        $user = $userModel->find((int) $userId);
+        if (! $user) {
+            return redirect()->to('/login')->with('error', 'User not found.');
+        }
+
+        $otp = random_int(100000, 999999);
+        $otpData = [
+            'otp'            => $otp,
+            'otp_expiration' => date('Y-m-d H:i:s', strtotime('+5 minutes')),
+        ];
+
+        if (! $userModel->insert_otp((int) $userId, $otpData)) {
+            return redirect()->back()->with('error', 'Could not generate a new code. Please try again.');
+        }
+
+        $emailTo   = $userModel->decryptValue($user['email_enc'] ?? '');
+        $firstName = $userModel->decryptValue($user['first_name_enc'] ?? '') ?: ($user['username'] ?? 'User');
+        $emailService = \Config\Services::email();
+        $emailService->setFrom('mesiaswael@gmail.com', 'IWAS-LIGTAS');
+        $emailService->setTo($emailTo);
+        $emailService->setSubject('Your IWAS-LIGTAS Login Code');
+        $emailService->setMailType('html');
+        $otpDigits = implode('</td><td style="width:40px;height:48px;background:#f0f4ff;border:2px solid #c7d2fe;border-radius:8px;text-align:center;font-size:26px;font-weight:700;color:#1635d1;font-family:monospace;">',
+            str_split((string) $otp));
+        $emailBody = '
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f3f4f6;font-family:Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6;padding:30px 0;">
+    <tr><td align="center">
+      <table width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(22,53,209,0.10);">
+        <tr>
+          <td align="center" style="padding:28px 0 18px;">
+            <img src="' . base_url('assets/images/ligtas.png') . '" alt="LIGTAS" width="64" height="64"
+                 style="border-radius:50%;border:3px solid #1635d1;display:block;" />
+          </td>
+        </tr>
+        <tr>
+          <td style="background:linear-gradient(135deg,#04f2ff 0%,#1635d1 100%);padding:32px 0;text-align:center;">
+            <div style="display:inline-block;width:68px;height:68px;border-radius:50%;background:#fff;line-height:68px;text-align:center;">
+              <span style="font-size:34px;">&#128274;</span>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:36px 48px 12px;">
+            <h1 style="margin:0 0 20px;font-size:26px;color:#1635d1;">Login Verification</h1>
+            <p style="margin:0 0 8px;font-size:15px;color:#374151;">Hi ' . esc($firstName) . ',</p>
+            <p style="margin:0 0 28px;font-size:15px;color:#374151;line-height:1.6;">
+              Use the one-time code below to complete your sign-in to <strong>IWAS-LIGTAS</strong>.
+              This code expires in <strong>5 minutes</strong>. Do not share it with anyone.
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td align="center" style="padding:0 48px 32px;">
+            <table cellpadding="0" cellspacing="6" style="margin:0 auto;">
+              <tr>
+                <td style="width:40px;height:48px;background:#f0f4ff;border:2px solid #c7d2fe;border-radius:8px;text-align:center;font-size:26px;font-weight:700;color:#1635d1;font-family:monospace;">' . $otpDigits . '</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr><td style="padding:0 48px;"><hr style="border:none;border-top:1px solid #e5e7eb;"></td></tr>
+        <tr>
+          <td style="padding:20px 48px 32px;text-align:center;">
+            <p style="margin:0;font-size:12px;color:#9ca3af;">If you did not attempt to log in, please ignore this email. Your account remains secure.</p>
+            <p style="margin:8px 0 0;font-size:12px;color:#9ca3af;">&copy; ' . date('Y') . ' IWAS-LIGTAS &mdash; Local Incident Gathering and Tracking for Aquatic Safety</p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>';
+        $emailService->setMessage($emailBody);
+        if (! $emailService->send()) {
+            log_message('error', '[Auth::resend_otp] email failed: ' . $emailService->printDebugger(['headers']));
+            return redirect()->back()->with('error', 'Could not send the code. Please try again.');
+        }
+
+        return redirect()->to('/verify-otp')->with('success', 'A new code has been sent to your email.');
+}
 
     public function register()
     {

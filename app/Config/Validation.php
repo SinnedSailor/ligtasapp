@@ -43,13 +43,13 @@ class Validation extends BaseConfig
     // --------------------------------------------------------------------
 
     public const EMAIL_VALIDATION = 'max_length[255]|valid_email';
-    public const NAME_VALIDATION = 'max_length[255]|regex_match/^([A-Za-z]+)([-\s]?[A-Za-z]+)*$/';
-    public const PASS_VALIDATION = 'min_length[12]|max_length[30]|regex_match/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.?[!@#$%^&~*()])|(?!.*\s)\.{12,30}$/';
+    public const NAME_VALIDATION = 'max_length[255]|regex_match/^([A-Za-zñÑ]+)([-\s]?[A-Za-zñÑ]+)*$/';
+    public const PASS_VALIDATION = 'min_length[12]|max_length[30]|regex_match/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&~*()])(?!.*\s).+$/';
     public const CONFPASS_VALIDATION = 'max_length[255]';
     public const DATE_VALIDATION = 'max_length[255]';
     public const TEXT_VALIDATION = 'max_length[10000]';
     public const INT_VALIDATION = 'max_length[11]|integer';
-    public const CONTACTNO_VALIDATION = 'max_length[20]|regex_match/^(\09)\d{9}$/';
+    public const CONTACTNO_VALIDATION = 'max_length[20]|regex_match/^09\d{9}$/';
     public const URL_VALIDATION = 'valid_url_strict';
     public const OTP_VALIDATION = 'numeric|exact_length[6]';
     public const MAC_VALIDATION = 'max_length[255]|regex_match/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/';
