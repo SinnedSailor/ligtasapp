@@ -1,6 +1,6 @@
 FROM php:8.2-apache
 
-WORKDIR /var/www/html/public
+WORKDIR /var/www/html
 
 COPY . .
 
@@ -14,8 +14,12 @@ RUN docker-php-ext-install \
     pdo \
     pdo_mysql
 
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html \
+    && chmod -R 775 /var/www/html/writable
+
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y nodej
+    && apt-get install -y nodejs
 
 RUN npm install
 RUN npm run build:css
