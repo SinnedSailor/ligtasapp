@@ -1,7 +1,7 @@
 services:
   php-app:
     build: .
-    container_name: new-php-app
+    container_name: dilg-ligtasapp
     restart: always
     ports:
       - "8081:80"
