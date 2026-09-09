@@ -41,7 +41,7 @@ class UserModel extends Model
     protected $validationRules = [
         'first_name' => 'required|min_length[2]|max_length[100]',
         'last_name' => 'required|min_length[2]|max_length[100]',
-        'username' => 'required|min_length[3]|max_length[50]|is_unique[users.username]',
+        'username' => 'required|min_length[3]|max_length[50]|is_unique[users.username,id,{id}]',
         // Validate email format here; uniqueness is checked via model lookup before insert
         'email' => 'required|valid_email',
         'password' => 'required|min_length[8]',

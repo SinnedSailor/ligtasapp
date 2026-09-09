@@ -78,10 +78,10 @@ class Auth extends BaseController
         $emailTo = $userModel->decryptValue($user['email_enc'] ?? '') ?: ($user['email'] ?? '');
         $firstName = $user['first_name'] ?: ($user['username'] ?? 'User');
 
-        $this->dispatchOtpEmail($emailTo, $firstName, (string) $otp);
+        $emailSent = $this->dispatchOtpEmail($emailTo, $firstName, (string) $otp);
 
-        // For local development convenience if SMTP delay occurs
-        if (ENVIRONMENT === 'development') {
+        // For local development fallback if SMTP delivery fails
+        if (ENVIRONMENT === 'development' && !$emailSent) {
             session()->setFlashdata('dev_otp_preview', (string) $otp);
             log_message('info', "[AUTH OTP] Generated OTP for user {$user['id']} ({$emailTo}): {$otp}");
         }
@@ -199,9 +199,9 @@ class Auth extends BaseController
         $emailTo = $userModel->decryptValue($user['email_enc'] ?? '') ?: ($user['email'] ?? '');
         $firstName = $user['first_name'] ?: ($user['username'] ?? 'User');
 
-        $this->dispatchOtpEmail($emailTo, $firstName, (string) $otp);
+        $emailSent = $this->dispatchOtpEmail($emailTo, $firstName, (string) $otp);
 
-        if (ENVIRONMENT === 'development') {
+        if (ENVIRONMENT === 'development' && !$emailSent) {
             session()->setFlashdata('dev_otp_preview', (string) $otp);
             log_message('info', "[AUTH RESEND OTP] Generated OTP for user {$userId} ({$emailTo}): {$otp}");
         }
@@ -519,48 +519,84 @@ class Auth extends BaseController
         }
 
         $userId = (int) session()->get('user_id');
+        $userModel = new UserModel();
+        $currentUser = $userModel->find($userId);
+        if (!$currentUser) {
+            return redirect()->to('/login');
+        }
+
+        $currentUserDecrypted = $userModel->decryptUserRow($currentUser, true);
+
+        $firstName     = trim((string) $this->request->getPost('first_name'));
+        $lastName      = trim((string) $this->request->getPost('last_name'));
+        $username      = trim((string) $this->request->getPost('username'));
+        $contactNumber = trim((string) $this->request->getPost('contact_number'));
+        $province      = trim((string) $this->request->getPost('province'));
+        $municipality  = trim((string) $this->request->getPost('municipality'));
+        $emailInput    = trim((string) $this->request->getPost('email'));
+
+        // Fallbacks for fields if not provided in request
+        if ($firstName === '') {
+            $firstName = (string) ($currentUserDecrypted['first_name'] ?? session()->get('first_name') ?? '');
+        }
+        if ($lastName === '') {
+            $lastName = (string) ($currentUserDecrypted['last_name'] ?? session()->get('last_name') ?? '');
+        }
+        if ($username === '') {
+            $username = (string) ($currentUser['username'] ?? session()->get('username') ?? '');
+        }
+        if ($province === '') {
+            $province = (string) ($currentUser['province'] ?? session()->get('province') ?? '');
+        }
+        if ($municipality === '') {
+            $municipality = (string) ($currentUser['municipality'] ?? session()->get('municipality') ?? '');
+        }
+
+        if ($firstName === '' || $lastName === '' || $username === '') {
+            return redirect()->back()->with('error', 'Please complete all required fields (First Name, Last Name, Username).')->withInput();
+        }
+
         $data = [
-            'first_name'     => trim((string) $this->request->getPost('first_name')),
-            'last_name'      => trim((string) $this->request->getPost('last_name')),
-            'username'       => trim((string) $this->request->getPost('username')),
-            'contact_number' => trim((string) $this->request->getPost('contact_number')),
-            'province'       => trim((string) $this->request->getPost('province')),
-            'municipality'   => trim((string) $this->request->getPost('municipality')),
+            'first_name'     => $firstName,
+            'last_name'      => $lastName,
+            'username'       => $username,
+            'contact_number' => $contactNumber,
+            'province'       => $province,
+            'municipality'   => $municipality,
         ];
 
-        $emailInput = trim((string) $this->request->getPost('email'));
-        if ($emailInput !== '') {
-            $data['email'] = $emailInput;
-        }
-
-        if ($data['first_name'] === '' || $data['last_name'] === '' || $data['username'] === '') {
-            return redirect()->back()->with('error', 'Please complete all required fields.')->withInput();
-        }
-
-        if ($data['contact_number'] !== '' && !preg_match('/^[0-9]{11}$/', $data['contact_number'])) {
+        if ($contactNumber !== '' && !preg_match('/^[0-9]{11}$/', $contactNumber)) {
             return redirect()->back()->with('error', 'Please enter a valid 11-digit contact number.')->withInput();
         }
 
-        if (isset($data['email'])) {
-            if ($data['email'] === '' || !filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+        if ($emailInput !== '') {
+            if (!filter_var($emailInput, FILTER_VALIDATE_EMAIL)) {
                 return redirect()->back()->with('error', 'Please provide a valid email address.')->withInput();
+            }
+            $data['email'] = $emailInput;
+        }
+
+        $isAdmin = (bool) (session()->get('is_admin') || ($currentUser['is_admin'] ?? 0));
+        $isSpecialLocation = ($province === 'System' || (empty($province) && $isAdmin));
+
+        if (!$isSpecialLocation && !$this->isValidRegion1Location($province, $municipality)) {
+            if (!$isAdmin) {
+                return redirect()->back()->with('error', 'Please select a valid Region 1 province and municipality.')->withInput();
             }
         }
 
-        if (!$this->isValidRegion1Location($data['province'], $data['municipality'])) {
-            return redirect()->back()->with('error', 'Please select a valid Region 1 province and municipality.')->withInput();
+        // Check if username changed and is already taken
+        if ($username !== $currentUser['username']) {
+            $existingUsername = $userModel
+                ->where('username', $username)
+                ->where('id !=', $userId)
+                ->first();
+            if ($existingUsername) {
+                return redirect()->back()->with('error', 'This username is already taken.')->withInput();
+            }
         }
 
-        $userModel = new UserModel();
-
-        $existingUsername = $userModel
-            ->where('username', $data['username'])
-            ->where('id !=', $userId)
-            ->first();
-        if ($existingUsername) {
-            return redirect()->back()->with('error', 'This username is already taken.')->withInput();
-        }
-
+        // Check if email changed and is already taken
         if (isset($data['email'])) {
             $existingEmail = $userModel->getUserByEmail($data['email']);
             if ($existingEmail && (int) $existingEmail['id'] !== $userId) {
@@ -568,17 +604,17 @@ class Auth extends BaseController
             }
         }
 
-        $data = $userModel->prepareForInsert($data);
+        $preparedData = $userModel->prepareForInsert($data);
 
         $userModel->skipValidation(true);
-        if (!$userModel->update($userId, $data)) {
+        if (!$userModel->update($userId, $preparedData)) {
             $errors = $userModel->errors();
             $errorMessage = is_array($errors) ? implode(', ', $errors) : 'Profile update failed.';
             return redirect()->back()->with('error', $errorMessage)->withInput();
         }
 
         $profile = $userModel->find($userId);
-        $profile = $userModel->decryptUserRow($profile);
+        $profile = $userModel->decryptUserRow($profile, true);
         $emailPlain = $userModel->decryptValue($profile['email_enc'] ?? ($profile['email'] ?? ''));
 
         session()->set([

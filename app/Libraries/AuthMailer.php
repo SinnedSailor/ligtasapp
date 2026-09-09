@@ -31,8 +31,8 @@ class AuthMailer
 
         $emailSent = $this->dispatchEmail($recipientEmail, $subject, $message);
 
-        // For local development convenience if SMTP is not set up
-        if (ENVIRONMENT === 'development') {
+        // For local development fallback if SMTP is not working
+        if (ENVIRONMENT === 'development' && !$emailSent) {
             session()->setFlashdata('dev_otp_preview', $rawOtp);
             log_message('info', "[AUTH 2FA] OTP for {$recipientEmail}: {$rawOtp}");
         }
@@ -93,7 +93,7 @@ class AuthMailer
             $config = config('Email');
 
             // Default sender if not set in Config\Email
-            $fromEmail = !empty($config->fromEmail) ? $config->fromEmail : 'no-reply@iwas-system.local';
+            $fromEmail = !empty($config->fromEmail) ? $config->fromEmail : (!empty($config->SMTPUser) ? $config->SMTPUser : 'no-reply@iwas-system.local');
             $fromName  = !empty($config->fromName) ? $config->fromName : 'IWAS Security Team';
 
             $email->setFrom($fromEmail, $fromName);

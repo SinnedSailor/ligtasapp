@@ -200,6 +200,10 @@
                         <label for="lastName" class="block text-sm font-medium text-gray-700">Last Name *</label>
                         <input type="text" id="lastName" name="last_name" value="<?= esc($profile['last_name'] ?? session()->get('last_name') ?? '') ?>" required onblur="this.value = this.value.replace(/\s+/g,' ').trim().split(' ').map(function(w){return w?(w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()):'';}).join(' ')" class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300" />
                     </div>
+                    <div class="form-group">
+                        <label for="username" class="block text-sm font-medium text-gray-700">Username *</label>
+                        <input type="text" id="username" name="username" value="<?= esc($profile['username'] ?? session()->get('username') ?? '') ?>" required class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                    </div>
                 </div>
             </div>
         </div> <!-- end personal info card -->
@@ -227,8 +231,8 @@
                 <h5 class="text-lg font-semibold mb-3">Location Information</h5>
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="province" class="block text-sm font-medium text-gray-700">Province *</label>
-                        <select id="province" name="province" required class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                        <label for="province" class="block text-sm font-medium text-gray-700">Province <?= (session()->get('is_admin') || ($profile['is_admin'] ?? 0)) ? '' : '*' ?></label>
+                        <select id="province" name="province" <?= (session()->get('is_admin') || ($profile['is_admin'] ?? 0)) ? '' : 'required' ?> class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
                             <option value="">Select province</option>
                             <?php if (!$provinceSelectedInList && $selectedProvince !== ''): ?>
                                 <option value="<?= esc($selectedProvince) ?>" selected>
@@ -241,9 +245,12 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="municipality" class="block text-sm font-medium text-gray-700">Municipality *</label>
-                        <select id="municipality" name="municipality" required class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                        <label for="municipality" class="block text-sm font-medium text-gray-700">Municipality <?= (session()->get('is_admin') || ($profile['is_admin'] ?? 0)) ? '' : '*' ?></label>
+                        <select id="municipality" name="municipality" <?= (session()->get('is_admin') || ($profile['is_admin'] ?? 0)) ? '' : 'required' ?> class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
                             <option value="">Select municipality</option>
+                            <?php if ($selectedMunicipality !== ''): ?>
+                                <option value="<?= esc($selectedMunicipality) ?>" selected><?= esc($selectedMunicipality) ?></option>
+                            <?php endif; ?>
                         </select>
                     </div>
                 </div>
@@ -340,10 +347,10 @@
             selectedValue = preferredValue;
         } else {
             const current = municipalityInput.value || '<?= addslashes($selectedMunicipality) ?>';
-            if (province && municipalities[province] && municipalities[province].includes(current)) {
-                selectedValue = current;
+            if (province && municipalities[province]) {
+                selectedValue = municipalities[province].includes(current) ? current : '';
             } else {
-                selectedValue = '';
+                selectedValue = current;
             }
         }
 
@@ -361,8 +368,7 @@
             });
         }
 
-        if (preferredValue !== undefined && selectedValue &&
-            (!municipalities[province] || !municipalities[province].includes(selectedValue))) {
+        if (selectedValue && (!municipalities[province] || !municipalities[province].includes(selectedValue))) {
             const option = document.createElement('option');
             option.value = selectedValue;
             option.textContent = selectedValue;
