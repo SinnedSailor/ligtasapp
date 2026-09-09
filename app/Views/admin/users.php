@@ -1,7 +1,6 @@
 <?= $this->extend('layouts/main_tailwind') ?>
 
 <?= $this->section('pageStyles') ?>
-<meta name="csrf-token" content="<?= csrf_hash() ?>">
 <style>
     /* Modern Role Option Cards */
     .role-option-card {
@@ -416,8 +415,9 @@
 
     function setCsrfToken(token) {
         if (!token) return;
-        const meta = document.querySelector('meta[name="csrf-token"]');
-        if (meta) meta.setAttribute('content', token);
+        document.querySelectorAll('meta[name="csrf-token"]').forEach(meta => {
+            meta.setAttribute('content', token);
+        });
     }
 
     async function parseJsonResponse(response) {
