@@ -535,19 +535,20 @@
             const csrfName = '<?= csrf_token() ?>';
             const csrfHeader = '<?= csrf_header() ?>';
 
-            const formData = new FormData();
-            formData.append('user_id', userId);
-            formData.append('role_id', roleId);
-            formData.append(csrfName, csrfToken);
+            const params = new URLSearchParams();
+            params.append('user_id', userId);
+            params.append('role_id', roleId);
+            params.append(csrfName, csrfToken);
 
             const reqHeaders = {
+                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
                 'X-Requested-With': 'XMLHttpRequest'
             };
             reqHeaders[csrfHeader] = csrfToken;
 
-            fetch('<?= base_url('admin/assignRole') ?>', {
+            fetch('<?= base_url('admin-panel/assign-role') ?>', {
                 method: 'POST',
-                body: formData,
+                body: params.toString(),
                 headers: reqHeaders
             })
             .then(parseJsonResponse)
@@ -604,17 +605,23 @@
         if (!confirm('Make this user an admin?')) return;
 
         const csrfToken = getCsrfToken();
-        const formData = new FormData();
-        formData.append('user_id', userId);
-        formData.append('<?= csrf_token() ?>', csrfToken);
+        const csrfName = '<?= csrf_token() ?>';
+        const csrfHeader = '<?= csrf_header() ?>';
 
-        fetch('<?= base_url('admin/grantAdmin') ?>', {
+        const params = new URLSearchParams();
+        params.append('user_id', userId);
+        params.append(csrfName, csrfToken);
+
+        const reqHeaders = {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+            'X-Requested-With': 'XMLHttpRequest'
+        };
+        reqHeaders[csrfHeader] = csrfToken;
+
+        fetch('<?= base_url('admin-panel/grant-admin') ?>', {
             method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': csrfToken
-            }
+            body: params.toString(),
+            headers: reqHeaders
         })
         .then(parseJsonResponse)
         .then(({ status, ok, data }) => {
@@ -638,17 +645,23 @@
         if (!confirm('Revoke admin privileges from this user?')) return;
 
         const csrfToken = getCsrfToken();
-        const formData = new FormData();
-        formData.append('user_id', userId);
-        formData.append('<?= csrf_token() ?>', csrfToken);
+        const csrfName = '<?= csrf_token() ?>';
+        const csrfHeader = '<?= csrf_header() ?>';
 
-        fetch('<?= base_url('admin/revokeAdmin') ?>', {
+        const params = new URLSearchParams();
+        params.append('user_id', userId);
+        params.append(csrfName, csrfToken);
+
+        const reqHeaders = {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+            'X-Requested-With': 'XMLHttpRequest'
+        };
+        reqHeaders[csrfHeader] = csrfToken;
+
+        fetch('<?= base_url('admin-panel/revoke-admin') ?>', {
             method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': csrfToken
-            }
+            body: params.toString(),
+            headers: reqHeaders
         })
         .then(parseJsonResponse)
         .then(({ status, ok, data }) => {
@@ -672,17 +685,23 @@
         if (!confirm('Change activation status for this user account?')) return;
 
         const csrfToken = getCsrfToken();
-        const formData = new FormData();
-        formData.append('user_id', userId);
-        formData.append('<?= csrf_token() ?>', csrfToken);
+        const csrfName = '<?= csrf_token() ?>';
+        const csrfHeader = '<?= csrf_header() ?>';
 
-        fetch('<?= base_url('admin/toggleStatus') ?>', {
+        const params = new URLSearchParams();
+        params.append('user_id', userId);
+        params.append(csrfName, csrfToken);
+
+        const reqHeaders = {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+            'X-Requested-With': 'XMLHttpRequest'
+        };
+        reqHeaders[csrfHeader] = csrfToken;
+
+        fetch('<?= base_url('admin-panel/toggle-status') ?>', {
             method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': csrfToken
-            }
+            body: params.toString(),
+            headers: reqHeaders
         })
         .then(parseJsonResponse)
         .then(({ status, ok, data }) => {
@@ -738,20 +757,26 @@
         }
 
         const csrfToken = getCsrfToken();
-        const formData = new FormData();
-        formData.append('user_id', userId);
-        formData.append('first_name', firstName);
-        formData.append('last_name', lastName);
-        formData.append('email', email);
-        formData.append('<?= csrf_token() ?>', csrfToken);
+        const csrfName = '<?= csrf_token() ?>';
+        const csrfHeader = '<?= csrf_header() ?>';
 
-        fetch('<?= base_url('admin/updateUser') ?>', {
+        const params = new URLSearchParams();
+        params.append('user_id', userId);
+        params.append('first_name', firstName);
+        params.append('last_name', lastName);
+        params.append('email', email);
+        params.append(csrfName, csrfToken);
+
+        const reqHeaders = {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+            'X-Requested-With': 'XMLHttpRequest'
+        };
+        reqHeaders[csrfHeader] = csrfToken;
+
+        fetch('<?= base_url('admin-panel/update-user') ?>', {
             method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': csrfToken
-            }
+            body: params.toString(),
+            headers: reqHeaders
         })
         .then(parseJsonResponse)
         .then(({ status, ok, data }) => {
@@ -814,10 +839,13 @@
         const userId = document.getElementById('resetUserId').value;
         const errorDiv = document.getElementById('resetPasswordModalError');
         const csrfToken = getCsrfToken();
-        const formData = new FormData();
-        formData.append('user_id', userId);
-        formData.append('mode', mode);
-        formData.append('<?= csrf_token() ?>', csrfToken);
+        const csrfName = '<?= csrf_token() ?>';
+        const csrfHeader = '<?= csrf_header() ?>';
+
+        const params = new URLSearchParams();
+        params.append('user_id', userId);
+        params.append('mode', mode);
+        params.append(csrfName, csrfToken);
 
         if (mode === 'manual') {
             const newPassword = document.getElementById('manualNewPassword').value.trim();
@@ -826,16 +854,19 @@
                 errorDiv.classList.remove('hidden');
                 return;
             }
-            formData.append('new_password', newPassword);
+            params.append('new_password', newPassword);
         }
 
-        fetch('<?= base_url('admin/resetUserPassword') ?>', {
+        const reqHeaders = {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+            'X-Requested-With': 'XMLHttpRequest'
+        };
+        reqHeaders[csrfHeader] = csrfToken;
+
+        fetch('<?= base_url('admin-panel/reset-password') ?>', {
             method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': csrfToken
-            }
+            body: params.toString(),
+            headers: reqHeaders
         })
         .then(parseJsonResponse)
         .then(({ status, ok, data }) => {

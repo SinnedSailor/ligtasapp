@@ -121,6 +121,7 @@ class Filters extends BaseFilters
                 'user-profile',
                 // admin routes (except first-admin bootstrap)
                 'admin-panel',
+                'admin-panel/*',
                 'admin/users',
                 'admin/assignRole',
                 'admin/clearRole',
@@ -147,6 +148,8 @@ class Filters extends BaseFilters
                 // old POPS-only route
                 'pops',
                 'user-profile',
+                'admin-panel',
+                'admin-panel/*',
             ],
         ],
     ];
