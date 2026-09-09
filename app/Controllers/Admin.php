@@ -61,7 +61,9 @@ class Admin extends BaseController
             return $accessCheck;
         }
 
-        return view('admin_panel');
+        return view('admin_panel', [
+            'roles' => $this->roleModel->getAllRoles()
+        ]);
     }
 
     /**

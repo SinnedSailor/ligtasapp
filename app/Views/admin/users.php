@@ -2,6 +2,48 @@
 
 <?= $this->section('pageStyles') ?>
 <meta name="csrf-token" content="<?= csrf_hash() ?>">
+<style>
+    /* Modern Role Option Cards */
+    .role-option-card {
+        border: 2px solid #e2e8f0;
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 14px;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    .role-option-card:hover {
+        border-color: #94a3b8;
+        background: #f8fafc;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+    }
+    .role-option-card.is-active {
+        border-color: #002c76 !important;
+        background-color: #f0f7ff !important;
+        box-shadow: 0 0 0 2px #002c76, 0 6px 18px rgba(0, 44, 118, 0.15) !important;
+    }
+    .role-option-card .role-radio-dot {
+        width: 18px;
+        height: 18px;
+        border-radius: 9999px;
+        border: 2px solid #cbd5e1;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    .role-option-card.is-active .role-radio-dot {
+        border-color: #002c76 !important;
+        background-color: #002c76 !important;
+        box-shadow: inset 0 0 0 3px #ffffff !important;
+    }
+</style>
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
@@ -92,7 +134,7 @@
                                     <td class="px-4 py-4 text-sm text-gray-600"><?= htmlspecialchars($user['province'] ?? '-') ?></td>
                                     <td class="px-4 py-4 text-sm text-gray-600"><?= htmlspecialchars($user['municipality'] ?? '-') ?></td>
                                     <td class="px-4 py-4 text-sm flex flex-wrap gap-2">
-                                        <button type="button" class="px-3 py-1.5 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700" onclick="openAssignRoleModal(<?= $user['id'] ?>, '<?= htmlspecialchars(addslashes(trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? '')) ?: $user['username'])) ?>', <?= $user['role_id'] ?? 'null' ?>)">
+                                        <button type="button" class="px-3 py-1.5 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700" onclick="openAssignRoleModal(<?= $user['id'] ?>, '<?= htmlspecialchars(addslashes(trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? '')) ?: $user['username'])) ?>', <?= $user['role_id'] ?? 'null' ?>, '<?= htmlspecialchars(addslashes($user['username'] ?? '')) ?>', '<?= htmlspecialchars(addslashes($user['email'] ?? '')) ?>', '<?= htmlspecialchars(addslashes($user['role_name'] ?? '')) ?>')">
                                             Assign Role
                                         </button>
                                         <button type="button" class="px-3 py-1.5 bg-indigo-600 text-white rounded-md text-sm hover:bg-indigo-700" onclick="openEditUserModal(<?= $user['id'] ?>, '<?= htmlspecialchars(addslashes($user['first_name'] ?? '')) ?>', '<?= htmlspecialchars(addslashes($user['last_name'] ?? '')) ?>', '<?= htmlspecialchars(addslashes($user['email'] ?? '')) ?>')">
@@ -124,32 +166,147 @@
     </div>
 </div>
 
-<!-- Tailwind modal (hidden by default) -->
-<div id="assignRoleModal" class="fixed inset-0 z-50 hidden items-center justify-center">
-    <div class="absolute inset-0 bg-black/40" onclick="closeAssignRoleModal()"></div>
-    <div class="relative bg-white rounded-2xl shadow-lg w-full max-w-xl mx-4 overflow-hidden">
-        <div class="flex items-center justify-between px-6 py-4 border-b">
-            <h5 class="text-lg font-semibold">Assign Role to <span id="userNameDisplay"></span></h5>
-            <button type="button" class="text-gray-500 hover:text-gray-700" onclick="closeAssignRoleModal()">&times;</button>
+<!-- Modern Assign Role Modal -->
+<div id="assignRoleModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 overflow-y-auto">
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" onclick="closeAssignRoleModal()"></div>
+    <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-xl mx-auto overflow-hidden z-10 my-auto flex flex-col max-h-[min(92vh,680px)]">
+        <!-- Header with Gradient Accent & Close Button -->
+        <div class="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 text-white flex-shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-blue-200 border border-white/15 shadow-sm">
+                    <?= svg_icon('shield', 'w-5 h-5 text-white') ?>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-white leading-tight m-0">Assign & Update Role</h3>
+                    <p class="text-xs text-blue-200 m-0 mt-0.5">Manage user permissions and system access</p>
+                </div>
+            </div>
+            <button type="button" class="text-white/70 hover:text-white transition p-1.5 rounded-lg hover:bg-white/10" onclick="closeAssignRoleModal()" title="Close modal">
+                <?= svg_icon('x', 'w-5 h-5') ?>
+            </button>
         </div>
-        <div class="p-6">
+
+        <div class="p-5 sm:p-6 overflow-y-auto flex-1 space-y-4" style="scrollbar-width: thin;">
+            <!-- Target User Info Card -->
+            <div class="p-3.5 bg-slate-50 border border-slate-200/80 rounded-xl flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-900 font-bold flex items-center justify-center flex-shrink-0 text-base shadow-sm">
+                        👤
+                    </div>
+                    <div class="min-w-0">
+                        <div class="font-bold text-gray-900 text-sm truncate" id="userNameDisplay">User Name</div>
+                        <div class="text-xs text-gray-500 truncate" id="userSubinfoDisplay">@username • email</div>
+                    </div>
+                </div>
+                <div id="userCurrentRoleBadgeDisplay" class="flex-shrink-0">
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700 border border-gray-200">No Role</span>
+                </div>
+            </div>
+
             <form id="assignRoleForm">
                 <input type="hidden" id="userId" name="user_id">
-                <div class="mb-4">
-                    <label for="roleId" class="block text-sm font-medium text-gray-700 mb-2">Select Role</label>
-                    <select id="roleId" name="role_id" required class="block w-full rounded-md border-gray-200 bg-white py-2 px-3 text-sm leading-5 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
-                        <option value="">-- Select a Role --</option>
-                        <option value="0">-- No Role (Clear Role) --</option>
-                        <?php foreach ($roles as $role): ?>
-                            <option value="<?= $role['id'] ?>"><?= htmlspecialchars($role['name']) ?> (<?= htmlspecialchars($role['description']) ?>)</option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
+                <select id="roleId" name="role_id" class="hidden">
+                    <option value="">-- Select a Role --</option>
+                    <option value="1">ADMIN (Full Administrator)</option>
+                    <option value="2">FOCAL (Regional / Focal Point)</option>
+                    <option value="3">LGU (Local Government Unit)</option>
+                    <option value="4">PROVINCE (Provincial Office)</option>
+                    <option value="0">No Role (Clear Role)</option>
+                </select>
             </form>
+
+            <div class="flex items-center justify-between">
+                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider">Choose System Role</label>
+                <span class="text-xs text-gray-400">Click a card to select</span>
+            </div>
+
+            <!-- Interactive Visual Role Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="usersRoleCardsContainer">
+                
+                <!-- Role Card: ADMIN -->
+                <div class="role-option-card cursor-pointer p-3.5 rounded-xl border-2 transition-all flex items-start gap-3 bg-white hover:border-red-300" data-role-id="1" onclick="selectUsersRoleCard('1')">
+                    <div class="w-9 h-9 rounded-xl bg-red-100 text-red-700 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <?= svg_icon('shield', 'w-4 h-4') ?>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-sm text-gray-900">ADMIN</span>
+                            <span class="role-radio-dot w-4 h-4 rounded-full border-2 border-gray-300 flex items-center justify-center"></span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1 leading-snug">Full system administrator; manage users, system settings, and all reports.</p>
+                    </div>
+                </div>
+
+                <!-- Role Card: FOCAL -->
+                <div class="role-option-card cursor-pointer p-3.5 rounded-xl border-2 transition-all flex items-start gap-3 bg-white hover:border-amber-300" data-role-id="2" onclick="selectUsersRoleCard('2')">
+                    <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <?= svg_icon('users', 'w-4 h-4') ?>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-sm text-gray-900">FOCAL</span>
+                            <span class="role-radio-dot w-4 h-4 rounded-full border-2 border-gray-300 flex items-center justify-center"></span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1 leading-snug">Regional focal point; review, validate, and monitor provincial reports.</p>
+                    </div>
+                </div>
+
+                <!-- Role Card: LGU -->
+                <div class="role-option-card cursor-pointer p-3.5 rounded-xl border-2 transition-all flex items-start gap-3 bg-white hover:border-emerald-300" data-role-id="3" onclick="selectUsersRoleCard('3')">
+                    <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <?= svg_icon('home', 'w-4 h-4') ?>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-sm text-gray-900">LGU</span>
+                            <span class="role-radio-dot w-4 h-4 rounded-full border-2 border-gray-300 flex items-center justify-center"></span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1 leading-snug">Municipal level user; encode, upload, and track municipal incident cases.</p>
+                    </div>
+                </div>
+
+                <!-- Role Card: PROVINCE -->
+                <div class="role-option-card cursor-pointer p-3.5 rounded-xl border-2 transition-all flex items-start gap-3 bg-white hover:border-blue-300" data-role-id="4" onclick="selectUsersRoleCard('4')">
+                    <div class="w-9 h-9 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <?= svg_icon('map-pin', 'w-4 h-4') ?>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-sm text-gray-900">PROVINCE</span>
+                            <span class="role-radio-dot w-4 h-4 rounded-full border-2 border-gray-300 flex items-center justify-center"></span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1 leading-snug">Provincial office user; consolidate and oversee municipal incident records.</p>
+                    </div>
+                </div>
+
+                <!-- Role Card: NO ROLE -->
+                <div class="role-option-card cursor-pointer p-3.5 rounded-xl border-2 transition-all flex items-start gap-3 bg-white sm:col-span-2 hover:border-gray-400" data-role-id="0" onclick="selectUsersRoleCard('0')">
+                    <div class="w-9 h-9 rounded-xl bg-gray-100 text-gray-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <?= svg_icon('x-circle', 'w-4 h-4') ?>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-sm text-gray-700">NO ROLE (Clear / Revoke Assignment)</span>
+                            <span class="role-radio-dot w-4 h-4 rounded-full border-2 border-gray-300 flex items-center justify-center"></span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-0.5 leading-snug">Removes current role permissions. The account cannot access role-restricted data.</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="p-3 rounded-xl bg-amber-50 border border-amber-200/80 text-amber-900 text-xs flex items-start gap-2.5">
+                <span class="text-amber-600 flex-shrink-0 font-bold text-sm">💡</span>
+                <span class="leading-relaxed">Assigning <strong>ADMIN</strong> automatically grants full administrative rights. Role changes take effect immediately.</span>
+            </div>
         </div>
-        <div class="flex items-center justify-end gap-3 px-6 py-4 border-t">
-            <button type="button" class="px-4 py-2 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200" onclick="closeAssignRoleModal()">Cancel</button>
-            <button type="button" class="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700" onclick="assignRoleSubmit()">Assign Role</button>
+
+        <div class="flex items-center justify-end gap-3 px-6 py-3.5 bg-gray-50 border-t border-gray-100 flex-shrink-0">
+            <button type="button" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm font-semibold transition" onclick="closeAssignRoleModal()">Cancel</button>
+            <button type="button" class="px-5 py-2 rounded-lg bg-blue-900 hover:bg-blue-800 text-white text-sm font-semibold shadow-md transition flex items-center gap-1.5" onclick="assignRoleSubmit()">
+                <?= svg_icon('check', 'w-4 h-4') ?>
+                <span>Update Role</span>
+            </button>
         </div>
     </div>
 </div>
@@ -263,16 +420,52 @@
         if (meta) meta.setAttribute('content', token);
     }
 
-    function setUserData(userId, userName, currentRoleId) {
-        document.getElementById('userId').value = userId;
-        document.getElementById('userNameDisplay').textContent = userName;
-        document.getElementById('roleId').value = (currentRoleId !== null && currentRoleId !== undefined) ? String(currentRoleId) : '';
+    function selectUsersRoleCard(roleId) {
+        const roleStr = (roleId !== null && roleId !== undefined && String(roleId) !== 'null') ? String(roleId) : '';
+        const roleSelect = document.getElementById('roleId');
+        if (roleSelect) {
+            roleSelect.value = roleStr;
+        }
+        document.querySelectorAll('#usersRoleCardsContainer .role-option-card').forEach(card => {
+            if (card.getAttribute('data-role-id') === roleStr) {
+                card.classList.add('is-active');
+            } else {
+                card.classList.remove('is-active');
+            }
+        });
     }
 
-    function openAssignRoleModal(userId, userName, currentRoleId) {
-        setUserData(userId, userName, currentRoleId);
-        document.getElementById('assignRoleModal').classList.remove('hidden');
-        document.getElementById('assignRoleModal').classList.add('flex');
+    function openAssignRoleModal(userId, userName, currentRoleId, username, email, roleName) {
+        document.getElementById('userId').value = userId;
+        document.getElementById('userNameDisplay').textContent = userName || 'User';
+
+        const subInfo = document.getElementById('userSubinfoDisplay');
+        if (subInfo) {
+            const parts = [];
+            if (username) parts.push('@' + username);
+            if (email) parts.push(email);
+            subInfo.textContent = parts.join(' • ') || 'Target Account';
+        }
+
+        const badgeContainer = document.getElementById('userCurrentRoleBadgeDisplay');
+        if (badgeContainer) {
+            if (roleName) {
+                const norm = String(roleName).trim().toUpperCase();
+                badgeContainer.innerHTML = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 border border-blue-200">${norm}</span>`;
+            } else {
+                badgeContainer.innerHTML = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700 border border-gray-200">No Role</span>`;
+            }
+        }
+
+        let normalizedRoleId = '0';
+        if (currentRoleId !== null && currentRoleId !== undefined && String(currentRoleId) !== 'null' && String(currentRoleId) !== '') {
+            normalizedRoleId = String(currentRoleId);
+        }
+        selectUsersRoleCard(normalizedRoleId);
+
+        const modal = document.getElementById('assignRoleModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
     }
 
     function closeAssignRoleModal() {
@@ -286,47 +479,91 @@
         const roleId = document.getElementById('roleId').value;
 
         if (!userId || roleId === '') {
-            alert('Please select a role');
+            Swal.fire({
+                title: 'Selection Required',
+                text: 'Please select a role or choose "NO ROLE (Clear / Revoke Assignment)".',
+                icon: 'warning',
+                confirmButtonColor: '#002c76'
+            });
             return;
         }
 
-        const csrfToken = getCsrfToken();
-        const formData = new FormData();
-        formData.append('user_id', userId);
-        formData.append('role_id', roleId);
-        formData.append('<?= csrf_token() ?>', csrfToken);
+        const userName = document.getElementById('userNameDisplay').textContent;
+        const roleNames = {
+            '1': 'ADMIN (Full Administrator)',
+            '2': 'FOCAL (Regional / Focal Point)',
+            '3': 'LGU (Local Government Unit)',
+            '4': 'PROVINCE (Provincial Office)',
+            '0': 'NO ROLE (Clear Role)'
+        };
+        const roleLabel = roleNames[roleId] || roleId;
 
-        fetch('<?= base_url('admin/assignRole') ?>', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': csrfToken
-            }
-        })
-        .then(response => response.json().then(data => ({ status: response.status, ok: response.ok, data })))
-        .then(({ status, ok, data }) => {
-            if (data && data.csrf_token) {
-                setCsrfToken(data.csrf_token);
-            }
-            if (ok && data.success) {
-                alert(data.message || 'Role assigned successfully');
-                location.reload();
-            } else {
-                const msg = (data && data.message) ? data.message : '';
-                if (msg.toLowerCase().includes('own role') || msg.toLowerCase().includes('own admin')) {
-                    showSelfModifyModal(msg);
-                } else {
-                    alert('Error: ' + msg);
+        Swal.fire({
+            title: 'Confirm Role Update',
+            html: `Change role for <strong>${userName}</strong> to <strong>${roleLabel}</strong>?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, update role',
+            cancelButtonText: 'Cancel',
+            confirmButtonColor: '#002c76',
+            cancelButtonColor: '#94a3b8'
+        }).then((result) => {
+            if (!result.isConfirmed) return;
+
+            const csrfToken = getCsrfToken();
+            const formData = new FormData();
+            formData.append('user_id', userId);
+            formData.append('role_id', roleId);
+            formData.append('<?= csrf_token() ?>', csrfToken);
+
+            fetch('<?= base_url('admin/assignRole') ?>', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': csrfToken
                 }
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while assigning role');
-        })
-        .finally(() => {
-            closeAssignRoleModal();
+            })
+            .then(response => response.json().then(data => ({ status: response.status, ok: response.ok, data })))
+            .then(({ status, ok, data }) => {
+                if (data && data.csrf_token) {
+                    setCsrfToken(data.csrf_token);
+                }
+                if (ok && data.success) {
+                    Swal.fire({
+                        title: 'Role Updated!',
+                        text: data.message || 'Role assigned successfully',
+                        icon: 'success',
+                        confirmButtonColor: '#002c76'
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    const msg = (data && data.message) ? data.message : '';
+                    if (msg.toLowerCase().includes('own role') || msg.toLowerCase().includes('own admin')) {
+                        showSelfModifyModal(msg);
+                    } else {
+                        Swal.fire({
+                            title: 'Error',
+                            text: msg || 'Failed to update role',
+                            icon: 'error',
+                            confirmButtonColor: '#002c76'
+                        });
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'An error occurred while assigning role',
+                    icon: 'error',
+                    confirmButtonColor: '#002c76'
+                });
+            })
+            .finally(() => {
+                closeAssignRoleModal();
+            });
         });
     }
 
