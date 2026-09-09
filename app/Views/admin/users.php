@@ -420,6 +420,19 @@
         if (meta) meta.setAttribute('content', token);
     }
 
+    async function parseJsonResponse(response) {
+        const contentType = response.headers.get('content-type') || '';
+        let data = null;
+        if (contentType.includes('application/json')) {
+            try {
+                data = await response.json();
+            } catch (e) {
+                data = null;
+            }
+        }
+        return { status: response.status, ok: response.ok, data };
+    }
+
     function selectUsersRoleCard(roleId) {
         const roleStr = (roleId !== null && roleId !== undefined && String(roleId) !== 'null') ? String(roleId) : '';
         const roleSelect = document.getElementById('roleId');
@@ -524,12 +537,12 @@
                     'X-CSRF-TOKEN': csrfToken
                 }
             })
-            .then(response => response.json().then(data => ({ status: response.status, ok: response.ok, data })))
+            .then(parseJsonResponse)
             .then(({ status, ok, data }) => {
                 if (data && data.csrf_token) {
                     setCsrfToken(data.csrf_token);
                 }
-                if (ok && data.success) {
+                if (ok && data && data.success) {
                     Swal.fire({
                         title: 'Role Updated!',
                         text: data.message || 'Role assigned successfully',
@@ -539,7 +552,7 @@
                         location.reload();
                     });
                 } else {
-                    const msg = (data && data.message) ? data.message : '';
+                    const msg = (data && data.message) ? data.message : (status === 403 ? 'Access forbidden or session expired. Please refresh the page.' : 'Failed to update role');
                     if (msg.toLowerCase().includes('own role') || msg.toLowerCase().includes('own admin')) {
                         showSelfModifyModal(msg);
                     } else {
@@ -583,16 +596,16 @@
                 'X-CSRF-TOKEN': csrfToken
             }
         })
-        .then(response => response.json().then(data => ({ status: response.status, ok: response.ok, data })))
+        .then(parseJsonResponse)
         .then(({ status, ok, data }) => {
             if (data && data.csrf_token) {
                 setCsrfToken(data.csrf_token);
             }
-            if (ok && data.success) {
+            if (ok && data && data.success) {
                 alert(data.message || 'Admin privileges granted');
                 location.reload();
             } else {
-                alert('Error: ' + ((data && data.message) || 'Failed'));
+                alert('Error: ' + ((data && data.message) || (status === 403 ? 'Access forbidden or session expired' : 'Failed')));
             }
         })
         .catch(error => {
@@ -617,16 +630,16 @@
                 'X-CSRF-TOKEN': csrfToken
             }
         })
-        .then(response => response.json().then(data => ({ status: response.status, ok: response.ok, data })))
+        .then(parseJsonResponse)
         .then(({ status, ok, data }) => {
             if (data && data.csrf_token) {
                 setCsrfToken(data.csrf_token);
             }
-            if (ok && data.success) {
+            if (ok && data && data.success) {
                 alert(data.message || 'Admin privileges revoked');
                 location.reload();
             } else {
-                alert('Error: ' + ((data && data.message) || 'Failed'));
+                alert('Error: ' + ((data && data.message) || (status === 403 ? 'Access forbidden or session expired' : 'Failed')));
             }
         })
         .catch(error => {
@@ -651,16 +664,16 @@
                 'X-CSRF-TOKEN': csrfToken
             }
         })
-        .then(response => response.json().then(data => ({ status: response.status, ok: response.ok, data })))
+        .then(parseJsonResponse)
         .then(({ status, ok, data }) => {
             if (data && data.csrf_token) {
                 setCsrfToken(data.csrf_token);
             }
-            if (ok && data.success) {
-                alert(data.message || 'Status updated successfully');
+            if (ok && data && data.success) {
+                alert(data.message || 'Status updated');
                 location.reload();
             } else {
-                alert('Error: ' + ((data && data.message) || 'Failed to update status'));
+                alert('Error: ' + ((data && data.message) || (status === 403 ? 'Access forbidden or session expired' : 'Failed to update user status')));
             }
         })
         .catch(error => {
@@ -720,15 +733,15 @@
                 'X-CSRF-TOKEN': csrfToken
             }
         })
-        .then(response => response.json().then(data => ({ status: response.status, ok: response.ok, data })))
-        .then(({ ok, data }) => {
+        .then(parseJsonResponse)
+        .then(({ status, ok, data }) => {
             if (data && data.csrf_token) setCsrfToken(data.csrf_token);
-            if (ok && data.success) {
+            if (ok && data && data.success) {
                 closeEditUserModal();
                 alert(data.message || 'User updated successfully');
                 location.reload();
             } else {
-                errorDiv.textContent = (data && data.message) ? data.message : 'Failed to update user details.';
+                errorDiv.textContent = (data && data.message) ? data.message : (status === 403 ? 'Access forbidden or session expired. Please refresh.' : 'Failed to update user details.');
                 errorDiv.classList.remove('hidden');
             }
         })
@@ -804,15 +817,15 @@
                 'X-CSRF-TOKEN': csrfToken
             }
         })
-        .then(response => response.json().then(data => ({ status: response.status, ok: response.ok, data })))
-        .then(({ ok, data }) => {
+        .then(parseJsonResponse)
+        .then(({ status, ok, data }) => {
             if (data && data.csrf_token) setCsrfToken(data.csrf_token);
-            if (ok && data.success) {
+            if (ok && data && data.success) {
                 closeResetPasswordModal();
                 alert(data.message || 'Password reset successfully.');
                 location.reload();
             } else {
-                errorDiv.textContent = (data && data.message) ? data.message : 'Failed to reset password.';
+                errorDiv.textContent = (data && data.message) ? data.message : (status === 403 ? 'Access forbidden or session expired. Please refresh.' : 'Failed to reset password.');
                 errorDiv.classList.remove('hidden');
             }
         })

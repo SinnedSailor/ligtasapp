@@ -600,6 +600,19 @@
         if (meta) meta.setAttribute('content', newToken);
     }
 
+    async function parseJsonResponse(response) {
+        const contentType = response.headers.get('content-type') || '';
+        let data = null;
+        if (contentType.includes('application/json')) {
+            try {
+                data = await response.json();
+            } catch (e) {
+                data = null;
+            }
+        }
+        return { status: response.status, ok: response.ok, data };
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         loadUsers();
         loadAdminStats();
@@ -902,12 +915,12 @@
                 'X-CSRF-TOKEN': csrfToken
             }
         })
-        .then(response => response.json().then(data => ({ status: response.status, ok: response.ok, data })))
+        .then(parseJsonResponse)
         .then(({ status, ok, data }) => {
             if (data && data.csrf_token) {
                 setCsrfToken(data.csrf_token);
             }
-            if (ok && data.success) {
+            if (ok && data && data.success) {
                 Swal.fire({
                     title: 'Role Updated!',
                     text: data.message || 'User role has been successfully assigned.',
@@ -917,7 +930,7 @@
                 loadUsers();
                 loadAdminStats();
             } else {
-                const msg = (data && data.message) ? data.message : 'Failed to update role';
+                const msg = (data && data.message) ? data.message : (status === 403 ? 'Access forbidden or session expired. Please refresh the page.' : 'Failed to update role');
                 if (msg.toLowerCase().includes('own role') || msg.toLowerCase().includes('own admin')) {
                     showSelfModifyModal(msg);
                 } else {
@@ -974,12 +987,12 @@
                         'X-CSRF-TOKEN': csrfToken
                     }
                 })
-                .then(response => response.json().then(data => ({ status: response.status, ok: response.ok, data })))
+                .then(parseJsonResponse)
                 .then(({ status, ok, data }) => {
                     if (data && data.csrf_token) {
                         setCsrfToken(data.csrf_token);
                     }
-                    if (ok && data.success) {
+                    if (ok && data && data.success) {
                         Swal.fire({
                             title: isDisabling ? 'Account Deactivated' : 'Account Activated',
                             text: data.message || 'Status updated successfully.',
@@ -989,7 +1002,7 @@
                         loadUsers();
                         loadAdminStats();
                     } else {
-                        const msg = (data && data.message) ? data.message : 'Failed to update user status';
+                        const msg = (data && data.message) ? data.message : (status === 403 ? 'Access forbidden or session expired. Please refresh the page.' : 'Failed to update user status');
                         if (msg.toLowerCase().includes('own') || msg.toLowerCase().includes('primary')) {
                             showSelfModifyModal(msg);
                         } else {
@@ -1102,10 +1115,10 @@
                 'X-CSRF-TOKEN': getCsrfToken(),
             }
         })
-        .then(response => response.json().then(data => ({ status: response.status, ok: response.ok, data })))
-        .then(({ ok, data }) => {
+        .then(parseJsonResponse)
+        .then(({ status, ok, data }) => {
             if (data && data.csrf_token) setCsrfToken(data.csrf_token);
-            if (ok && data.success) {
+            if (ok && data && data.success) {
                 closeEditUserModal();
                 Swal.fire({
                     title: 'Updated!',
@@ -1115,7 +1128,7 @@
                 });
                 loadUsers();
             } else {
-                errorDiv.textContent = (data && data.message) ? data.message : 'Failed to update user details.';
+                errorDiv.textContent = (data && data.message) ? data.message : (status === 403 ? 'Access forbidden or session expired. Please refresh.' : 'Failed to update user details.');
                 errorDiv.classList.add('show');
             }
         })
@@ -1188,10 +1201,10 @@
                 'X-CSRF-TOKEN': getCsrfToken(),
             }
         })
-        .then(response => response.json().then(data => ({ status: response.status, ok: response.ok, data })))
-        .then(({ ok, data }) => {
+        .then(parseJsonResponse)
+        .then(({ status, ok, data }) => {
             if (data && data.csrf_token) setCsrfToken(data.csrf_token);
-            if (ok && data.success) {
+            if (ok && data && data.success) {
                 closeResetPasswordModal();
                 Swal.fire({
                     title: 'Password Updated!',
@@ -1200,7 +1213,7 @@
                     confirmButtonColor: '#002c76',
                 });
             } else {
-                errorDiv.textContent = (data && data.message) ? data.message : 'Failed to reset password.';
+                errorDiv.textContent = (data && data.message) ? data.message : (status === 403 ? 'Access forbidden or session expired. Please refresh.' : 'Failed to reset password.');
                 errorDiv.classList.add('show');
             }
         })
