@@ -95,6 +95,8 @@
     </style>
 
     <meta name="csrf-token" content="<?= csrf_hash() ?>">
+    <meta name="csrf-header" content="<?= csrf_header() ?>">
+    <meta name="csrf-name" content="<?= csrf_token() ?>">
     <?= $this->renderSection('pageStyles') ?>
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
