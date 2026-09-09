@@ -68,24 +68,42 @@ $routes->get('/admin-panel', 'Admin::panel');
 $routes->get('/admin/create-first-admin', 'Admin::createFirstAdmin');
 $routes->post('/admin/store-first-admin', 'Admin::storeFirstAdmin');
 $routes->get('/admin/users', 'Admin::users');
+
+// Role & user management routes (accessible via both /admin-panel/* and /admin/*)
+$routes->post('/admin-panel/assign-role', 'Admin::assignRole');
 $routes->post('/admin/assignRole', 'Admin::assignRole');
 $routes->get('/admin/assignRole', static function() { return redirect()->to('/admin-panel'); });
+
+$routes->post('/admin-panel/clear-role', 'Admin::clearRole');
 $routes->post('/admin/clearRole', 'Admin::clearRole');
 $routes->get('/admin/clearRole', static function() { return redirect()->to('/admin-panel'); });
+
+$routes->post('/admin-panel/toggle-status', 'Admin::toggleStatus');
 $routes->post('/admin/toggleStatus', 'Admin::toggleStatus');
 $routes->get('/admin/toggleStatus', static function() { return redirect()->to('/admin-panel'); });
 $routes->post('/admin/disableUser', 'Admin::toggleStatus');
+
+$routes->post('/admin-panel/grant-admin', 'Admin::grantAdmin');
 $routes->post('/admin/grantAdmin', 'Admin::grantAdmin');
 $routes->get('/admin/grantAdmin', static function() { return redirect()->to('/admin-panel'); });
+
+$routes->post('/admin-panel/revoke-admin', 'Admin::revokeAdmin');
 $routes->post('/admin/revokeAdmin', 'Admin::revokeAdmin');
 $routes->get('/admin/revokeAdmin', static function() { return redirect()->to('/admin-panel'); });
+
+$routes->post('/admin-panel/update-user', 'Admin::updateUser');
 $routes->post('/admin/updateUser', 'Admin::updateUser');
 $routes->get('/admin/updateUser', static function() { return redirect()->to('/admin-panel'); });
+
+$routes->post('/admin-panel/reset-password', 'Admin::resetUserPassword');
 $routes->post('/admin/resetUserPassword', 'Admin::resetUserPassword');
 $routes->get('/admin/resetUserPassword', static function() { return redirect()->to('/admin-panel'); });
+
 $routes->get('/admin/getUsers', 'Admin::getUsers');
+$routes->get('/admin-panel/get-users', 'Admin::getUsers');
 
 $routes->get('/admin/getStats', 'Admin::getStats');
+$routes->get('/admin-panel/get-stats', 'Admin::getStats');
 $routes->get('/admin/backup', 'Admin::backup');
 $routes->get('/admin/backup/export', 'Admin::exportBackup');
 $routes->post('/admin/backup/restore', 'Admin::restoreBackup');
