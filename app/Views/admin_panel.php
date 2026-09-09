@@ -1,7 +1,6 @@
 <?= $this->extend('layouts/main_tailwind') ?>
 
 <?= $this->section('pageStyles') ?>
-<meta name="csrf-token" content="<?= csrf_hash() ?>">
 <style>
     .page-header {
         background: linear-gradient(135deg, rgba(0, 44, 118, 0.15), rgba(0, 44, 118, 0.04));
@@ -596,8 +595,9 @@
 
     function setCsrfToken(newToken) {
         if (!newToken) return;
-        const meta = document.querySelector('meta[name="csrf-token"]');
-        if (meta) meta.setAttribute('content', newToken);
+        document.querySelectorAll('meta[name="csrf-token"]').forEach(meta => {
+            meta.setAttribute('content', newToken);
+        });
     }
 
     async function parseJsonResponse(response) {

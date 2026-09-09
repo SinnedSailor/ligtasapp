@@ -74,18 +74,7 @@ class Filters extends BaseFilters
     public array $globals = [
         'before' => [
             // 'honeypot',
-            'csrf' => [
-                'except' => [
-                    'admin/assignRole',
-                    'admin/clearRole',
-                    'admin/toggleStatus',
-                    'admin/disableUser',
-                    'admin/grantAdmin',
-                    'admin/revokeAdmin',
-                    'admin/updateUser',
-                    'admin/resetUserPassword',
-                ]
-            ],
+            'csrf',
             // 'invalidchars',
         ],
         'after' => [
