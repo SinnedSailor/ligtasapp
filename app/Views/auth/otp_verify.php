@@ -58,6 +58,13 @@ $hideFooter = true;
                 <h4 class="text-lg font-semibold text-white mb-2">Two-Factor Verification</h4>
                 <p class="text-sm text-white/80 mb-6">Enter the 6-digit code sent to your email. It expires in 5 minutes.</p>
 
+                <?php if (ENVIRONMENT === 'development' && session()->getFlashdata('dev_otp_preview')): ?>
+                    <div class="mb-4 rounded-xl bg-amber-500/30 border border-amber-300/60 p-3 text-amber-100 text-xs text-center backdrop-blur">
+                        <span class="font-semibold block mb-0.5 uppercase tracking-wide">🛠️ Development Mode Preview</span>
+                        OTP Code: <span class="font-mono text-base font-bold text-white bg-black/40 px-2 py-0.5 rounded ml-1"><?= esc(session()->getFlashdata('dev_otp_preview')) ?></span>
+                    </div>
+                <?php endif; ?>
+
                 <?php if (session()->getFlashdata('error')): ?>
                     <div role="alert" class="mb-4 rounded-md bg-red-100 border border-red-200 text-red-800 px-4 py-3">
                         <span class="mr-2">&#x26A0;</span><?= esc(session()->getFlashdata('error')) ?>

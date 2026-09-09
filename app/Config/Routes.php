@@ -19,6 +19,17 @@ $routes->post('/store-register', 'Auth::store_register');
 $routes->get('/dashboard', 'Auth::dashboard');
 $routes->get('/logout', 'Auth::logout');
 
+// Admin 2FA Verification routes (aliases to verify-otp)
+$routes->get('/admin/verify-otp', 'Auth::verify_otp_form');
+$routes->post('/admin/verify-otp', 'Auth::verify_otp');
+$routes->post('/admin/resend-otp', 'Auth::resend_otp');
+
+// Password Reset routes
+$routes->get('/forgot-password', 'Auth::forgotPassword');
+$routes->post('/forgot-password', 'Auth::sendResetLink');
+$routes->get('/reset-password/(:segment)', 'Auth::showResetPassword/$1');
+$routes->post('/reset-password', 'Auth::processResetPassword');
+
 // Navigation routes
 $routes->get('/documents', 'Documents::index');
 // legacy paths now redirect so URL updates (keeps nav highlighting correct)
@@ -58,10 +69,22 @@ $routes->get('/admin/create-first-admin', 'Admin::createFirstAdmin');
 $routes->post('/admin/store-first-admin', 'Admin::storeFirstAdmin');
 $routes->get('/admin/users', 'Admin::users');
 $routes->post('/admin/assignRole', 'Admin::assignRole');
+$routes->get('/admin/assignRole', static function() { return redirect()->to('/admin-panel'); });
 $routes->post('/admin/clearRole', 'Admin::clearRole');
+$routes->get('/admin/clearRole', static function() { return redirect()->to('/admin-panel'); });
+$routes->post('/admin/toggleStatus', 'Admin::toggleStatus');
+$routes->get('/admin/toggleStatus', static function() { return redirect()->to('/admin-panel'); });
+$routes->post('/admin/disableUser', 'Admin::toggleStatus');
 $routes->post('/admin/grantAdmin', 'Admin::grantAdmin');
+$routes->get('/admin/grantAdmin', static function() { return redirect()->to('/admin-panel'); });
 $routes->post('/admin/revokeAdmin', 'Admin::revokeAdmin');
+$routes->get('/admin/revokeAdmin', static function() { return redirect()->to('/admin-panel'); });
+$routes->post('/admin/updateUser', 'Admin::updateUser');
+$routes->get('/admin/updateUser', static function() { return redirect()->to('/admin-panel'); });
+$routes->post('/admin/resetUserPassword', 'Admin::resetUserPassword');
+$routes->get('/admin/resetUserPassword', static function() { return redirect()->to('/admin-panel'); });
 $routes->get('/admin/getUsers', 'Admin::getUsers');
+
 $routes->get('/admin/getStats', 'Admin::getStats');
 $routes->get('/admin/backup', 'Admin::backup');
 $routes->get('/admin/backup/export', 'Admin::exportBackup');

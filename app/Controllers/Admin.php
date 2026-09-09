@@ -4,6 +4,8 @@ namespace App\Controllers;
 
 use App\Models\UserModel;
 use App\Models\RoleModel;
+use App\Models\PasswordResetModel;
+use App\Libraries\AuthMailer;
 
 class Admin extends BaseController
 {
@@ -17,11 +19,19 @@ class Admin extends BaseController
     }
 
     /**
-     * Check if user is admin
+     * Check if user is admin. Returns null if authorized, or a Response/Redirect if not.
      */
-    private function checkAdminAccess()
+    private function checkAdminAccess(bool $isAjax = false)
     {
+        $isRequestAjax = $isAjax || $this->request->isAJAX();
+
         if (!session()->get('logged_in')) {
+            if ($isRequestAjax) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Your session has expired. Please log in again.'
+                ])->setStatusCode(401);
+            }
             return redirect()->to('/login');
         }
 
@@ -29,6 +39,12 @@ class Admin extends BaseController
         $user = $this->userModel->find($userId);
 
         if (!$user || !$user['is_admin']) {
+            if ($isRequestAjax) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Unauthorized: Administrator access required.'
+                ])->setStatusCode(403);
+            }
             return redirect()->to('/dashboard')->with('error', 'You do not have permission to access this page');
         }
 
@@ -62,7 +78,7 @@ class Admin extends BaseController
             ->join('roles', 'roles.id = users.role_id', 'left')
             ->findAll();
 
-        // Decrypt user fields for display.  Admin panel may show plaintext
+        // Decrypt user fields for display. Admin panel may show plaintext
         // email so request it explicitly from the model.
         foreach ($users as &$u) {
             $u = $this->userModel->decryptUserRow($u, true);
@@ -70,6 +86,7 @@ class Admin extends BaseController
             if (isset($u['email']) && preg_match('/^[0-9a-f]{64}$/i', (string) $u['email'])) {
                 $u['email'] = '';
             }
+            $u['is_active'] = isset($u['is_active']) ? (int) $u['is_active'] : 1;
         }
         unset($u);
 
@@ -89,7 +106,7 @@ class Admin extends BaseController
      */
     public function assignRole()
     {
-        $accessCheck = $this->checkAdminAccess();
+        $accessCheck = $this->checkAdminAccess(true);
         if ($accessCheck) {
             return $accessCheck;
         }
@@ -97,56 +114,324 @@ class Admin extends BaseController
         $userId = $this->request->getPost('user_id');
         $roleId = $this->request->getPost('role_id');
 
-        if (!$userId || $roleId === '') {
+        if (!$userId || $userId === 'null' || $userId === 'undefined' || !is_numeric($userId) || $roleId === null || $roleId === '') {
             return $this->response->setJSON([
-                'success' => false,
-                'message' => 'Invalid user or role'
+                'success'    => false,
+                'message'    => 'Invalid user or role selection',
+                'csrf_token' => csrf_hash(),
             ])->setStatusCode(400);
         }
+
+        $userId = (int) $userId;
 
         // Verify user exists
         $user = $this->userModel->find($userId);
         if (!$user) {
             return $this->response->setJSON([
-                'success' => false,
-                'message' => 'User not found'
-            ])->setStatusCode(404);
-        }
-
-        // Prevent changing own role/admin status
-        if ($userId == session()->get('user_id')) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'You cannot change your own role or admin status'
+                'success'    => false,
+                'message'    => 'User not found in system',
+                'csrf_token' => csrf_hash(),
             ])->setStatusCode(400);
         }
 
-        // Verify role exists
-        $role = $this->roleModel->find($roleId);
-        if (!$role) {
+        // Prevent changing own role/admin status
+        if ($userId === (int) session()->get('user_id')) {
             return $this->response->setJSON([
-                'success' => false,
-                'message' => 'Role not found'
-            ])->setStatusCode(404);
+                'success'    => false,
+                'message'    => 'You cannot change your own role or admin status',
+                'csrf_token' => csrf_hash(),
+            ])->setStatusCode(400);
         }
 
-        // Update user role and admin status
-        // If assigning ADMIN role (id=1), set is_admin=1, otherwise set is_admin=0
-        $updateData = [
-            'role_id' => $roleId,
-            'is_admin' => ($roleId == 1) ? 1 : 0
-        ];
+        // Check if clearing role
+        if ($roleId === '0' || $roleId === 'none' || $roleId === 'null') {
+            $updateData = [
+                'role_id'  => null,
+                'is_admin' => 0
+            ];
+            $assignedRoleName = 'No Role';
+        } else {
+            // Verify role exists
+            $role = $this->roleModel->find($roleId);
+            if (!$role) {
+                return $this->response->setJSON([
+                    'success'    => false,
+                    'message'    => 'Selected role does not exist',
+                    'csrf_token' => csrf_hash(),
+                ])->setStatusCode(400);
+            }
+
+            // Update user role and admin status
+            // If assigning ADMIN role (id=1), set is_admin=1, otherwise set is_admin=0
+            $updateData = [
+                'role_id'  => (int) $roleId,
+                'is_admin' => ((int) $roleId === 1) ? 1 : 0
+            ];
+            $assignedRoleName = $role['name'] ?? 'Role';
+        }
 
         if ($this->userModel->update($userId, $updateData)) {
             return $this->response->setJSON([
-                'success' => true,
-                'message' => 'Role assigned successfully'
+                'success'    => true,
+                'role_id'    => $updateData['role_id'],
+                'role_name'  => $assignedRoleName,
+                'is_admin'   => $updateData['is_admin'],
+                'message'    => "Role assigned successfully: {$assignedRoleName}",
+                'csrf_token' => csrf_hash(),
             ]);
         }
 
         return $this->response->setJSON([
-            'success' => false,
-            'message' => 'Failed to assign role'
+            'success'    => false,
+            'message'    => 'Failed to assign role',
+            'csrf_token' => csrf_hash(),
+        ])->setStatusCode(500);
+    }
+
+    /**
+     * Toggle active/disabled status for a user
+     */
+    public function toggleStatus()
+    {
+        $accessCheck = $this->checkAdminAccess(true);
+        if ($accessCheck) {
+            return $accessCheck;
+        }
+
+        $userId = $this->request->getPost('user_id');
+        if (!$userId || $userId === 'null' || $userId === 'undefined' || !is_numeric($userId)) {
+            return $this->response->setJSON([
+                'success'    => false,
+                'message'    => 'Invalid user ID',
+                'csrf_token' => csrf_hash(),
+            ])->setStatusCode(400);
+        }
+
+        $userId = (int) $userId;
+
+        $currentAdminId = (int) session()->get('user_id');
+        if ($userId === $currentAdminId) {
+            return $this->response->setJSON([
+                'success'    => false,
+                'message'    => 'You cannot disable your own administrator account',
+                'csrf_token' => csrf_hash(),
+            ])->setStatusCode(400);
+        }
+
+        $user = $this->userModel->find($userId);
+        if (!$user) {
+            return $this->response->setJSON([
+                'success'    => false,
+                'message'    => 'User not found in system',
+                'csrf_token' => csrf_hash(),
+            ])->setStatusCode(400);
+        }
+
+        // Prevent disabling primary admin username
+        if (strtolower($user['username'] ?? '') === 'admin') {
+            return $this->response->setJSON([
+                'success'    => false,
+                'message'    => 'The primary administrator account cannot be disabled',
+                'csrf_token' => csrf_hash(),
+            ])->setStatusCode(400);
+        }
+
+        $currentStatus = isset($user['is_active']) ? (int) $user['is_active'] : 1;
+        $newStatus = ($currentStatus === 1) ? 0 : 1;
+
+        if ($this->userModel->update($userId, ['is_active' => $newStatus])) {
+            $actionLabel = ($newStatus === 1) ? 'enabled' : 'disabled';
+            return $this->response->setJSON([
+                'success'    => true,
+                'is_active'  => $newStatus,
+                'message'    => "User account has been {$actionLabel} successfully",
+                'csrf_token' => csrf_hash(),
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'success'    => false,
+            'message'    => 'Failed to update user status',
+            'csrf_token' => csrf_hash(),
+        ])->setStatusCode(500);
+    }
+
+    /**
+     * Admin: Edit user's name and email
+     */
+    public function updateUser()
+    {
+        $accessCheck = $this->checkAdminAccess(true);
+        if ($accessCheck) {
+            return $accessCheck;
+        }
+
+        $userId = $this->request->getPost('user_id');
+        if (!$userId || !is_numeric($userId)) {
+            return $this->response->setJSON([
+                'success'    => false,
+                'message'    => 'Invalid user ID',
+                'csrf_token' => csrf_hash(),
+            ])->setStatusCode(400);
+        }
+
+        $userId = (int) $userId;
+        $firstName = trim((string) $this->request->getPost('first_name'));
+        $lastName  = trim((string) $this->request->getPost('last_name'));
+        $email     = trim((string) $this->request->getPost('email'));
+
+        if ($firstName === '' || $lastName === '' || $email === '') {
+            return $this->response->setJSON([
+                'success'    => false,
+                'message'    => 'First name, last name, and email are all required.',
+                'csrf_token' => csrf_hash(),
+            ])->setStatusCode(400);
+        }
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return $this->response->setJSON([
+                'success'    => false,
+                'message'    => 'Please provide a valid email address.',
+                'csrf_token' => csrf_hash(),
+            ])->setStatusCode(400);
+        }
+
+        $user = $this->userModel->find($userId);
+        if (!$user) {
+            return $this->response->setJSON([
+                'success'    => false,
+                'message'    => 'User not found in system',
+                'csrf_token' => csrf_hash(),
+            ])->setStatusCode(404);
+        }
+
+        // Check email uniqueness if email is changed
+        $existing = $this->userModel->getUserByEmail($email);
+        if ($existing && (int) $existing['id'] !== $userId) {
+            return $this->response->setJSON([
+                'success'    => false,
+                'message'    => 'This email address is already registered to another user.',
+                'csrf_token' => csrf_hash(),
+            ])->setStatusCode(400);
+        }
+
+        // Prepare encrypted PII
+        $updateData = [
+            'first_name' => $firstName,
+            'last_name'  => $lastName,
+            'email'      => $email,
+        ];
+        $prepared = $this->userModel->prepareForInsert($updateData);
+
+        $this->userModel->skipValidation(true);
+        if ($this->userModel->update($userId, $prepared)) {
+            return $this->response->setJSON([
+                'success'    => true,
+                'message'    => 'User details updated successfully.',
+                'csrf_token' => csrf_hash(),
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'success'    => false,
+            'message'    => 'Failed to update user details.',
+            'csrf_token' => csrf_hash(),
+        ])->setStatusCode(500);
+    }
+
+    /**
+     * Admin: Reset password for another user (via email link or direct manual password)
+     */
+    public function resetUserPassword()
+    {
+        $accessCheck = $this->checkAdminAccess(true);
+        if ($accessCheck) {
+            return $accessCheck;
+        }
+
+        $userId = $this->request->getPost('user_id');
+        if (!$userId || !is_numeric($userId)) {
+            return $this->response->setJSON([
+                'success'    => false,
+                'message'    => 'Invalid user ID',
+                'csrf_token' => csrf_hash(),
+            ])->setStatusCode(400);
+        }
+
+        $userId = (int) $userId;
+        $user = $this->userModel->find($userId);
+        if (!$user) {
+            return $this->response->setJSON([
+                'success'    => false,
+                'message'    => 'User not found in system',
+                'csrf_token' => csrf_hash(),
+            ])->setStatusCode(404);
+        }
+
+        $mode = $this->request->getPost('mode') ?: 'manual';
+
+        if ($mode === 'email') {
+            $user = $this->userModel->decryptUserRow($user);
+            $email = $this->userModel->decryptValue($user['email_enc'] ?? '') ?: ($user['email'] ?? '');
+            if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                return $this->response->setJSON([
+                    'success'    => false,
+                    'message'    => 'User does not have a valid email address on file.',
+                    'csrf_token' => csrf_hash(),
+                ])->setStatusCode(400);
+            }
+
+            $key = env('encryption.key') ?: getenv('encryption.key');
+            $emailHash = hash_hmac('sha256', mb_strtolower(trim($email)), $key);
+            $resetModel = new PasswordResetModel();
+            $rawToken = $resetModel->createToken($userId, $emailHash);
+
+            $mailer = new AuthMailer();
+            $mailer->sendPasswordReset($email, $user['first_name'] ?: $user['username'], $rawToken);
+
+            return $this->response->setJSON([
+                'success'    => true,
+                'message'    => "Password reset link has been sent to {$email}.",
+                'csrf_token' => csrf_hash(),
+            ]);
+        }
+
+        // Manual password change
+        $newPassword = (string) $this->request->getPost('new_password');
+        if (empty($newPassword)) {
+            return $this->response->setJSON([
+                'success'    => false,
+                'message'    => 'Password cannot be empty.',
+                'csrf_token' => csrf_hash(),
+            ])->setStatusCode(400);
+        }
+
+        $hasUppercase = preg_match('/[A-Z]/', $newPassword);
+        $hasLowercase = preg_match('/[a-z]/', $newPassword);
+        $hasNumber    = preg_match('/[0-9]/', $newPassword);
+        $hasSpecial   = preg_match('/[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/', $newPassword);
+
+        if (!$hasUppercase || !$hasLowercase || !$hasNumber || !$hasSpecial || strlen($newPassword) < 8) {
+            return $this->response->setJSON([
+                'success'    => false,
+                'message'    => 'Password must contain at least 8 characters, one uppercase, one lowercase, one number, and one special character.',
+                'csrf_token' => csrf_hash(),
+            ])->setStatusCode(400);
+        }
+
+        $hash = password_hash($newPassword, PASSWORD_DEFAULT);
+        if ($this->userModel->update($userId, ['password' => $hash])) {
+            return $this->response->setJSON([
+                'success'    => true,
+                'message'    => 'Password has been successfully updated for this user.',
+                'csrf_token' => csrf_hash(),
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'success'    => false,
+            'message'    => 'Failed to update password.',
+            'csrf_token' => csrf_hash(),
         ])->setStatusCode(500);
     }
 
@@ -155,53 +440,60 @@ class Admin extends BaseController
      */
     public function clearRole()
     {
-        $accessCheck = $this->checkAdminAccess();
+        $accessCheck = $this->checkAdminAccess(true);
         if ($accessCheck) {
             return $accessCheck;
         }
 
         $userId = $this->request->getPost('user_id');
 
-        if (!$userId) {
+        if (!$userId || $userId === 'null' || $userId === 'undefined' || !is_numeric($userId)) {
             return $this->response->setJSON([
-                'success' => false,
-                'message' => 'Invalid user'
+                'success'    => false,
+                'message'    => 'Invalid user ID',
+                'csrf_token' => csrf_hash(),
             ])->setStatusCode(400);
         }
+
+        $userId = (int) $userId;
 
         // Verify user exists
         $user = $this->userModel->find($userId);
         if (!$user) {
             return $this->response->setJSON([
-                'success' => false,
-                'message' => 'User not found'
-            ])->setStatusCode(404);
+                'success'    => false,
+                'message'    => 'User not found in system',
+                'csrf_token' => csrf_hash(),
+            ])->setStatusCode(400);
         }
 
         // Prevent clearing own role/admin status
-        if ($userId == session()->get('user_id')) {
+        if ($userId === (int) session()->get('user_id')) {
             return $this->response->setJSON([
-                'success' => false,
-                'message' => 'You cannot clear your own role or revoke your own admin status'
+                'success'    => false,
+                'message'    => 'You cannot clear your own role or revoke your own admin status',
+                'csrf_token' => csrf_hash(),
             ])->setStatusCode(400);
         }
 
         // Clear role and admin status
         $updateData = [
-            'role_id' => null,
+            'role_id'  => null,
             'is_admin' => 0
         ];
 
         if ($this->userModel->update($userId, $updateData)) {
             return $this->response->setJSON([
-                'success' => true,
-                'message' => 'Role cleared successfully'
+                'success'    => true,
+                'message'    => 'Role cleared successfully',
+                'csrf_token' => csrf_hash(),
             ]);
         }
 
         return $this->response->setJSON([
-            'success' => false,
-            'message' => 'Failed to clear role'
+            'success'    => false,
+            'message'    => 'Failed to clear role',
+            'csrf_token' => csrf_hash(),
         ])->setStatusCode(500);
     }
 
@@ -317,39 +609,45 @@ class Admin extends BaseController
      */
     public function grantAdmin()
     {
-        $accessCheck = $this->checkAdminAccess();
+        $accessCheck = $this->checkAdminAccess(true);
         if ($accessCheck) {
             return $accessCheck;
         }
 
         $userId = $this->request->getPost('user_id');
 
-        if (!$userId) {
+        if (!$userId || $userId === 'null' || $userId === 'undefined' || !is_numeric($userId)) {
             return $this->response->setJSON([
-                'success' => false,
-                'message' => 'Invalid user'
+                'success'    => false,
+                'message'    => 'Invalid user ID',
+                'csrf_token' => csrf_hash(),
             ])->setStatusCode(400);
         }
+
+        $userId = (int) $userId;
 
         $user = $this->userModel->find($userId);
         if (!$user) {
             return $this->response->setJSON([
-                'success' => false,
-                'message' => 'User not found'
-            ])->setStatusCode(404);
+                'success'    => false,
+                'message'    => 'User not found in system',
+                'csrf_token' => csrf_hash(),
+            ])->setStatusCode(400);
         }
 
         // Grant admin privileges and assign ADMIN role
         if ($this->userModel->update($userId, ['is_admin' => 1, 'role_id' => 1])) {
             return $this->response->setJSON([
-                'success' => true,
-                'message' => 'Admin privileges granted'
+                'success'    => true,
+                'message'    => 'Admin privileges granted successfully',
+                'csrf_token' => csrf_hash(),
             ]);
         }
 
         return $this->response->setJSON([
-            'success' => false,
-            'message' => 'Failed to grant admin privileges'
+            'success'    => false,
+            'message'    => 'Failed to grant admin privileges',
+            'csrf_token' => csrf_hash(),
         ])->setStatusCode(500);
     }
 
@@ -358,47 +656,63 @@ class Admin extends BaseController
      */
     public function revokeAdmin()
     {
-        $accessCheck = $this->checkAdminAccess();
+        $accessCheck = $this->checkAdminAccess(true);
         if ($accessCheck) {
             return $accessCheck;
         }
 
         $userId = $this->request->getPost('user_id');
 
-        // Prevent revoking your own admin privileges
-        if ($userId == session()->get('user_id')) {
+        if (!$userId || $userId === 'null' || $userId === 'undefined' || !is_numeric($userId)) {
             return $this->response->setJSON([
-                'success' => false,
-                'message' => 'You cannot revoke your own admin privileges'
+                'success'    => false,
+                'message'    => 'Invalid user ID',
+                'csrf_token' => csrf_hash(),
             ])->setStatusCode(400);
         }
 
-        if (!$userId) {
+        $userId = (int) $userId;
+
+        // Prevent revoking your own admin privileges
+        if ($userId === (int) session()->get('user_id')) {
             return $this->response->setJSON([
-                'success' => false,
-                'message' => 'Invalid user'
+                'success'    => false,
+                'message'    => 'You cannot revoke your own admin privileges',
+                'csrf_token' => csrf_hash(),
             ])->setStatusCode(400);
         }
 
         $user = $this->userModel->find($userId);
         if (!$user) {
             return $this->response->setJSON([
-                'success' => false,
-                'message' => 'User not found'
-            ])->setStatusCode(404);
+                'success'    => false,
+                'message'    => 'User not found in system',
+                'csrf_token' => csrf_hash(),
+            ])->setStatusCode(400);
+        }
+
+        // Prevent revoking primary admin
+        if (strtolower($user['username'] ?? '') === 'admin') {
+            return $this->response->setJSON([
+                'success'    => false,
+                'message'    => 'You cannot revoke privileges from the primary administrator',
+                'csrf_token' => csrf_hash(),
+            ])->setStatusCode(400);
         }
 
         // Revoke admin privileges and clear role
         if ($this->userModel->update($userId, ['is_admin' => 0, 'role_id' => null])) {
             return $this->response->setJSON([
-                'success' => true,
-                'message' => 'Admin privileges revoked'
+                'success'    => true,
+                'message'    => 'Admin privileges revoked successfully',
+                'csrf_token' => csrf_hash(),
             ]);
         }
 
         return $this->response->setJSON([
-            'success' => false,
-            'message' => 'Failed to revoke admin privileges'
+            'success'    => false,
+            'message'    => 'Failed to revoke admin privileges',
+            'csrf_token' => csrf_hash(),
         ])->setStatusCode(500);
     }
 
@@ -407,20 +721,9 @@ class Admin extends BaseController
      */
     public function getUsers()
     {
-        // API-specific access check
-        if (!session()->get('logged_in')) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'Unauthorized: not logged in'
-            ])->setStatusCode(403);
-        }
-        $userId = session()->get('user_id');
-        $user = $this->userModel->find($userId);
-        if (!$user || !$user['is_admin']) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'Unauthorized: not admin'
-            ])->setStatusCode(403);
+        $accessCheck = $this->checkAdminAccess(true);
+        if ($accessCheck) {
+            return $accessCheck;
         }
 
         $users = $this->userModel->select('users.*, roles.name as role_name')
@@ -433,6 +736,16 @@ class Admin extends BaseController
             if (isset($u['email']) && preg_match('/^[0-9a-f]{64}$/i', (string) $u['email'])) {
                 $u['email'] = '';
             }
+            $u['is_active'] = isset($u['is_active']) ? (int) $u['is_active'] : 1;
+            // SECURITY: Strip password hash and internal ciphertexts before sending to client
+            unset(
+                $u['password'],
+                $u['email_hash'],
+                $u['email_enc'],
+                $u['first_name_enc'],
+                $u['last_name_enc'],
+                $u['contact_number_enc']
+            );
         }
         unset($u);
 
@@ -499,11 +812,13 @@ class Admin extends BaseController
             $last = 'User';
         }
 
-        $this->userModel->update($id, [
+        $reData = [
             'first_name' => $first,
-            'last_name' => $last,
-            'email' => $email ?: ($user['username'] . '@example.local'),
-        ]);
+            'last_name'  => $last,
+            'email'      => $email ?: ($user['username'] . '@example.local'),
+        ];
+        $reData = $this->userModel->prepareForInsert($reData);
+        $this->userModel->skipValidation(true)->update($id, $reData);
 
         return $this->response->setJSON(['success' => true, 'message' => 'Re-encrypted user data']);
     }
@@ -592,15 +907,16 @@ class Admin extends BaseController
 
         // Whitelist only known safe columns to prevent arbitrary field injection
         $allowed = [
-            'id', 'username', 'password', 'email', 'email_enc',
+            'id', 'username', 'password', 'email', 'email_hash', 'email_enc',
             'first_name', 'first_name_enc', 'last_name', 'last_name_enc',
-            'province', 'municipality', 'is_admin', 'role_id',
-            'created_at', 'updated_at',
+            'contact_number_enc', 'agency', 'province', 'municipality',
+            'is_admin', 'is_active', 'role_id', 'created_at', 'updated_at',
         ];
         $safeData = array_intersect_key($data, array_flip($allowed));
 
-        // Force admin flag – backup restore must not downgrade the admin record
+        // Force admin and active flags – backup restore must not downgrade the admin record
         $safeData['is_admin'] = 1;
+        $safeData['is_active'] = 1;
 
         try {
             // Use table builder replace to bypass model callbacks/validation, since

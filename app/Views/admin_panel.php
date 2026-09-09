@@ -1,6 +1,7 @@
 <?= $this->extend('layouts/main_tailwind') ?>
 
 <?= $this->section('pageStyles') ?>
+<meta name="csrf-token" content="<?= csrf_hash() ?>">
 <style>
     .page-header {
         background: linear-gradient(135deg, rgba(0, 44, 118, 0.15), rgba(0, 44, 118, 0.04));
@@ -22,11 +23,12 @@
     .role-badge {
         display: inline-flex;
         align-items: center;
-        padding: 6px 10px;
+        padding: 4px 10px;
         border-radius: 999px;
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 600;
         color: #fff;
+        letter-spacing: 0.025em;
     }
 
     .role-admin {
@@ -45,29 +47,45 @@
         background: #7C3AED;
     }
 
+    .role-norole {
+        background: #6B7280;
+    }
+
     .stats-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-        gap: 12px;
-        margin-top: 12px;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 14px;
     }
 
     .stat-item {
-        background: rgba(9, 99, 126, 0.06);
-        border: 1px solid rgba(9, 99, 126, 0.12);
-        border-radius: 8px;
+        background: #ffffff;
+        border: 1px solid rgba(0, 44, 118, 0.12);
+        border-radius: 12px;
         text-align: center;
-        padding: 12px;
+        padding: 16px 12px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .stat-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 44, 118, 0.08);
     }
 
     .stat-number {
-        font-size: 22px;
+        font-size: 26px;
         font-weight: 700;
+        color: #002C76;
+        line-height: 1.2;
     }
 
     .stat-label {
         font-size: 12px;
-        color: #6c757d;
+        font-weight: 500;
+        color: #64748b;
+        margin-top: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
     }
 
     .table thead th {
@@ -93,16 +111,16 @@
     .modal-content {
         background: #fff;
         padding: 24px;
-        border-radius: 10px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
-        max-width: 520px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+        max-width: 500px;
         width: 100%;
-        animation: modalSlideIn 0.25s ease-out;
+        animation: modalSlideIn 0.2s ease-out;
     }
 
     @keyframes modalSlideIn {
         from {
-            transform: translateY(-20px);
+            transform: translateY(-16px);
             opacity: 0;
         }
         to {
@@ -114,12 +132,17 @@
     .modal-header h3 {
         margin: 0;
         color: #002C76;
-        font-size: 20px;
+        font-size: 18px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
     .modal-body p {
-        color: #6c757d;
-        margin-bottom: 12px;
+        color: #64748b;
+        margin-bottom: 14px;
+        font-size: 14px;
     }
 
     .modal-footer {
@@ -135,6 +158,11 @@
         cursor: pointer;
         font-size: 14px;
         font-weight: 600;
+        transition: opacity 0.15s ease;
+    }
+
+    .modal-btn:hover {
+        opacity: 0.9;
     }
 
     .modal-btn-primary {
@@ -143,13 +171,13 @@
     }
 
     .modal-btn-secondary {
-        background: #e5e7eb;
-        color: #1f2937;
+        background: #e2e8f0;
+        color: #334155;
     }
 
     .success-icon {
-        width: 64px;
-        height: 64px;
+        width: 56px;
+        height: 56px;
         background: #10B981;
         border-radius: 50%;
         display: flex;
@@ -158,33 +186,28 @@
         margin: 0 auto 16px;
     }
 
-    .success-icon i {
-        font-size: 30px;
-        color: #fff;
-    }
-
     .success-message {
         text-align: center;
         color: #002C76;
         font-size: 18px;
-        font-weight: 600;
-        margin-bottom: 10px;
+        font-weight: 700;
+        margin-bottom: 8px;
     }
 
     .success-detail {
         text-align: center;
-        color: #6c757d;
+        color: #64748b;
         font-size: 14px;
         margin-bottom: 16px;
     }
 
     .modal-error {
-        background: #fee;
-        color: #DC2626;
+        background: #fef2f2;
+        color: #dc2626;
         padding: 10px 12px;
         border-radius: 6px;
         font-size: 13px;
-        border-left: 4px solid #DC2626;
+        border-left: 4px solid #dc2626;
         margin-bottom: 12px;
         display: none;
     }
@@ -196,169 +219,224 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-<div class="page-header flex flex-wrap justify-between items-center mb-4 mx-auto px-4 sm:px-6 lg:px-8" style="max-width:1200px; margin-left:auto; margin-right:auto;">
+<div class="page-header flex flex-wrap justify-between items-center mb-6 mx-auto px-4 sm:px-6 lg:px-8" style="max-width:1200px;">
     <div>
-        <h3 class="page-title mb-1"><?= svg_icon('shield', 'w-5 h-5 mr-3 text-blue-900') ?><span class="text-xl font-semibold">User Management</span></h3>
-        <div class="text-gray-500">Manage users, roles, and administrative access.</div>
+        <h3 class="page-title mb-1 flex items-center">
+            <?= svg_icon('shield', 'w-6 h-6 mr-2 text-blue-900') ?>
+            <span class="text-xl font-bold text-gray-900">User Management</span>
+        </h3>
+        <div class="text-sm text-gray-500">Manage user roles, account activation status, and administrative privileges.</div>
     </div>
 </div>
 
+<!-- Admin Statistics Section -->
+<div class="mx-auto px-4 sm:px-6 lg:px-8 mb-6" style="max-width:1200px;">
+    <div id="admin-stats" class="stats-grid">
+        <div class="stat-item"><div class="stat-number">—</div><div class="stat-label">Total Users</div></div>
+        <div class="stat-item"><div class="stat-number">—</div><div class="stat-label">Admin Users</div></div>
+        <div class="stat-item"><div class="stat-number">—</div><div class="stat-label">Regular Users</div></div>
+        <div class="stat-item"><div class="stat-number">—</div><div class="stat-label">No Role Assigned</div></div>
+    </div>
+</div>
 
-<div id="user-management-section" class="bg-white rounded-2xl shadow admin-card mx-auto px-4 sm:px-6 lg:px-8" style="max-width:1200px; margin-left:auto; margin-right:auto; border-left: none;">
+<div id="user-management-section" class="bg-white rounded-2xl shadow admin-card mx-auto px-4 sm:px-6 lg:px-8 mb-8" style="max-width:1200px; border-left: none;">
     <div class="p-6">
-        <h4 class="text-lg font-semibold mb-4">User Management</h4>
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-5">
+            <h4 class="text-lg font-bold text-gray-800">Registered Users</h4>
 
-        <div class="flex flex-wrap items-center gap-3 mb-4 mt-2">
-            <div class="flex items-center rounded-full bg-gray-50 border border-gray-200 overflow-hidden" style="max-width:320px;">
-                <div class="px-3 text-gray-500"><?= svg_icon('search', 'w-4 h-4') ?></div>
-                <input type="text" id="userSearch" class="py-2 px-3 text-sm bg-transparent outline-none" placeholder="Search" onkeyup="filterUsers()" />
-            </div>
+            <div class="flex flex-wrap items-center gap-3">
+                <div class="flex items-center rounded-lg bg-gray-50 border border-gray-200 overflow-hidden px-3 py-1.5 focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500">
+                    <div class="text-gray-400 mr-2"><?= svg_icon('search', 'w-4 h-4') ?></div>
+                    <input type="text" id="userSearch" class="text-sm bg-transparent outline-none w-48 sm:w-60" placeholder="Search by name, email, user..." onkeyup="filterUsers()" />
+                </div>
 
-            <div class="flex items-center rounded-full bg-gray-50 border border-gray-200 overflow-hidden" style="max-width:180px;">
-                <div class="px-3 text-gray-500"><?= svg_icon('users', 'w-4 h-4') ?></div>
-                <select id="roleFilter" class="py-2 pr-3 pl-1 text-sm bg-transparent outline-none" onchange="filterUsers()">
-                    <option value="">Role</option>
-                    <option value="ADMIN">ADMIN</option>
-                    <option value="FOCAL">FOCAL</option>
-                    <option value="LGU">LGU</option>
-                    <option value="PROVINCE">PROVINCE</option>
-                </select>
+                <div class="flex items-center rounded-lg bg-gray-50 border border-gray-200 overflow-hidden px-2.5 py-1.5">
+                    <div class="text-gray-400 mr-1.5"><?= svg_icon('users', 'w-4 h-4') ?></div>
+                    <select id="roleFilter" class="text-sm bg-transparent outline-none pr-2 text-gray-700 cursor-pointer" onchange="filterUsers()">
+                        <option value="">All Roles</option>
+                        <option value="ADMIN">ADMIN</option>
+                        <option value="FOCAL">FOCAL</option>
+                        <option value="LGU">LGU</option>
+                        <option value="PROVINCE">PROVINCE</option>
+                        <option value="NO ROLE">NO ROLE</option>
+                    </select>
+                </div>
+
+                <div class="flex items-center rounded-lg bg-gray-50 border border-gray-200 overflow-hidden px-2.5 py-1.5">
+                    <select id="statusFilter" class="text-sm bg-transparent outline-none pr-2 text-gray-700 cursor-pointer" onchange="filterUsers()">
+                        <option value="">All Status</option>
+                        <option value="ACTIVE">ACTIVE</option>
+                        <option value="DISABLED">DISABLED</option>
+                    </select>
+                </div>
             </div>
         </div>
 
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto rounded-lg border border-gray-100">
             <table class="min-w-full w-full divide-y divide-gray-200">
-                <thead class="bg-[#002c76]" style="background-color:#002c76">
+                <thead style="background-color:#002c76;">
                     <tr>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-white">USERNAME</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-white">NAME</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-white">EMAIL</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-white">ROLE</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-white">ACTIONS</th>
+                        <th class="px-4 py-3.5 text-left text-xs font-semibold text-white tracking-wider">USERNAME</th>
+                        <th class="px-4 py-3.5 text-left text-xs font-semibold text-white tracking-wider">FULL NAME</th>
+                        <th class="px-4 py-3.5 text-left text-xs font-semibold text-white tracking-wider">EMAIL</th>
+                        <th class="px-4 py-3.5 text-left text-xs font-semibold text-white tracking-wider">ROLE</th>
+                        <th class="px-4 py-3.5 text-left text-xs font-semibold text-white tracking-wider">STATUS</th>
+                        <th class="px-4 py-3.5 text-left text-xs font-semibold text-white tracking-wider">ACTIONS</th>
                     </tr>
                 </thead>
                 <tbody id="user-tbody" class="bg-white divide-y divide-gray-100">
-                    <tr><td colspan="5" class="px-4 py-4 text-center text-sm text-gray-400">Loading users...</td></tr>
+                    <tr><td colspan="6" class="px-4 py-8 text-center text-sm text-gray-400">Loading users...</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 </div>
 
+<!-- Assign Role Modal -->
 <div id="assignRoleModal" class="modal-overlay">
     <div class="modal-content">
         <div class="modal-header mb-3">
-            <h3><?= svg_icon('users', 'w-5 h-5') ?> Assign Role</h3>
+            <h3><?= svg_icon('pencil', 'w-5 h-5 text-blue-900') ?> Assign / Update Role</h3>
         </div>
         <div class="modal-body">
-            <p>Assign a role to <strong id="modalUserName"></strong></p>
+            <p>Update role assignment for <strong id="modalUserName" class="text-gray-900"></strong>:</p>
             <div id="roleModalError" class="modal-error"></div>
-            <div class="form-group">
-                <label for="roleSelect" class="text-sm font-medium text-gray-600 block mb-1">Select Role:</label>
-                <select id="roleSelect" class="block w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
+            <div class="form-group mb-4">
+                <label for="roleSelect" class="text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1.5">System Role</label>
+                <select id="roleSelect" class="block w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     <option value="">-- Select a role --</option>
-                    <option value="1">ADMIN</option>
-                    <option value="2">FOCAL</option>
-                    <option value="3">LGU</option>
-                    <option value="4">PROVINCE</option>
+                    <option value="1">ADMIN (Full System Administrator)</option>
+                    <option value="2">FOCAL (Regional / Focal Point)</option>
+                    <option value="3">LGU (Local Government Unit)</option>
+                    <option value="4">PROVINCE (Provincial Office)</option>
+                    <option value="0">-- No Role (Clear Role) --</option>
                 </select>
             </div>
+            <p class="text-xs text-gray-400 italic">Assigning ADMIN grants full administrative privileges. Selecting "No Role" will remove the user's role access.</p>
         </div>
         <div class="modal-footer">
-            <div class="mt-6 flex gap-2">
-                <button class="modal-btn modal-btn-secondary" onclick="closeRoleModal()">Cancel</button>
-                <button class="modal-btn modal-btn-primary" onclick="submitRoleAssignment()">Assign Role</button>
-            </div>
+            <button type="button" class="modal-btn modal-btn-secondary" onclick="closeRoleModal()">Cancel</button>
+            <button type="button" class="modal-btn modal-btn-primary" onclick="submitRoleAssignment()">Save Role</button>
         </div>
     </div>
 </div>
 
+<!-- Edit User Details Modal -->
+<div id="editUserModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header mb-3">
+            <h3><?= svg_icon('pencil', 'w-5 h-5 text-blue-900') ?> Edit User Details</h3>
+        </div>
+        <div class="modal-body">
+            <div id="editUserModalError" class="modal-error"></div>
+            <input type="hidden" id="editUserId" />
+            <div class="form-group mb-3">
+                <label for="editFirstName" class="text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1">First Name *</label>
+                <input type="text" id="editFirstName" class="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required />
+            </div>
+            <div class="form-group mb-3">
+                <label for="editLastName" class="text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1">Last Name *</label>
+                <input type="text" id="editLastName" class="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required />
+            </div>
+            <div class="form-group mb-3">
+                <label for="editEmail" class="text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1">Email Address *</label>
+                <input type="email" id="editEmail" class="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required />
+                <p class="text-xs text-gray-400 mt-1">Used for authentication, 2FA security codes, and password reset links.</p>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="modal-btn modal-btn-secondary" onclick="closeEditUserModal()">Cancel</button>
+            <button type="button" class="modal-btn modal-btn-primary" onclick="submitEditUser()">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<!-- Admin Reset Password Modal -->
+<div id="resetPasswordModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header mb-3">
+            <h3 class="flex items-center text-blue-900 font-bold"><?= svg_icon('shield', 'w-5 h-5 mr-1.5 text-blue-900') ?> Reset User Password</h3>
+        </div>
+        <div class="modal-body">
+            <p class="text-sm text-gray-700 mb-3">Reset password for <strong id="resetTargetName" class="text-gray-900"></strong>:</p>
+            <div id="resetPasswordModalError" class="modal-error"></div>
+            <input type="hidden" id="resetUserId" />
+
+            <!-- Option 1: Send Reset Link via Email -->
+            <div class="p-3.5 mb-4 rounded-xl bg-blue-50 border border-blue-200">
+                <div class="text-xs font-bold text-blue-950 uppercase tracking-wide mb-1">Option 1: Send Reset Link via Email</div>
+                <p class="text-xs text-blue-800 mb-2.5">Dispatches an email with a secure 30-minute password reset link to <span id="resetTargetEmail" class="font-semibold underline"></span>.</p>
+                <button type="button" class="inline-flex items-center px-3 py-1.5 bg-blue-700 hover:bg-blue-800 text-white rounded-lg text-xs font-semibold shadow-sm transition" onclick="submitResetPassword('email')">
+                    📨 Send Password Reset Email
+                </button>
+            </div>
+
+            <!-- Option 2: Set New Password Manually -->
+            <div class="p-3.5 rounded-xl bg-gray-50 border border-gray-200">
+                <div class="text-xs font-bold text-gray-800 uppercase tracking-wide mb-1">Option 2: Set New Password Directly</div>
+                <p class="text-xs text-gray-500 mb-2">Instantly change the user's password now.</p>
+                <div class="flex gap-2 mb-2">
+                    <input type="text" id="manualNewPassword" placeholder="Enter new password (min 8 chars)" class="flex-1 rounded-lg border border-gray-300 px-3 py-1.5 text-xs text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <button type="button" class="px-2.5 py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-medium rounded-lg" onclick="generateRandomPassword()">
+                        🎲 Generate
+                    </button>
+                </div>
+                <button type="button" class="inline-flex items-center px-3 py-1.5 bg-gray-800 hover:bg-gray-900 text-white rounded-lg text-xs font-semibold shadow-sm transition" onclick="submitResetPassword('manual')">
+                    💾 Save New Password
+                </button>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="modal-btn modal-btn-secondary" onclick="closeResetPasswordModal()">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- Success Feedback Modal -->
 <div id="successModal" class="modal-overlay">
     <div class="modal-content">
         <div class="modal-body">
             <div class="success-icon">
-                <?= svg_icon('check', 'w-4 h-4 text-white') ?>
+                <?= svg_icon('check', 'w-6 h-6 text-white') ?>
             </div>
-            <div class="success-message" id="successMessage">Role assigned successfully!</div>
+            <div class="success-message" id="successMessage">Action Completed</div>
             <div class="success-detail" id="successDetail"></div>
         </div>
         <div class="modal-footer" style="justify-content: center;">
-            <button class="modal-btn modal-btn-primary" onclick="closeSuccessModal()">OK</button>
+            <button class="modal-btn modal-btn-primary px-6" onclick="closeSuccessModal()">Done</button>
         </div>
     </div>
 </div>
 
-<div id="revokeAdminModal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header mb-3">
-            <h3><?= svg_icon('alert', 'w-5 h-5 text-red-600') ?> Confirm Action</h3>
-        </div>
-        <div class="modal-body">
-            <p>Are you sure you want to <strong style="color: #DC2626;">revoke admin privileges</strong> from <strong id="revokeUserName"></strong>?</p>
-            <p class="small">This will remove their admin status and clear their role assignment.</p>
-        </div>
-        <div class="modal-footer">
-            <button class="modal-btn modal-btn-secondary" onclick="closeRevokeModal()">Cancel</button>
-            <button class="modal-btn modal-btn-primary" style="background-color: #DC2626;" onclick="confirmRevokeAdmin()">Revoke Admin</button>
-        </div>
-    </div>
-</div>
-
-<div id="grantAdminModal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header mb-3">
-            <h3><?= svg_icon('shield', 'w-5 h-5 text-green-500') ?> Confirm Action</h3>
-        </div>
-        <div class="modal-body">
-            <p>Are you sure you want to <strong style="color: #10B981;">grant admin privileges</strong> to <strong id="grantUserName"></strong>?</p>
-            <p class="small">This will give them full admin access and assign the ADMIN role.</p>
-        </div>
-        <div class="modal-footer">
-            <button class="modal-btn modal-btn-secondary" onclick="closeGrantModal()">Cancel</button>
-            <button class="modal-btn modal-btn-primary" style="background-color: #10B981;" onclick="confirmGrantAdmin()">Grant Admin</button>
-        </div>
-    </div>
-</div>
-
-<div id="clearRoleModal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header mb-3">
-            <h3><?= svg_icon('alert', 'w-5 h-5 text-yellow-500') ?> Confirm Action</h3>
-        </div>
-        <div class="modal-body">
-            <p>Are you sure you want to <strong style="color: #F59E0B;">clear the role</strong> for <strong id="clearUserName"></strong>?</p>
-            <p class="small">The user will no longer have any assigned role in the system.</p>
-        </div>
-        <div class="modal-footer">
-            <button class="modal-btn modal-btn-secondary" onclick="closeClearRoleModal()">Cancel</button>
-            <button class="modal-btn modal-btn-primary" style="background-color: #F59E0B;" onclick="confirmClearRole()">Clear Role</button>
-        </div>
-    </div>
-</div>
-
-<!-- Self-modify information modal -->
+<!-- Self-modify Information Modal -->
 <div id="selfModifyModal" class="modal-overlay">
     <div class="modal-content">
         <div class="modal-header mb-3">
-            <h3><i class="bi bi-info-circle" style="color: #6B7280;"></i> Action not allowed</h3>
+            <h3 class="text-amber-600"><?= svg_icon('alert', 'w-5 h-5 text-amber-500') ?> Action Restricted</h3>
         </div>
         <div class="modal-body">
-            <p id="selfModifyMessage">You cannot change your own role or admin status.</p>
+            <p id="selfModifyMessage">You cannot change your own role or deactivate your own administrator account.</p>
         </div>
         <div class="modal-footer">
-            <button class="modal-btn modal-btn-primary" onclick="closeSelfModifyModal()">OK</button>
+            <button class="modal-btn modal-btn-primary" onclick="closeSelfModifyModal()">Understood</button>
         </div>
     </div>
 </div>
-
 <?= $this->endSection() ?>
 
 <?= $this->section('pageScripts') ?>
 <script>
-    // CSRF helper: read CSRF cookie value for AJAX requests
-    function getCsrfCookie() {
-        const match = document.cookie.match(/(?:^|;\s*)csrf_cookie_name=([^;]*)/);
-        return match ? decodeURIComponent(match[1]) : '';
+    const currentLoggedInUserId = <?= (int) (session()->get('user_id') ?? 0) ?>;
+
+    function getCsrfToken() {
+        const meta = document.querySelector('meta[name="csrf-token"]');
+        return meta ? meta.getAttribute('content') : '';
+    }
+
+    function setCsrfToken(newToken) {
+        if (!newToken) return;
+        const meta = document.querySelector('meta[name="csrf-token"]');
+        if (meta) meta.setAttribute('content', newToken);
     }
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -366,128 +444,398 @@
         loadAdminStats();
     });
 
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
     function getRoleBadge(roleName) {
         if (!roleName) {
-            return '<span class="text-muted small">No Role</span>';
+            return '<span class="role-badge role-norole">NO ROLE</span>';
         }
 
-        const normalized = roleName.toUpperCase();
+        const normalized = String(roleName).trim().toUpperCase();
         const roleClassMap = {
             'ADMIN': 'role-badge role-admin',
             'FOCAL': 'role-badge role-focal',
             'LGU': 'role-badge role-lgu',
             'PROVINCE': 'role-badge role-province'
         };
-        const badgeClass = roleClassMap[normalized] || 'role-badge role-focal';
-
-        return `<span class="${badgeClass}">${normalized}</span>`;
+        const badgeClass = roleClassMap[normalized] || 'role-badge role-norole';
+        return `<span class="${badgeClass}">${escapeHtml(normalized)}</span>`;
     }
 
-    // Helper: convert a string to Title Case for display
-    function titleCase(str) {
-        if (!str) return '';
-        return String(str).split(/\s+/).map(function(w){ return w ? (w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()) : ''; }).join(' ');
-    }
+    let usersList = [];
 
     function loadUsers() {
-        fetch('<?= base_url('admin/getUsers') ?>')
-            .then(response => response.json())
-            .then(data => {
-                const tbody = document.getElementById('user-tbody');
-                if (data.users && data.users.length > 0) {
-                    tbody.innerHTML = data.users.map(user => {
-                        const roleBadge = getRoleBadge(user.role_name);
-                        const fullName = (user.first_name || '').trim() + ' ' + (user.last_name || '').trim();
-                        // Only show edit and disable icons for actions
-                        return `
-                            <tr>
-                                <td class="px-4 py-4 font-semibold">${user.username}</td>
-                                <td class="px-4 py-4">${user.first_name} ${user.last_name}</td>
-                                <td class="px-4 py-4">${user.email || ''}</td>
-                                <td class="px-4 py-4">${roleBadge}</td>
-                                <td class="px-4 py-4 flex flex-wrap gap-2">
-                                    <button class="px-2.5 py-1.5 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-100" title="Edit User" onclick="editUser(${user.id})">
-                                        <?= svg_icon('pencil', 'w-4 h-4') ?>
-                                    </button>
-                                    <button class="px-2.5 py-1.5 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-100" title="Disable User" onclick="disableUser(${user.id})">
-                                        <?= svg_icon('users', 'w-4 h-4') ?>
-                                    </button>
-                                </td>
-                            </tr>
-                        `;
-                    }).join('');
-                } else {
-                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No users found</td></tr>';
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                document.getElementById('user-tbody').innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error loading users</td></tr>';
-            });
+        fetch('<?= base_url('admin/getUsers') ?>', {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('HTTP ' + response.status);
+            }
+            return response.json();
+        })
+        .then(data => {
+            const tbody = document.getElementById('user-tbody');
+            if (data.users && data.users.length > 0) {
+                usersList = data.users;
+                renderUserRows(usersList);
+            } else {
+                tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-sm text-gray-400">No users found</td></tr>';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading users:', error);
+            document.getElementById('user-tbody').innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-sm text-rose-500 font-medium">Failed to load users. Please refresh the page.</td></tr>';
+        });
     }
 
-    let currentUserId = null;
-    let currentToggleUserId = null;
+    function renderUserRows(users) {
+        const tbody = document.getElementById('user-tbody');
+        if (!users || users.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-sm text-gray-400">No matching users found</td></tr>';
+            return;
+        }
 
-    function openRoleModal(userId, userName) {
-        currentUserId = userId;
+        tbody.innerHTML = users.map(user => {
+            const roleBadge = getRoleBadge(user.role_name);
+            const first = (user.first_name || '').trim();
+            const last = (user.last_name || '').trim();
+            const fullName = (first + ' ' + last).trim() || user.username;
+            const isSelf = Number(user.id) === currentLoggedInUserId;
+            const isRootAdmin = (user.username || '').toLowerCase() === 'admin';
+            const isActive = user.is_active !== undefined ? Number(user.is_active) === 1 : true;
+
+            const statusBadge = isActive
+                ? `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">Active</span>`
+                : `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-100 text-rose-800 border border-rose-200">Disabled</span>`;
+
+            let actionHtml = '';
+
+            if (isSelf) {
+                actionHtml = `<span class="text-xs text-blue-900 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-md font-medium">Current Account</span>`;
+            } else {
+                // Edit Name & Email button
+                actionHtml += `
+                    <button type="button" class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 rounded-md text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 hover:text-blue-900 transition-colors shadow-sm" title="Edit Name & Email" onclick="openEditUserModal(${user.id})">
+                        <?= svg_icon('pencil', 'w-3.5 h-3.5 mr-1') ?> Edit
+                    </button>
+                `;
+
+                // Edit Role button
+                actionHtml += `
+                    <button type="button" class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 rounded-md text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 hover:text-blue-900 transition-colors shadow-sm" title="Change Role" onclick="openRoleModal(${user.id}, '${escapeHtml(fullName)}', ${user.role_id || 'null'})">
+                        <?= svg_icon('users', 'w-3.5 h-3.5 mr-1') ?> Role
+                    </button>
+                `;
+
+                // Reset Password button
+                actionHtml += `
+                    <button type="button" class="inline-flex items-center px-2.5 py-1.5 border border-indigo-200 rounded-md text-xs font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition-colors shadow-sm" title="Reset Password" onclick="openResetPasswordModal(${user.id})">
+                        🔒 Reset Pass
+                    </button>
+                `;
+
+                // Toggle Status (Disable/Enable) button
+                if (!isRootAdmin) {
+                    if (isActive) {
+                        actionHtml += `
+                            <button type="button" class="inline-flex items-center px-2.5 py-1.5 border border-rose-200 rounded-md text-xs font-medium text-rose-700 bg-rose-50 hover:bg-rose-100 transition-colors shadow-sm" title="Disable User Account" onclick="toggleStatus(${user.id}, '${escapeHtml(fullName)}', 0)">
+                                <?= svg_icon('x-circle', 'w-3.5 h-3.5 mr-1') ?> Disable
+                            </button>
+                        `;
+                    } else {
+                        actionHtml += `
+                            <button type="button" class="inline-flex items-center px-2.5 py-1.5 border border-emerald-200 rounded-md text-xs font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition-colors shadow-sm" title="Enable User Account" onclick="toggleStatus(${user.id}, '${escapeHtml(fullName)}', 1)">
+                                <?= svg_icon('check', 'w-3.5 h-3.5 mr-1') ?> Enable
+                            </button>
+                        `;
+                    }
+                }
+            }
+
+            return `
+                <tr class="hover:bg-slate-50/70 transition-colors">
+                    <td class="px-4 py-4 text-sm font-semibold text-gray-900">${escapeHtml(user.username)}</td>
+                    <td class="px-4 py-4 text-sm text-gray-800">${escapeHtml(fullName)}</td>
+                    <td class="px-4 py-4 text-sm text-gray-600">${escapeHtml(user.email || '—')}</td>
+                    <td class="px-4 py-4 text-sm">${roleBadge}</td>
+                    <td class="px-4 py-4 text-sm">${statusBadge}</td>
+                    <td class="px-4 py-4 text-sm flex flex-wrap items-center gap-2">
+                        ${actionHtml}
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function loadAdminStats() {
+        fetch('<?= base_url('admin/getStats') ?>', {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const statsDiv = document.getElementById('admin-stats');
+                if (!statsDiv) return;
+                statsDiv.innerHTML = `
+                    <div class="stat-item">
+                        <div class="stat-number">${data.totalUsers ?? 0}</div>
+                        <div class="stat-label">Total Users</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number text-rose-600">${data.adminUsers ?? 0}</div>
+                        <div class="stat-label">Admin Users</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number text-blue-700">${data.regularUsers ?? 0}</div>
+                        <div class="stat-label">Regular Users</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number text-amber-600">${data.unassignedRoles ?? 0}</div>
+                        <div class="stat-label">No Role Assigned</div>
+                    </div>
+                `;
+            }
+        })
+        .catch(error => console.error('Error loading admin stats:', error));
+    }
+
+    let currentRoleIdTargetUserId = null;
+
+    function openRoleModal(userId, userName, currentRoleId) {
+        currentRoleIdTargetUserId = userId;
         document.getElementById('modalUserName').textContent = userName;
-        document.getElementById('roleSelect').value = '';
+        const roleSelect = document.getElementById('roleSelect');
+        roleSelect.value = (currentRoleId !== null && currentRoleId !== undefined) ? String(currentRoleId) : '';
+        document.getElementById('roleModalError').classList.remove('show');
         document.getElementById('assignRoleModal').classList.add('active');
     }
 
     function closeRoleModal() {
         document.getElementById('assignRoleModal').classList.remove('active');
-        currentUserId = null;
+        currentRoleIdTargetUserId = null;
     }
 
     function submitRoleAssignment() {
-        const roleId = document.getElementById('roleSelect').value;
+        const roleSelect = document.getElementById('roleSelect');
+        const roleId = roleSelect.value;
         const errorDiv = document.getElementById('roleModalError');
 
-        if (!roleId) {
-            errorDiv.textContent = 'Please select a role';
+        if (roleId === '') {
+            errorDiv.textContent = 'Please choose a role or select "No Role"';
+            errorDiv.classList.add('show');
+            return;
+        }
+
+        const targetUserId = currentRoleIdTargetUserId;
+        if (!targetUserId) {
+            errorDiv.textContent = 'No user target selected. Please close and re-open the modal.';
             errorDiv.classList.add('show');
             return;
         }
 
         errorDiv.classList.remove('show');
+        const userName = document.getElementById('modalUserName').textContent;
+        const selectedRoleText = roleSelect.options[roleSelect.selectedIndex].text;
 
         closeRoleModal();
+
         Swal.fire({
-            title: 'Editing role is crucial',
-            text: 'Are you sure you want to change the user\'s role?',
-            icon: 'warning',
+            title: 'Confirm Role Update',
+            html: `Change role for <strong>${escapeHtml(userName)}</strong> to <strong>${escapeHtml(selectedRoleText)}</strong>?`,
+            icon: 'question',
             showCancelButton: true,
-            confirmButtonText: 'Yes, change role',
-            cancelButtonText: 'No',
+            confirmButtonText: 'Yes, update role',
+            cancelButtonText: 'Cancel',
             confirmButtonColor: '#002c76',
-            cancelButtonColor: '#9db4dd',
+            cancelButtonColor: '#94a3b8',
         }).then((result) => {
             if (result.isConfirmed) {
-                assignRole(currentUserId, roleId);
-                Swal.fire({
-                    title: 'Success!',
-                    text: 'Role has been updated.',
-                    icon: 'success',
-                    confirmButtonColor: '#002c76',
-                });
-            } else {
-                openRoleModal(currentUserId, document.getElementById('modalUserName').textContent);
+                assignRole(targetUserId, roleId);
             }
         });
     }
 
-    document.getElementById('assignRoleModal').addEventListener('click', function(event) {
-        if (event.target === this) {
-            closeRoleModal();
+    function assignRole(userId, roleId) {
+        if (!userId) {
+            Swal.fire({
+                title: 'Error',
+                text: 'Invalid target user for role assignment.',
+                icon: 'error',
+                confirmButtonColor: '#002c76',
+            });
+            return;
         }
-    });
 
-    function showSuccessModal(message, detail = '') {
-        document.getElementById('successMessage').textContent = message;
-        document.getElementById('successDetail').textContent = detail;
-        document.getElementById('successModal').classList.add('active');
+        const csrfToken = getCsrfToken();
+        const formData = new FormData();
+        formData.append('user_id', userId);
+        formData.append('role_id', roleId);
+        formData.append('<?= csrf_token() ?>', csrfToken);
+
+        fetch('<?= base_url('admin/assignRole') ?>', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': csrfToken
+            }
+        })
+        .then(response => response.json().then(data => ({ status: response.status, ok: response.ok, data })))
+        .then(({ status, ok, data }) => {
+            if (data && data.csrf_token) {
+                setCsrfToken(data.csrf_token);
+            }
+            if (ok && data.success) {
+                Swal.fire({
+                    title: 'Role Updated!',
+                    text: data.message || 'User role has been successfully assigned.',
+                    icon: 'success',
+                    confirmButtonColor: '#002c76',
+                });
+                loadUsers();
+                loadAdminStats();
+            } else {
+                const msg = (data && data.message) ? data.message : 'Failed to update role';
+                if (msg.toLowerCase().includes('own role') || msg.toLowerCase().includes('own admin')) {
+                    showSelfModifyModal(msg);
+                } else {
+                    Swal.fire({
+                        title: 'Error',
+                        text: msg,
+                        icon: 'error',
+                        confirmButtonColor: '#002c76',
+                    });
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error assigning role:', error);
+            Swal.fire({
+                title: 'Request Failed',
+                text: 'A network or server error occurred while assigning the role.',
+                icon: 'error',
+                confirmButtonColor: '#002c76',
+            });
+        });
+    }
+
+    function toggleStatus(userId, userName, targetStatus) {
+        const isDisabling = (Number(targetStatus) === 0);
+        const actionTitle = isDisabling ? 'Deactivate User Account?' : 'Activate User Account?';
+        const actionText = isDisabling
+            ? `Are you sure you want to disable <strong>${escapeHtml(userName)}</strong>? They will no longer be able to log in.`
+            : `Are you sure you want to enable <strong>${escapeHtml(userName)}</strong>? They will regain access to the system.`;
+        const confirmBtnText = isDisabling ? 'Yes, deactivate' : 'Yes, activate';
+        const confirmColor = isDisabling ? '#dc2626' : '#059669';
+
+        Swal.fire({
+            title: actionTitle,
+            html: actionText,
+            icon: isDisabling ? 'warning' : 'question',
+            showCancelButton: true,
+            confirmButtonText: confirmBtnText,
+            cancelButtonText: 'Cancel',
+            confirmButtonColor: confirmColor,
+            cancelButtonColor: '#94a3b8',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrfToken = getCsrfToken();
+                const formData = new FormData();
+                formData.append('user_id', userId);
+                formData.append('<?= csrf_token() ?>', csrfToken);
+
+                fetch('<?= base_url('admin/toggleStatus') ?>', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': csrfToken
+                    }
+                })
+                .then(response => response.json().then(data => ({ status: response.status, ok: response.ok, data })))
+                .then(({ status, ok, data }) => {
+                    if (data && data.csrf_token) {
+                        setCsrfToken(data.csrf_token);
+                    }
+                    if (ok && data.success) {
+                        Swal.fire({
+                            title: isDisabling ? 'Account Deactivated' : 'Account Activated',
+                            text: data.message || 'Status updated successfully.',
+                            icon: 'success',
+                            confirmButtonColor: '#002c76',
+                        });
+                        loadUsers();
+                        loadAdminStats();
+                    } else {
+                        const msg = (data && data.message) ? data.message : 'Failed to update user status';
+                        if (msg.toLowerCase().includes('own') || msg.toLowerCase().includes('primary')) {
+                            showSelfModifyModal(msg);
+                        } else {
+                            Swal.fire({
+                                title: 'Error',
+                                text: msg,
+                                icon: 'error',
+                                confirmButtonColor: '#002c76',
+                            });
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error toggling status:', error);
+                    Swal.fire({
+                        title: 'Request Failed',
+                        text: 'A network or server error occurred while updating status.',
+                        icon: 'error',
+                        confirmButtonColor: '#002c76',
+                    });
+                });
+            }
+        });
+    }
+
+    function filterUsers() {
+        const searchValue = document.getElementById('userSearch').value.toLowerCase().trim();
+        const roleFilter = document.getElementById('roleFilter').value.toUpperCase();
+        const statusFilter = document.getElementById('statusFilter').value.toUpperCase();
+
+        if (!usersList || usersList.length === 0) return;
+
+        const filtered = usersList.filter(user => {
+            const username = (user.username || '').toLowerCase();
+            const fullName = ((user.first_name || '') + ' ' + (user.last_name || '')).toLowerCase();
+            const email = (user.email || '').toLowerCase();
+            const userRole = (user.role_name || 'NO ROLE').toUpperCase();
+            const isActive = user.is_active !== undefined ? Number(user.is_active) === 1 : true;
+            const userStatus = isActive ? 'ACTIVE' : 'DISABLED';
+
+            const matchesSearch = !searchValue || username.includes(searchValue) || fullName.includes(searchValue) || email.includes(searchValue);
+            const matchesRole = !roleFilter || userRole === roleFilter;
+            const matchesStatus = !statusFilter || userStatus === statusFilter;
+
+            return matchesSearch && matchesRole && matchesStatus;
+        });
+
+        renderUserRows(filtered);
+    }
+
+    function showSelfModifyModal(message) {
+        document.getElementById('selfModifyMessage').textContent = message || 'You cannot change your own role or administrative status.';
+        document.getElementById('selfModifyModal').classList.add('active');
+    }
+
+    function closeSelfModifyModal() {
+        document.getElementById('selfModifyModal').classList.remove('active');
     }
 
     function closeSuccessModal() {
@@ -496,283 +844,177 @@
         loadAdminStats();
     }
 
-    document.getElementById('successModal').addEventListener('click', function(event) {
-        if (event.target === this) {
-            closeSuccessModal();
-        }
-    });
+    // ==========================================
+    // EDIT USER DETAILS (NAME & EMAIL)
+    // ==========================================
+    function openEditUserModal(userId) {
+        const user = usersList.find(u => Number(u.id) === Number(userId));
+        if (!user) return;
 
-    /* Self-modify modal (show when user attempts to change their own admin/role) */
-    function showSelfModifyModal(message) {
-        document.getElementById('selfModifyMessage').textContent = message || 'You cannot change your own role or admin status.';
-        document.getElementById('selfModifyModal').classList.add('active');
+        document.getElementById('editUserId').value = user.id;
+        document.getElementById('editFirstName').value = user.first_name || '';
+        document.getElementById('editLastName').value = user.last_name || '';
+        document.getElementById('editEmail').value = user.email || '';
+        document.getElementById('editUserModalError').classList.remove('show');
+        document.getElementById('editUserModal').classList.add('active');
     }
 
-    function closeSelfModifyModal() {
-        document.getElementById('selfModifyModal').classList.remove('active');
+    function closeEditUserModal() {
+        document.getElementById('editUserModal').classList.remove('active');
     }
 
-    document.getElementById('selfModifyModal').addEventListener('click', function(event) {
-        if (event.target === this) {
-            closeSelfModifyModal();
-        }
-    });
+    function submitEditUser() {
+        const userId = document.getElementById('editUserId').value;
+        const firstName = document.getElementById('editFirstName').value.trim();
+        const lastName = document.getElementById('editLastName').value.trim();
+        const email = document.getElementById('editEmail').value.trim();
+        const errorDiv = document.getElementById('editUserModalError');
 
-    function assignRole(userId, roleId) {
-        const formData = new FormData();
-        formData.append('user_id', userId);
-        formData.append('role_id', roleId);
-
-        fetch('<?= base_url('admin/assignRole') ?>', {
-            method: 'POST',
-            body: formData,
-            headers: { 'X-CSRF-TOKEN': getCsrfCookie() }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const roleNames = {1: 'ADMIN', 2: 'FOCAL', 3: 'LGU', 4: 'PROVINCE'};
-                showSuccessModal('Role assigned successfully!', `User has been assigned the ${roleNames[roleId]} role.`);
-            } else {
-                const msg = data.message || '';
-                if (msg.includes('cannot change your own') || msg.includes('cannot clear your own') || msg.includes('You cannot revoke your own') || msg.includes('You cannot change your own')) {
-                    showSelfModifyModal(msg);
-                } else {
-                    alert('Error: ' + msg);
-                }
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred');
-        });
-    }
-
-    function clearRoleConfirm(userId, userName) {
-        currentToggleUserId = userId;
-        document.getElementById('clearUserName').textContent = userName;
-        document.getElementById('clearRoleModal').classList.add('active');
-    }
-
-    function closeClearRoleModal() {
-        document.getElementById('clearRoleModal').classList.remove('active');
-    }
-
-    function confirmClearRole() {
-        closeClearRoleModal();
-        clearRole(currentToggleUserId);
-    }
-
-    function clearRole(userId) {
-        const formData = new FormData();
-        formData.append('user_id', userId);
-
-        fetch('<?= base_url('admin/clearRole') ?>', {
-            method: 'POST',
-            body: formData,
-            headers: { 'X-CSRF-TOKEN': getCsrfCookie() }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showSuccessModal('Role cleared successfully!', "User's role has been removed.");
-            } else {
-                const msg = data.message || '';
-                if (msg.includes('cannot change your own') || msg.includes('cannot clear your own') || msg.includes('You cannot revoke your own') || msg.includes('You cannot change your own')) {
-                    showSelfModifyModal(msg);
-                } else {
-                    alert('Error: ' + msg);
-                }
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred');
-        });
-    }
-
-    document.getElementById('clearRoleModal').addEventListener('click', function(event) {
-        if (event.target === this) {
-            closeClearRoleModal();
-        }
-    });
-
-    function revokeAdminConfirm(userId, userName) {
-        currentToggleUserId = userId;
-        document.getElementById('revokeUserName').textContent = userName;
-        document.getElementById('revokeAdminModal').classList.add('active');
-    }
-
-    function closeRevokeModal() {
-        document.getElementById('revokeAdminModal').classList.remove('active');
-    }
-
-    function closeGrantModal() {
-        document.getElementById('grantAdminModal').classList.remove('active');
-    }
-
-    function confirmRevokeAdmin() {
-        closeRevokeModal();
-        executeToggleAdmin('revokeAdmin', 'revoked');
-    }
-
-    function confirmGrantAdmin() {
-        closeGrantModal();
-        executeToggleAdmin('grantAdmin', 'granted');
-    }
-
-    function executeToggleAdmin(endpoint, actionText) {
-        const formData = new FormData();
-        formData.append('user_id', currentToggleUserId);
-
-        fetch(`<?= base_url('admin/') ?>${endpoint}`, {
-            method: 'POST',
-            body: formData,
-            headers: { 'X-CSRF-TOKEN': getCsrfCookie() }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showSuccessModal('Admin status updated!', `Admin privileges have been ${actionText}.`);
-            } else {
-                const msg = data.message || '';
-                if (msg.includes('cannot change your own') || msg.includes('cannot clear your own') || msg.includes('You cannot revoke your own') || msg.includes('You cannot change your own')) {
-                    showSelfModifyModal(msg);
-                } else {
-                    alert('Error: ' + msg);
-                }
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred');
-        });
-    }
-
-    document.getElementById('revokeAdminModal').addEventListener('click', function(event) {
-        if (event.target === this) {
-            closeRevokeModal();
-        }
-    });
-
-    document.getElementById('grantAdminModal').addEventListener('click', function(event) {
-        if (event.target === this) {
-            closeGrantModal();
-        }
-    });
-
-    function filterUsers() {
-        const searchValue = document.getElementById('userSearch').value.toLowerCase();
-        const roleValue = document.getElementById('roleFilter').value;
-        const tbody = document.getElementById('user-tbody');
-        const rows = tbody.getElementsByTagName('tr');
-        for (let i = 0; i < rows.length; i++) {
-            const row = rows[i];
-            const cells = row.getElementsByTagName('td');
-            if (cells.length > 0) {
-                const name = cells[0].textContent.toLowerCase();
-                const email = cells[1].textContent.toLowerCase();
-                const username = cells[2].textContent.toLowerCase();
-                const role = cells[3].textContent.trim().toUpperCase();
-                const matchesSearch = name.includes(searchValue) || email.includes(searchValue) || username.includes(searchValue);
-                const matchesRole = !roleValue || role === roleValue;
-                row.style.display = (matchesSearch && matchesRole) ? '' : 'none';
-            }
-        }
-    }
-
-    function loadAdminStats() {
-        fetch('<?= base_url('admin/getStats') ?>')
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const statsDiv = document.getElementById('admin-stats');
-                    statsDiv.innerHTML = `
-                        <div class="stat-item">
-                            <div class="stat-number">${data.totalUsers}</div>
-                            <div class="stat-label">Total Users</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number">${data.adminUsers}</div>
-                            <div class="stat-label">Admin Users</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number">${data.regularUsers}</div>
-                            <div class="stat-label">Regular Users</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number">${data.unassignedRoles}</div>
-                            <div class="stat-label">No Role Assigned</div>
-                        </div>
-                    `;
-                }
-            })
-            .catch(error => console.error('Error loading stats:', error));
-    }
-
-    function editUser(userId) {
-        // Find the user row and get the name
-        const row = Array.from(document.getElementById('user-tbody').getElementsByTagName('tr')).find(tr => {
-            const editBtn = tr.querySelector('button[onclick^="editUser("]');
-            return editBtn && editBtn.getAttribute('onclick') === `editUser(${userId})`;
-        });
-        if (!row) return;
-        const name = row.querySelector('td').textContent.trim();
-        document.getElementById('modalUserName').textContent = name;
-        document.getElementById('roleSelect').value = '';
-        currentUserId = userId;
-        document.getElementById('assignRoleModal').classList.add('active');
-    }
-
-    function disableUser(userId) {
-        // Find the user row and get the role
-        const row = Array.from(document.getElementById('user-tbody').getElementsByTagName('tr')).find(tr => {
-            const disableBtn = tr.querySelector('button[onclick^="disableUser(")');
-            return disableBtn && disableBtn.getAttribute('onclick') === `disableUser(${userId})`;
-        });
-        if (!row) return;
-        const role = row.querySelectorAll('td')[3].textContent.trim().toUpperCase();
-        if (role === 'ADMIN') {
-            showSuccessModal('Cannot disable admin account!', 'Admin accounts cannot be disabled.');
+        if (!firstName || !lastName || !email) {
+            errorDiv.textContent = 'Please complete First Name, Last Name, and Email Address.';
+            errorDiv.classList.add('show');
             return;
         }
-        Swal.fire({
-            title: 'Are you sure?',
-            text: 'Do you want to disable this user account?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, disable',
-            cancelButtonText: 'No',
-            confirmButtonColor: '#002c76',
-            cancelButtonColor: '#9db4dd',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Call backend to disable
-                const formData = new FormData();
-                formData.append('user_id', userId);
-                fetch('<?= base_url('admin/disableUser') ?>', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        Swal.fire({
-                            title: 'User disabled!',
-                            text: 'The user account has been disabled.',
-                            icon: 'success',
-                            confirmButtonColor: '#002c76',
-                        });
-                    } else {
-                        showSuccessModal('Error', data.message || 'Failed to disable user.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred');
-                });
+
+        const formData = new FormData();
+        formData.append('user_id', userId);
+        formData.append('first_name', firstName);
+        formData.append('last_name', lastName);
+        formData.append('email', email);
+        formData.append('<?= csrf_token() ?>', getCsrfToken());
+
+        fetch('<?= base_url('admin/updateUser') ?>', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': getCsrfToken(),
             }
+        })
+        .then(response => response.json().then(data => ({ status: response.status, ok: response.ok, data })))
+        .then(({ ok, data }) => {
+            if (data && data.csrf_token) setCsrfToken(data.csrf_token);
+            if (ok && data.success) {
+                closeEditUserModal();
+                Swal.fire({
+                    title: 'Updated!',
+                    text: data.message || 'User details have been updated.',
+                    icon: 'success',
+                    confirmButtonColor: '#002c76',
+                });
+                loadUsers();
+            } else {
+                errorDiv.textContent = (data && data.message) ? data.message : 'Failed to update user details.';
+                errorDiv.classList.add('show');
+            }
+        })
+        .catch(err => {
+            console.error('Update user error:', err);
+            errorDiv.textContent = 'A network or server error occurred.';
+            errorDiv.classList.add('show');
         });
     }
+
+    // ==========================================
+    // RESET USER PASSWORD
+    // ==========================================
+    function openResetPasswordModal(userId) {
+        const user = usersList.find(u => Number(u.id) === Number(userId));
+        if (!user) return;
+
+        const fullName = ((user.first_name || '') + ' ' + (user.last_name || '')).trim() || user.username;
+        document.getElementById('resetUserId').value = user.id;
+        document.getElementById('resetTargetName').textContent = fullName;
+        document.getElementById('resetTargetEmail').textContent = user.email || 'No email on file';
+        document.getElementById('manualNewPassword').value = '';
+        document.getElementById('resetPasswordModalError').classList.remove('show');
+        document.getElementById('resetPasswordModal').classList.add('active');
+    }
+
+    function closeResetPasswordModal() {
+        document.getElementById('resetPasswordModal').classList.remove('active');
+    }
+
+    function generateRandomPassword() {
+        const letters = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz';
+        const numbers = '23456789';
+        const specials = '!@#$%^&*';
+        let pwd = '';
+        pwd += 'ABCDEFGHJKLMNPQRSTUVWXYZ'[Math.floor(Math.random() * 24)];
+        pwd += 'abcdefghjkmnpqrstuvwxyz'[Math.floor(Math.random() * 23)];
+        pwd += numbers[Math.floor(Math.random() * numbers.length)];
+        pwd += specials[Math.floor(Math.random() * specials.length)];
+        const allChars = letters + numbers + specials;
+        for (let i = 0; i < 6; i++) {
+            pwd += allChars[Math.floor(Math.random() * allChars.length)];
+        }
+        document.getElementById('manualNewPassword').value = pwd;
+    }
+
+    function submitResetPassword(mode) {
+        const userId = document.getElementById('resetUserId').value;
+        const errorDiv = document.getElementById('resetPasswordModalError');
+        const formData = new FormData();
+        formData.append('user_id', userId);
+        formData.append('mode', mode);
+        formData.append('<?= csrf_token() ?>', getCsrfToken());
+
+        if (mode === 'manual') {
+            const newPassword = document.getElementById('manualNewPassword').value.trim();
+            if (!newPassword) {
+                errorDiv.textContent = 'Please enter or generate a new password.';
+                errorDiv.classList.add('show');
+                return;
+            }
+            formData.append('new_password', newPassword);
+        }
+
+        fetch('<?= base_url('admin/resetUserPassword') ?>', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': getCsrfToken(),
+            }
+        })
+        .then(response => response.json().then(data => ({ status: response.status, ok: response.ok, data })))
+        .then(({ ok, data }) => {
+            if (data && data.csrf_token) setCsrfToken(data.csrf_token);
+            if (ok && data.success) {
+                closeResetPasswordModal();
+                Swal.fire({
+                    title: 'Password Updated!',
+                    text: data.message || 'The user password was successfully updated.',
+                    icon: 'success',
+                    confirmButtonColor: '#002c76',
+                });
+            } else {
+                errorDiv.textContent = (data && data.message) ? data.message : 'Failed to reset password.';
+                errorDiv.classList.add('show');
+            }
+        })
+        .catch(err => {
+            console.error('Password reset error:', err);
+            errorDiv.textContent = 'A network or server error occurred.';
+            errorDiv.classList.add('show');
+        });
+    }
+
+    // Modal background dismissals
+    document.getElementById('assignRoleModal')?.addEventListener('click', function(e) {
+        if (e.target === this) closeRoleModal();
+    });
+    document.getElementById('editUserModal')?.addEventListener('click', function(e) {
+        if (e.target === this) closeEditUserModal();
+    });
+    document.getElementById('resetPasswordModal')?.addEventListener('click', function(e) {
+        if (e.target === this) closeResetPasswordModal();
+    });
+    document.getElementById('selfModifyModal')?.addEventListener('click', function(e) {
+        if (e.target === this) closeSelfModifyModal();
+    });
+    document.getElementById('successModal')?.addEventListener('click', function(e) {
+        if (e.target === this) closeSuccessModal();
+    });
 </script>
 <?= $this->endSection() ?>

@@ -97,13 +97,42 @@ class IncidentReportModel extends Model
     {
         if (isset($row['name_of_victim_enc']) && $row['name_of_victim_enc'] !== null) {
             $plain = $this->decryptValue((string) $row['name_of_victim_enc']);
-            $row['name_of_victim'] = $plain === null || $plain === '' ? $plain : mb_convert_case($plain, MB_CASE_TITLE, 'UTF-8');
         } elseif (isset($row['name_of_victim'])) {
             $plain = $this->decryptValue((string) $row['name_of_victim']);
-            $row['name_of_victim'] = $plain === null || $plain === '' ? $plain : mb_convert_case($plain, MB_CASE_TITLE, 'UTF-8');
+        } else {
+            $plain = null;
         }
+
+        if ($plain !== null && $plain !== '') {
+            $plain = mb_convert_case($plain, MB_CASE_TITLE, 'UTF-8');
+
+            // 🔥 APPLY MASK HERE
+            $row['name_of_victim'] = $this->maskName($plain);
+        } else {
+            $row['name_of_victim'] = $plain;
+        }
+
         return $row;
     }
+
+    private function maskName($name)
+    {
+        $words = explode(' ', $name);
+
+        foreach ($words as &$word) {
+            $len = mb_strlen($word);
+
+            if ($len <= 1) {
+                $word = '*';
+            } else {
+                $first = mb_substr($word, 0, 1);
+                $word = $first . str_repeat('*', $len - 1);
+            }
+        }
+
+        return implode(' ', $words);
+    }
+
 
     /**
      * Ensure location categories are stored in a normalized form.  This keeps the

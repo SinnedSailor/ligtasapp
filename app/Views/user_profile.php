@@ -184,68 +184,80 @@
         </div>
     </div>
 
-    <!-- contact info card -->
-    <div class="mb-4">
-        <h5 class="text-lg font-semibold mb-3">Contact Information</h5>
-        <p class="text-sm text-gray-700 mb-2">Email: <?= esc($profile['display_email'] ?? session()->get('email') ?? 'Not provided') ?></p>
-        <p class="text-sm text-gray-700 mb-4">Contact No: <?= esc($profile['contact_number'] ?? session()->get('contact_number') ?? 'Not provided') ?></p>
-        <a href="#" class="text-blue-600 text-sm">+ Add Email Address</a>
-    </div>
-
     <!-- form cards -->
     <form id="profileForm" action="<?= base_url('/user-profile/update') ?>" method="post">
         <?= csrf_field() ?>
 
         <div class="profile-card mb-4">
             <div class="p-6">
-            <h5 class="text-lg font-semibold mb-3">Personal Information</h5>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="firstName" class="block text-sm font-medium text-gray-700">First Name *</label>
-                    <input type="text" id="firstName" name="first_name" value="<?= esc($profile['first_name'] ?? session()->get('first_name') ?? '') ?>" required onblur="this.value = this.value.replace(/\s+/g,' ').trim().split(' ').map(function(w){return w?(w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()):'';}).join(' ')" class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                <h5 class="text-lg font-semibold mb-3">Personal Information</h5>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName" class="block text-sm font-medium text-gray-700">First Name *</label>
+                        <input type="text" id="firstName" name="first_name" value="<?= esc($profile['first_name'] ?? session()->get('first_name') ?? '') ?>" required onblur="this.value = this.value.replace(/\s+/g,' ').trim().split(' ').map(function(w){return w?(w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()):'';}).join(' ')" class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName" class="block text-sm font-medium text-gray-700">Last Name *</label>
+                        <input type="text" id="lastName" name="last_name" value="<?= esc($profile['last_name'] ?? session()->get('last_name') ?? '') ?>" required onblur="this.value = this.value.replace(/\s+/g,' ').trim().split(' ').map(function(w){return w?(w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()):'';}).join(' ')" class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="lastName" class="block text-sm font-medium text-gray-700">Last Name *</label>
-                    <input type="text" id="lastName" name="last_name" value="<?= esc($profile['last_name'] ?? session()->get('last_name') ?? '') ?>" required onblur="this.value = this.value.replace(/\s+/g,' ').trim().split(' ').map(function(w){return w?(w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()):'';}).join(' ')" class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300" />
-                </div>
-            </div>
             </div>
         </div> <!-- end personal info card -->
 
+        <div class="profile-card mb-4">
+            <div class="p-6">
+                <h5 class="text-lg font-semibold mb-3">Contact Information</h5>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email" class="block text-sm font-medium text-gray-700">Email Address *</label>
+                        <input type="email" id="email" name="email" value="<?= esc($profile['display_email'] ?? session()->get('email') ?? '') ?>" required class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                        <p class="text-xs text-gray-500 mt-1">This email will receive login verification codes and password reset links.</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="contactNumber" class="block text-sm font-medium text-gray-700">Contact Number</label>
+                        <input type="text" id="contactNumber" name="contact_number" maxlength="11" pattern="[0-9]{11}" placeholder="09XXXXXXXXX (11 digits)" value="<?= esc($profile['contact_number'] ?? session()->get('contact_number') ?? '') ?>" class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                        <p class="text-xs text-gray-500 mt-1">Must be an 11-digit Philippine mobile number.</p>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- end contact info card -->
+
         <div class="profile-card mb-6">
             <div class="p-6">
-            <h5 class="text-lg font-semibold mb-3">Location Information</h5>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="province" class="block text-sm font-medium text-gray-700">Province *</label>
-                    <select id="province" name="province" required class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
-                        <option value="">Select province</option>
-                        <?php if (!$provinceSelectedInList && $selectedProvince !== ''): ?>
-                            <option value="<?= esc($selectedProvince) ?>" selected>
-                                <?= esc($selectedProvince) ?>
-                            </option>
-                        <?php endif; ?>
-                        <?php foreach ($provinceList as $province): ?>
-                            <option value="<?= esc($province) ?>" <?= ($selectedProvince === $province) ? 'selected' : '' ?>><?= esc($province) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="municipality" class="block text-sm font-medium text-gray-700">Municipality *</label>
-                    <select id="municipality" name="municipality" required class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
-                        <option value="">Select municipality</option>
-                    </select>
+                <h5 class="text-lg font-semibold mb-3">Location Information</h5>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="province" class="block text-sm font-medium text-gray-700">Province *</label>
+                        <select id="province" name="province" required class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                            <option value="">Select province</option>
+                            <?php if (!$provinceSelectedInList && $selectedProvince !== ''): ?>
+                                <option value="<?= esc($selectedProvince) ?>" selected>
+                                    <?= esc($selectedProvince) ?>
+                                </option>
+                            <?php endif; ?>
+                            <?php foreach ($provinceList as $province): ?>
+                                <option value="<?= esc($province) ?>" <?= ($selectedProvince === $province) ? 'selected' : '' ?>><?= esc($province) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="municipality" class="block text-sm font-medium text-gray-700">Municipality *</label>
+                        <select id="municipality" name="municipality" required class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                            <option value="">Select municipality</option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="profile-card mb-6">
             <div class="p-6">
-            <h5 class="text-lg font-semibold mb-3">Password Settings</h5>
-            <p class="text-muted">Need to change your password?</p>
-            <a href="#" class="forgot-password-link" onclick="forgotPassword(event)">
-                🔒 Reset Password via Email
-            </a>
+                <h5 class="text-lg font-semibold mb-3">Password Settings</h5>
+                <p class="text-sm text-gray-600 mb-2">Need to change your account password?</p>
+                <button type="button" class="text-blue-700 hover:text-blue-900 font-semibold text-sm inline-flex items-center gap-1.5" onclick="forgotPassword(event)">
+                    🔒 Send Password Reset Link to My Email
+                </button>
+            </div>
         </div>
 
         <div class="mt-4 flex flex-wrap gap-2">
@@ -286,10 +298,33 @@
     }
 
     function forgotPassword(event) {
-        event.preventDefault();
-        const email = document.getElementById('email').value;
-        if (confirm(`Send password reset link to ${email}?`)) {
-            alert('Password reset link has been sent to your email. Please check your inbox.');
+        if (event) event.preventDefault();
+        const emailInput = document.getElementById('email');
+        const email = emailInput ? emailInput.value.trim() : '';
+        if (!email) {
+            alert('Please enter a valid email address in the field above first.');
+            return;
+        }
+
+        if (confirm(`Send a password reset link to ${email}?`)) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '<?= base_url('/forgot-password') ?>';
+
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '<?= csrf_token() ?>';
+            csrfInput.value = '<?= csrf_hash() ?>';
+            form.appendChild(csrfInput);
+
+            const emailField = document.createElement('input');
+            emailField.type = 'hidden';
+            emailField.name = 'email';
+            emailField.value = email;
+            form.appendChild(emailField);
+
+            document.body.appendChild(form);
+            form.submit();
         }
     }
 

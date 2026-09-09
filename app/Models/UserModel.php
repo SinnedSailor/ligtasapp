@@ -22,8 +22,10 @@ class UserModel extends Model
         'province',
         'municipality',
         'contact_number_enc',
+        'agency',
         'role_id',
         'is_admin',
+        'is_active',
         'OTP',
         'OTP_EXPIRED',
     ];
@@ -65,8 +67,11 @@ class UserModel extends Model
 
     protected function hashPassword(array $data)
     {
-        if (isset($data['data']['password'])) {
-            $data['data']['password'] = password_hash($data['data']['password'], PASSWORD_DEFAULT);
+        if (isset($data['data']['password']) && $data['data']['password'] !== '') {
+            $info = password_get_info($data['data']['password']);
+            if (empty($info['algo'])) {
+                $data['data']['password'] = password_hash($data['data']['password'], PASSWORD_DEFAULT);
+            }
         }
         return $data;
     }
