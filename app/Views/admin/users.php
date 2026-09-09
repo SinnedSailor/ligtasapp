@@ -410,7 +410,7 @@
 <script>
     function getCsrfToken() {
         const meta = document.querySelector('meta[name="csrf-token"]');
-        return meta ? meta.getAttribute('content') : '';
+        return (meta && meta.content) ? meta.content : '<?= csrf_hash() ?>';
     }
 
     function setCsrfToken(token) {
@@ -421,16 +421,24 @@
     }
 
     async function parseJsonResponse(response) {
-        const contentType = response.headers.get('content-type') || '';
+        let rawText = '';
         let data = null;
-        if (contentType.includes('application/json')) {
-            try {
-                data = await response.json();
-            } catch (e) {
-                data = null;
-            }
+        try {
+            rawText = await response.text();
+            data = JSON.parse(rawText);
+        } catch (e) {
+            data = null;
         }
-        return { status: response.status, ok: response.ok, data };
+        if (!response.ok) {
+            console.error('[AJAX Error Details]', {
+                status: response.status,
+                statusText: response.statusText,
+                url: response.url,
+                data: data,
+                rawBody: rawText ? rawText.slice(0, 500) : '(empty)'
+            });
+        }
+        return { status: response.status, ok: response.ok, data, rawText };
     }
 
     function selectUsersRoleCard(roleId) {
@@ -524,21 +532,26 @@
             if (!result.isConfirmed) return;
 
             const csrfToken = getCsrfToken();
+            const csrfName = '<?= csrf_token() ?>';
+            const csrfHeader = '<?= csrf_header() ?>';
+
             const formData = new FormData();
             formData.append('user_id', userId);
             formData.append('role_id', roleId);
-            formData.append('<?= csrf_token() ?>', csrfToken);
+            formData.append(csrfName, csrfToken);
+
+            const reqHeaders = {
+                'X-Requested-With': 'XMLHttpRequest'
+            };
+            reqHeaders[csrfHeader] = csrfToken;
 
             fetch('<?= base_url('admin/assignRole') ?>', {
                 method: 'POST',
                 body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': csrfToken
-                }
+                headers: reqHeaders
             })
             .then(parseJsonResponse)
-            .then(({ status, ok, data }) => {
+            .then(({ status, ok, data, rawText }) => {
                 if (data && data.csrf_token) {
                     setCsrfToken(data.csrf_token);
                 }
@@ -552,14 +565,21 @@
                         location.reload();
                     });
                 } else {
-                    const msg = (data && data.message) ? data.message : (status === 403 ? 'Access forbidden or session expired. Please refresh the page.' : 'Failed to update role');
+                    let msg = (data && data.message) ? data.message : 'Failed to update role';
+                    if (!data) {
+                        if (status === 403) {
+                            msg = 'Access forbidden (403). Session token was rejected. Please refresh the page.';
+                        } else {
+                            msg = 'Server error (HTTP ' + status + ')';
+                        }
+                    }
                     if (msg.toLowerCase().includes('own role') || msg.toLowerCase().includes('own admin')) {
                         showSelfModifyModal(msg);
                     } else {
                         Swal.fire({
-                            title: 'Error',
-                            text: msg || 'Failed to update role',
-                            icon: 'error',
+                            title: (data && data.csrf_error) ? 'Security Token Notice' : 'Error',
+                            text: msg,
+                            icon: (data && data.csrf_error) ? 'warning' : 'error',
                             confirmButtonColor: '#002c76'
                         });
                     }
