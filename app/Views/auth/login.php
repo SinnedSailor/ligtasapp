@@ -68,6 +68,9 @@ $hideFooter = true;
                             autocomplete="current-password"
                             class="w-full rounded-lg bg-white/30 border border-transparent px-4 py-4 pr-10 text-base text-black placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-transparent" />
                     </div>
+                    <div class="flex items-center justify-end -mt-1 mb-2">
+                        <a href="<?= base_url('/forgot-password') ?>" class="text-white/90 hover:text-white hover:underline text-xs font-medium">Forgot password?</a>
+                    </div>
                     <div>
                         <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-4 rounded-lg shadow transition transform hover:-translate-y-0.5 uppercase text-base">Sign In</button>
                     </div>

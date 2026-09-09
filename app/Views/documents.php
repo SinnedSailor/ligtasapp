@@ -334,26 +334,26 @@
         <div class="bg-white rounded-md shadow p-4 mt-4">
             <div class="section-title">My Submissions</div>
             <?php if (!empty($myDocuments)): ?>
-                <div class="table-responsive">
+                <div class="table-responsive docs-table-scope-my">
+                    <div class="table-filter-card mb-2 p-2 bg-white rounded-md flex flex-wrap gap-2">
+                        <select class="filter-input-my filter-doc-type rounded-full border border-blue-300 bg-blue-100 text-blue-800 px-2 py-1 text-sm">
+                            <option value="">All Types</option>
+                            <option value="ordinance">Ordinance</option>
+                            <option value="pops">POPS</option>
+                            <option value="budget">Budget</option>
+                        </select>
+                        <select class="filter-input-my filter-province rounded-full border border-blue-300 bg-blue-100 text-blue-800 px-2 py-1 text-sm">
+                            <option value="">All Provinces</option>
+                            <?php foreach (($provinces ?? []) as $province): ?>
+                                <option value="<?= esc($province) ?>"><?= esc($province) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <select class="filter-input-my filter-municipality rounded-full border border-blue-300 bg-blue-100 text-blue-800 px-2 py-1 text-sm">
+                            <option value="">All Municipalities</option>
+                        </select>
+                        <input type="date" class="filter-input-my filter-date rounded-full border border-blue-300 bg-blue-100 text-blue-800 px-2 py-1 text-sm" />
+                    </div>
                     <table class="w-full table-docs">
-                        <div class="table-filter-card mb-2 p-2 bg-white rounded-md flex flex-wrap gap-2">
-                            <select class="filter-input-my filter-doc-type rounded-full border border-blue-300 bg-blue-100 text-blue-800 px-2 py-1 text-sm">
-                                <option value="">All Types</option>
-                                <option value="ordinance">Ordinance</option>
-                                <option value="pops">POPS</option>
-                                <option value="budget">Budget</option>
-                            </select>
-                            <select class="filter-input-my filter-province rounded-full border border-blue-300 bg-blue-100 text-blue-800 px-2 py-1 text-sm">
-                                <option value="">All Provinces</option>
-                                <?php foreach (($provinces ?? []) as $province): ?>
-                                    <option value="<?= esc($province) ?>"><?= esc($province) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                            <select class="filter-input-my filter-municipality rounded-full border border-blue-300 bg-blue-100 text-blue-800 px-2 py-1 text-sm">
-                                <option value="">All Municipalities</option>
-                            </select>
-                            <input type="date" class="filter-input-my filter-date rounded-full border border-blue-300 bg-blue-100 text-blue-800 px-2 py-1 text-sm" />
-                        </div>
                         <thead>
                             <tr>
                                 <th>Document Type</th>
@@ -399,26 +399,26 @@
         <div class="bg-white rounded-md shadow p-4 mt-4">
             <div class="section-title">Pending Documents for Review</div>
             <?php if (!empty($pendingDocuments)): ?>
-                <div class="table-responsive">
+                <div class="table-responsive docs-table-scope-pending">
+                    <div class="table-filter-card mb-2 p-2 bg-white rounded-md flex flex-wrap gap-2">
+                        <select class="filter-input-pending filter-doc-type rounded-full border border-blue-300 bg-blue-100 text-blue-800 px-2 py-1 text-sm">
+                            <option value="">All Types</option>
+                            <option value="ordinance">Ordinance</option>
+                            <option value="pops">POPS</option>
+                            <option value="budget">Budget</option>
+                        </select>
+                        <select class="filter-input-pending filter-province rounded-full border border-blue-300 bg-blue-100 text-blue-800 px-2 py-1 text-sm">
+                            <option value="">All Provinces</option>
+                            <?php foreach (($provinces ?? []) as $province): ?>
+                                <option value="<?= esc($province) ?>"><?= esc($province) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <select class="filter-input-pending filter-municipality rounded-full border border-blue-300 bg-blue-100 text-blue-800 px-2 py-1 text-sm">
+                            <option value="">All Municipalities</option>
+                        </select>
+                        <input type="date" class="filter-input-pending filter-date rounded-full border border-blue-300 bg-blue-100 text-blue-800 px-2 py-1 text-sm" />
+                    </div>
                     <table class="w-full table-docs">
-                        <div class="table-filter-card mb-2 p-2 bg-white rounded-md flex flex-wrap gap-2">
-                            <select class="filter-input-pending filter-doc-type rounded-full border border-blue-300 bg-blue-100 text-blue-800 px-2 py-1 text-sm">
-                                <option value="">All Types</option>
-                                <option value="ordinance">Ordinance</option>
-                                <option value="pops">POPS</option>
-                                <option value="budget">Budget</option>
-                            </select>
-                            <select class="filter-input-pending filter-province rounded-full border border-blue-300 bg-blue-100 text-blue-800 px-2 py-1 text-sm">
-                                <option value="">All Provinces</option>
-                                <?php foreach (($provinces ?? []) as $province): ?>
-                                    <option value="<?= esc($province) ?>"><?= esc($province) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                            <select class="filter-input-pending filter-municipality rounded-full border border-blue-300 bg-blue-100 text-blue-800 px-2 py-1 text-sm">
-                                <option value="">All Municipalities</option>
-                            </select>
-                            <input type="date" class="filter-input-pending filter-date rounded-full border border-blue-300 bg-blue-100 text-blue-800 px-2 py-1 text-sm" />
-                        </div>
                         <thead>
                             <tr>
                                 <th>Document Type</th>
@@ -460,26 +460,26 @@
         <div class="bg-white rounded-md shadow p-4 mt-4">
             <div class="section-title">Approved Documents</div>
             <?php if (!empty($approvedDocuments)): ?>
-                <div class="table-responsive">
+                <div class="table-responsive docs-table-scope-approved">
+                    <div class="table-filter-card mb-2 p-2 bg-white rounded-md flex flex-wrap gap-2">
+                        <select class="filter-input-approved filter-doc-type rounded-full border border-blue-300 bg-blue-100 text-blue-800 px-2 py-1 text-sm">
+                            <option value="">All Types</option>
+                            <option value="ordinance">Ordinance</option>
+                            <option value="pops">POPS</option>
+                            <option value="budget">Budget</option>
+                        </select>
+                        <select class="filter-input-approved filter-province rounded-full border border-blue-300 bg-blue-100 text-blue-800 px-2 py-1 text-sm">
+                            <option value="">All Provinces</option>
+                            <?php foreach (($provinces ?? []) as $province): ?>
+                                <option value="<?= esc($province) ?>"><?= esc($province) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <select class="filter-input-approved filter-municipality rounded-full border border-blue-300 bg-blue-100 text-blue-800 px-2 py-1 text-sm">
+                            <option value="">All Municipalities</option>
+                        </select>
+                        <input type="date" class="filter-input-approved filter-date rounded-full border border-blue-300 bg-blue-100 text-blue-800 px-2 py-1 text-sm" />
+                    </div>
                     <table class="w-full table-docs">
-                        <div class="table-filter-card mb-2 p-2 bg-white rounded-md flex flex-wrap gap-2">
-                            <select class="filter-input-approved filter-doc-type rounded-full border border-blue-300 bg-blue-100 text-blue-800 px-2 py-1 text-sm">
-                                <option value="">All Types</option>
-                                <option value="ordinance">Ordinance</option>
-                                <option value="pops">POPS</option>
-                                <option value="budget">Budget</option>
-                            </select>
-                            <select class="filter-input-approved filter-province rounded-full border border-blue-300 bg-blue-100 text-blue-800 px-2 py-1 text-sm">
-                                <option value="">All Provinces</option>
-                                <?php foreach (($provinces ?? []) as $province): ?>
-                                    <option value="<?= esc($province) ?>"><?= esc($province) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                            <select class="filter-input-approved filter-municipality rounded-full border border-blue-300 bg-blue-100 text-blue-800 px-2 py-1 text-sm">
-                                <option value="">All Municipalities</option>
-                            </select>
-                            <input type="date" class="filter-input-approved filter-date rounded-full border border-blue-300 bg-blue-100 text-blue-800 px-2 py-1 text-sm" />
-                        </div>
                         <thead>
                             <tr>
                                 <th>Document Type</th>
@@ -626,14 +626,16 @@
     }
 
     // --- Per-column filter logic for each table ---
-    function setupColumnFilters(tableClass, docTypeIdx, statusIdx, dateIdx, provinceIdx, municipalityIdx, locationIdx) {
-        const table = document.querySelector(tableClass);
+    function setupColumnFilters(scopeClass, docTypeIdx, statusIdx, dateIdx, provinceIdx, municipalityIdx, locationIdx) {
+        const container = document.querySelector(scopeClass);
+        if (!container) return;
+        const table = container.querySelector('table.table-docs');
         if (!table) return;
-        const filterDocType = table.querySelector('.filter-doc-type');
-        const filterStatus = table.querySelector('.filter-status');
-        const filterDate = table.querySelector('.filter-date');
-        const filterProvince = table.querySelector('.filter-province');
-        const filterMunicipality = table.querySelector('.filter-municipality');
+        const filterDocType = container.querySelector('.filter-doc-type');
+        const filterStatus = container.querySelector('.filter-status');
+        const filterDate = container.querySelector('.filter-date');
+        const filterProvince = container.querySelector('.filter-province');
+        const filterMunicipality = container.querySelector('.filter-municipality');
         const rows = table.querySelectorAll('tbody tr.doc-filter-row');
 
         function updateMunicipalityOptions() {
@@ -698,10 +700,10 @@
     }
 
     // My Submissions: [docType, file, status, uploaded, action]
-    setupColumnFilters('.table-docs:nth-of-type(1)', 0, 2, 3, null, null, null); // location filters use data attributes for my submissions
+    setupColumnFilters('.docs-table-scope-my', 0, 2, 3, null, null, null);
     // Pending Documents: [docType, file, submitted by, location, uploaded, actions]
-    setupColumnFilters('.table-docs:nth-of-type(2)', 0, 4, 4, 3, 4, 3);
+    setupColumnFilters('.docs-table-scope-pending', 0, null, 4, 3, 4, 3);
     // Approved Documents: [docType, file, submitted by, location, approved, action]
-    setupColumnFilters('.table-docs:nth-of-type(3)', 0, 4, 4, 3, 4, 3);
+    setupColumnFilters('.docs-table-scope-approved', 0, null, 4, 3, 4, 3);
 </script>
 <?= $this->endSection() ?>

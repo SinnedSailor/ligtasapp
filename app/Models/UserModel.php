@@ -22,8 +22,10 @@ class UserModel extends Model
         'province',
         'municipality',
         'contact_number_enc',
+        'agency',
         'role_id',
         'is_admin',
+        'is_active',
         'OTP',
         'OTP_EXPIRED',
     ];
@@ -39,7 +41,7 @@ class UserModel extends Model
     protected $validationRules = [
         'first_name' => 'required|min_length[2]|max_length[100]',
         'last_name' => 'required|min_length[2]|max_length[100]',
-        'username' => 'required|min_length[3]|max_length[50]|is_unique[users.username]',
+        'username' => 'required|min_length[3]|max_length[50]|is_unique[users.username,id,{id}]',
         // Validate email format here; uniqueness is checked via model lookup before insert
         'email' => 'required|valid_email',
         'password' => 'required|min_length[8]',
@@ -65,8 +67,11 @@ class UserModel extends Model
 
     protected function hashPassword(array $data)
     {
-        if (isset($data['data']['password'])) {
-            $data['data']['password'] = password_hash($data['data']['password'], PASSWORD_DEFAULT);
+        if (isset($data['data']['password']) && $data['data']['password'] !== '') {
+            $info = password_get_info($data['data']['password']);
+            if (empty($info['algo'])) {
+                $data['data']['password'] = password_hash($data['data']['password'], PASSWORD_DEFAULT);
+            }
         }
         return $data;
     }
