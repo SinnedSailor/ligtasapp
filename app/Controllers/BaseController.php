@@ -42,37 +42,21 @@ abstract class BaseController extends Controller
         // Preload any models, libraries, etc, here.
         // $this->session = service('session');
         
-        // Synchronize session with user's current role and status from database
+        // Synchronize session with user's current role from database
         $userId = session()->get('user_id');
         if (session()->get('logged_in') && $userId) {
             $userModel = new \App\Models\UserModel();
-            $user = $userModel->select('users.id, users.role_id, users.is_admin, users.is_active, roles.name as role_name')
+            $user = $userModel->select('users.id, users.role_id, users.is_admin, roles.name as role_name')
                 ->join('roles', 'roles.id = users.role_id', 'left')
                 ->where('users.id', $userId)
                 ->first();
 
             if ($user) {
-                // If account was deactivated while logged in, terminate session immediately
-                if (isset($user['is_active']) && (int) $user['is_active'] === 0) {
-                    session()->destroy();
-                    if ($request->isAJAX()) {
-                        header('Content-Type: application/json', true, 403);
-                        echo json_encode([
-                            'success' => false,
-                            'message' => 'Your account has been deactivated. Please contact an administrator.',
-                        ]);
-                    } else {
-                        header('Location: ' . base_url('/login?error=account_disabled'));
-                    }
-                    exit;
-                }
-
-                // Keep session role, admin flag, and active status synchronized
+                // Keep session role and admin status synchronized
                 session()->set([
                     'role_id'   => $user['role_id'],
                     'role_name' => $user['role_name'] ?? 'No Role',
                     'is_admin'  => (bool) ($user['is_admin'] ?? false),
-                    'is_active' => (int) ($user['is_active'] ?? 1),
                 ]);
             }
         }
